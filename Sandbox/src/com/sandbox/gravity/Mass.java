@@ -10,7 +10,7 @@ import com.electronauts.mathutil.PolarPoint;
 
 public class Mass
 {
-	public static final double	EXPLOSION_CONSTANT		= 0.0000001;
+	public static final double	EXPLOSION_CONSTANT		= Math.pow(10, -11);
 	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, -11);
 	public static double		timeStep				= 1 / 500d;
 
@@ -46,6 +46,12 @@ public class Mass
 		this.setyV(0);
 
 		if (mass == 0) this.mass = 1;
+	}
+
+	public void paintTarget(String name, Graphics g)
+	{
+		double radius = 10;
+		g.drawOval((int) (this.getxCenter() - radius), (int) (this.getyCenter() - radius), (int) (radius * 2), (int) (radius * 2));
 	}
 
 	public double angleTo(final Mass mass)
@@ -175,12 +181,17 @@ public class Mass
 		final PolarPoint p = new PolarPoint(100000 * Math.sqrt(Math.pow(this.getxV(), 2) + Math.pow(this.getyV(), 2)), Math.atan2(this.getyV(), this.getxV()));
 		g.setColor(Color.RED);
 		g.drawLine((int) this.getxCenter(), (int) this.getyCenter(), (int) (p.getX() + this.getxCenter()), (int) (p.getY() + this.getyCenter()));
+
+		if (this.getMass() > 10000)
+		{
+			this.paintTarget("", g);
+		}
 	}
 
 	public void repell(final Mass mass, final double strength)
 	{
 		// F = G * M1 * M2 / r^2
-		final double force = -Mass.EXPLOSION_CONSTANT * strength * (this.getMass() * mass.getMass() / Math.pow(this.distanceTo(mass), 1));
+		final double force = -Mass.EXPLOSION_CONSTANT * strength * (this.getMass() * mass.getMass() / Math.pow(this.distanceTo(mass), 3 / 2d));
 		final double angle = this.angleTo(mass);
 
 		final double xForce = force * Math.cos(angle);
