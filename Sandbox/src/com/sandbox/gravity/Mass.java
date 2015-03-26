@@ -5,17 +5,35 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.electronauts.mathutil.PolarPoint;
+
 public class Mass
 {
-	private double				mass;
 	private static double		maxMass					= 0;
+	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, -1);
 
-	private double				xCenter, yCenter;
+	public static double		timeStep				= 1 / 500d;
 
-	private double				xV, yV;
+	public static void decrementTimeStep()
+	{
+		if (Mass.timeStep > 1) Mass.timeStep = 1 / (1 / Mass.timeStep - 1);
+	}
 
-	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, 0);
-	public static final double	TIME_STEP				= 1 / 5d;
+	public static void incrementTimeStep()
+	{
+		Mass.timeStep = 1 / (1 / Mass.timeStep + 1);
+	}
+
+	public static void setTimeStep(final double timeStep)
+	{
+		Mass.timeStep = timeStep;
+	}
+
+	private double	mass;
+
+	private double	xCenter, yCenter;
+
+	private double	xV, yV;
 
 	public Mass(final double xCenter, final double yCenter, final double mass)
 	{
@@ -25,36 +43,83 @@ public class Mass
 		this.setxV(0);
 		this.setyV(0);
 
-		if (mass == 0)
+		if (mass == 0) this.mass = 1;
+	}
+
+	public double angleTo(final Mass mass)
+	{
+		return Math.atan2(this.getyCenter() - mass.getyCenter(), this.getxCenter() - mass.getxCenter());
+	}
+
+	public void attract(final Mass mass)
+	{
+		// F = G * M1 * M2 / r^2
+		final double force = Mass.GRAVITATIONAL_CONSTANT * (this.getMass() * mass.getMass() / Math.pow(this.distanceTo(mass), 2));
+		final double angle = this.angleTo(mass);
+
+		final double xForce = force * Math.cos(angle);
+		final double yForce = force * Math.sin(angle);
+
+		// F = m * a
+
+		final double xAcceleration = xForce / mass.getMass();
+		final double yAcceleration = yForce / mass.getMass();
+
+		final double deltaXVelocity = xAcceleration * Mass.timeStep;
+		final double deltaYVelocity = yAcceleration * Mass.timeStep;
+
+		mass.setxV(mass.getxV() + deltaXVelocity);
+		mass.setyV(mass.getyV() + deltaYVelocity);
+
+		if (!(Double.isFinite(mass.getyV()) || Double.isFinite(mass.getxV()) || Double.isFinite(mass.getxCenter()) || Double.isFinite(mass.getyCenter())))
 		{
-			this.mass = 1;
+			System.out.println(this.toString() + " " + mass.toString());
+			mass.reset();
 		}
 	}
 
-	public void paint(Graphics g)
+	public void attractAll(final ArrayList<Mass> masses)
 	{
-		double radius = this.getRadius();
-		if (this.getMass() > maxMass) maxMass = this.getMass();
-
-		g.setColor(new Color(191 - (int) (191 * (this.getMass() / maxMass)), 191 - (int) (191 * (this.getMass() / maxMass)),
-				191 - (int) (191 * (this.getMass() / maxMass))));
-		g.fillOval((int) (xCenter - radius), (int) (yCenter - radius), (int) (2 * radius), (int) (2 * radius));
+		for (final Mass mass : masses)
+			if (!this.equals(mass)) this.attract(mass);
 	}
 
-	public double getRadius()
+	public void collideAll(final ArrayList<Mass> masses)
 	{
-		return Math.sqrt(mass / Math.PI) * (100 / (100 + Math.pow(Math.E, mass / 1000))) + (mass / 250000) + 2;
+		final Iterator<Mass> i = masses.iterator();
+
+		while (i.hasNext())
+		{
+			final Mass mass = i.next();
+			if (!this.equals(mass) && this.collides(mass)) if (this.getMass() > mass.getMass())
+			{
+				this.setxV((this.getxV() * this.getMass() + mass.getxV() * mass.getMass()) / (this.getMass() + mass.getMass()));
+				this.setyV((this.getyV() * this.getMass() + mass.getyV() * mass.getMass()) / (this.getMass() + mass.getMass()));
+				this.setMass(this.getMass() + mass.getMass());
+				i.remove();
+			}
+		}
 	}
 
-	public void stepTime()
+	public boolean collides(final Mass mass)
 	{
-		this.setxCenter(this.getxCenter() + this.getxV() * TIME_STEP);
-		this.setyCenter(this.getyCenter() + this.getyV() * TIME_STEP);
+		return Math.sqrt(Math.pow(this.getxCenter() - mass.getxCenter(), 2) + Math.pow(this.getyCenter() - mass.getyCenter(), 2)) < this.getRadius()
+				+ mass.getRadius();
+	}
+
+	public double distanceTo(final Mass mass)
+	{
+		return Math.sqrt(Math.pow(this.getxCenter() - mass.getxCenter(), 2) + Math.pow(this.getyCenter() - mass.getyCenter(), 2));
 	}
 
 	public double getMass()
 	{
 		return this.mass;
+	}
+
+	public double getRadius()
+	{
+		return Math.sqrt(this.mass / Math.PI) * (100 / (100 + Math.pow(Math.E, this.mass / 1000))) + this.mass / 250000 + 2;
 	}
 
 	public double getxCenter()
@@ -75,6 +140,29 @@ public class Mass
 	public double getyV()
 	{
 		return this.yV;
+	}
+
+	public void paint(final Graphics g)
+	{
+		final double radius = this.getRadius();
+		if (this.getMass() > Mass.maxMass) Mass.maxMass = this.getMass();
+
+		g.setColor(new Color(191 - (int) (191 * (this.getMass() / Mass.maxMass)), 191 - (int) (191 * (this.getMass() / Mass.maxMass)), 191 - (int) (191 * (this
+				.getMass() / Mass.maxMass))));
+		g.fillOval((int) (this.xCenter - radius), (int) (this.yCenter - radius), (int) (2 * radius), (int) (2 * radius));
+
+		final PolarPoint p = new PolarPoint(Math.sqrt(Math.pow(this.getxV(), 2) + Math.pow(this.getyV(), 2)), Math.atan2(this.getyV(), this.getxV()));
+		g.setColor(Color.RED);
+		g.drawLine((int) this.getxCenter(), (int) this.getyCenter(), (int) (p.getX() + this.getxCenter()), (int) (p.getY() + this.getyCenter()));
+	}
+
+	public void reset()
+	{
+		this.mass = 100;
+		this.xCenter = 100;
+		this.yCenter = 100;
+		this.xV = 0;
+		this.yV = 0;
 	}
 
 	public void setMass(final double mass)
@@ -102,74 +190,15 @@ public class Mass
 		this.yV = yV;
 	}
 
-	public void attractAll(ArrayList<Mass> masses)
+	public void stepTime()
 	{
-		for (Mass mass : masses)
-		{
-			if (!this.equals(mass)) this.attract(mass);
-		}
+		this.setxCenter(this.getxCenter() + this.getxV() * Mass.timeStep);
+		this.setyCenter(this.getyCenter() + this.getyV() * Mass.timeStep);
 	}
 
-	public void collideAll(ArrayList<Mass> masses)
-	{
-		Iterator<Mass> i = masses.iterator();
-
-		while (i.hasNext())
-		{
-			Mass mass = i.next();
-			if (!this.equals(mass) && this.collide(mass)) if (this.getMass() > mass.getMass())
-			{
-				this.setMass(this.getMass() + mass.getMass());
-				i.remove();
-			}
-		}
-	}
-
-	public boolean collide(Mass mass)
-	{
-		return Math.sqrt(Math.pow(this.getxCenter() - mass.getxCenter(), 2) + Math.pow(this.getyCenter() - mass.getyCenter(), 2)) < this.getRadius()
-				+ mass.getRadius();
-	}
-
-	public void attract(Mass mass)
-	{
-		// F = G * M1 * M2 / r^2
-		double force = Mass.GRAVITATIONAL_CONSTANT * (this.getMass() * mass.getMass() / Math.pow(this.distanceTo(mass), 2));
-		double angle = this.angleTo(mass);
-
-		double xForce = force * Math.cos(angle);
-		double yForce = force * Math.sin(angle);
-
-		// F = m * a
-
-		double xAcceleration = xForce / mass.getMass();
-		double yAcceleration = yForce / mass.getMass();
-
-		double deltaXVelocity = xAcceleration * Mass.TIME_STEP;
-		double deltaYVelocity = yAcceleration * Mass.TIME_STEP;
-
-		mass.setxV(mass.getxV() + deltaXVelocity);
-		mass.setyV(mass.getyV() + deltaYVelocity);
-
-		if ((new Double(mass.getxV())).isNaN())
-		{
-			System.out.println(this.toString() + " " + mass.toString());
-			throw new IllegalArgumentException("Oh no...");
-		}
-	}
-
-	public double distanceTo(Mass mass)
-	{
-		return Math.sqrt(Math.pow(this.getxCenter() - mass.getxCenter(), 2) + Math.pow(this.getyCenter() - mass.getyCenter(), 2));
-	}
-
-	public double angleTo(Mass mass)
-	{
-		return Math.atan2(this.getyCenter() - mass.getyCenter(), this.getxCenter() - mass.getxCenter());
-	}
-
+	@Override
 	public String toString()
 	{
-		return "Mass: " + mass + " Location: (" + this.xCenter + ", " + this.yCenter + ") ";
+		return "Mass: " + this.mass + " Location: (" + this.xCenter + ", " + this.yCenter + ") ";
 	}
 }
