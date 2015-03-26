@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.electronauts.mathutil.PolarPoint;
+import com.electronauts.mathutil.MathUtil;
 
 public class Mass
 {
 	private static double		maxMass					= 0;
-	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, -1);
+	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, 0);
 
 	public static double		timeStep				= 1 / 500d;
 
@@ -71,7 +72,8 @@ public class Mass
 		mass.setxV(mass.getxV() + deltaXVelocity);
 		mass.setyV(mass.getyV() + deltaYVelocity);
 
-		if (!(Double.isFinite(mass.getyV()) || Double.isFinite(mass.getxV()) || Double.isFinite(mass.getxCenter()) || Double.isFinite(mass.getyCenter())))
+		if (!(MathUtil.isFinite(mass.getyV()) || MathUtil.isFinite(mass.getxV()) || MathUtil.isFinite(mass.getxCenter()) || MathUtil
+				.isFinite(mass.getyCenter())))
 		{
 			System.out.println(this.toString() + " " + mass.toString());
 			mass.reset();

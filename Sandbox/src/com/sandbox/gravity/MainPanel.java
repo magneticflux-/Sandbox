@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 
 public class MainPanel extends JComponent
 {
-	public static final int		updateSpeed			= 0;
+	public static final int		updateSpeed			= 2;
 	public static final int		logSize				= 100;
 	private static final long	serialVersionUID	= 1L;
 	private static long			lastTime			= 0;
@@ -43,11 +43,14 @@ public class MainPanel extends JComponent
 				{
 					synchronized (component)
 					{
-						component.masses.add(new Mass((int) (Math.random() * 720), (int) (Math.random() * 720), (int) (Math.random() * 200)));
+						Mass mass = new Mass((int) (Math.random() * 720), (int) (Math.random() * 720), (int) (Math.random() * 10));
+						mass.setxV((Math.random() - 0.5) * 100);
+						mass.setyV((Math.random() - 0.5) * 100);
+						component.masses.add(mass);
 					}
 					try
 					{
-						Thread.sleep(10000);
+						Thread.sleep(20);
 					}
 					catch (final Exception e)
 					{
@@ -100,25 +103,29 @@ public class MainPanel extends JComponent
 
 			for (int i = 0; i < this.masses.size(); i++)
 			{
-				if (this.masses.get(i).getxCenter() < 0)
+				boolean wallCollide = true;
+				if (wallCollide)
 				{
-					this.masses.get(i).setxV(-this.masses.get(i).getxV() / 2);
-					this.masses.get(i).setxCenter(this.masses.get(i).getxCenter() + 5);
-				}
-				else if (this.masses.get(i).getxCenter() > this.getWidth())
-				{
-					this.masses.get(i).setxV(-this.masses.get(i).getxV() / 2);
-					this.masses.get(i).setxCenter(this.masses.get(i).getxCenter() - 5);
-				}
-				else if (this.masses.get(i).getyCenter() < 0)
-				{
-					this.masses.get(i).setyV(-this.masses.get(i).getyV() / 2);
-					this.masses.get(i).setyCenter(this.masses.get(i).getyCenter() + 5);
-				}
-				else if (this.masses.get(i).getyCenter() > this.getHeight())
-				{
-					this.masses.get(i).setyV(-this.masses.get(i).getyV() / 2);
-					this.masses.get(i).setyCenter(this.masses.get(i).getyCenter() - 5);
+					if (this.masses.get(i).getxCenter() < 0)
+					{
+						this.masses.get(i).setxV(-this.masses.get(i).getxV() / 2);
+						this.masses.get(i).setxCenter(this.masses.get(i).getxCenter() + 5);
+					}
+					else if (this.masses.get(i).getxCenter() > this.getWidth())
+					{
+						this.masses.get(i).setxV(-this.masses.get(i).getxV() / 2);
+						this.masses.get(i).setxCenter(this.masses.get(i).getxCenter() - 5);
+					}
+					else if (this.masses.get(i).getyCenter() < 0)
+					{
+						this.masses.get(i).setyV(-this.masses.get(i).getyV() / 2);
+						this.masses.get(i).setyCenter(this.masses.get(i).getyCenter() + 5);
+					}
+					else if (this.masses.get(i).getyCenter() > this.getHeight())
+					{
+						this.masses.get(i).setyV(-this.masses.get(i).getyV() / 2);
+						this.masses.get(i).setyCenter(this.masses.get(i).getyCenter() - 5);
+					}
 				}
 				this.masses.get(i).collideAll(this.masses);
 			}
@@ -161,7 +168,7 @@ public class MainPanel extends JComponent
 			}
 			MainPanel.lastTime = System.nanoTime() - startTime;
 			this.fpsLog.addFirst(MainPanel.lastTime);
-			Mass.setTimeStep(1 / MainPanel.getFPS());
+			Mass.setTimeStep(10 / MainPanel.getFPS());
 			this.repaint();
 		}
 	}
