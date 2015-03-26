@@ -5,15 +5,16 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.electronauts.mathutil.PolarPoint;
 import com.electronauts.mathutil.MathUtil;
+import com.electronauts.mathutil.PolarPoint;
 
 public class Mass
 {
-	private static double		maxMass					= 0;
-	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, 0);
-
+	public static final double	EXPLOSION_CONSTANT		= 0.0000001;
+	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, -11);
 	public static double		timeStep				= 1 / 500d;
+
+	public static double		maxMass					= 0;
 
 	public static void decrementTimeStep()
 	{
@@ -93,13 +94,17 @@ public class Mass
 		while (i.hasNext())
 		{
 			final Mass mass = i.next();
-			if (!this.equals(mass) && this.collides(mass)) if (this.getMass() > mass.getMass())
-			{
-				this.setxV((this.getxV() * this.getMass() + mass.getxV() * mass.getMass()) / (this.getMass() + mass.getMass()));
-				this.setyV((this.getyV() * this.getMass() + mass.getyV() * mass.getMass()) / (this.getMass() + mass.getMass()));
-				this.setMass(this.getMass() + mass.getMass());
-				i.remove();
-			}
+			if (!this.equals(mass) && this.collides(mass))
+				if (this.getMass() > mass.getMass())
+				{
+					this.setxV((this.getxV() * this.getMass() + mass.getxV() * mass.getMass()) / (this.getMass() + mass.getMass()));
+					this.setyV((this.getyV() * this.getMass() + mass.getyV() * mass.getMass()) / (this.getMass() + mass.getMass()));
+					final double strength = Math.sqrt(Math.pow(this.getMass(), 2) + Math.pow(mass.getMass(), 2))
+							* Math.sqrt(Math.pow(this.getVelocity(), 2) + Math.pow(mass.getVelocity(), 2));
+					this.setMass(this.getMass() + mass.getMass());
+					i.remove();
+					this.repellAll(masses, strength);
+				}
 		}
 	}
 
@@ -122,6 +127,11 @@ public class Mass
 	public double getRadius()
 	{
 		return Math.sqrt(this.mass / Math.PI) * (100 / (100 + Math.pow(Math.E, this.mass / 1000))) + this.mass / 250000 + 2;
+	}
+
+	public double getVelocity()
+	{
+		return Math.sqrt(Math.pow(this.xV, 2) + Math.pow(this.yV, 2));
 	}
 
 	public double getxCenter()
@@ -147,15 +157,58 @@ public class Mass
 	public void paint(final Graphics g)
 	{
 		final double radius = this.getRadius();
-		if (this.getMass() > Mass.maxMass) Mass.maxMass = this.getMass();
+		boolean hold = false;
+		if (this.getMass() >= Mass.maxMass)
+		{
+			Mass.maxMass = this.getMass();
+			if (hold)
+			{
+				this.setxV(0);
+				this.setyV(0);
+			}
+		}
 
 		g.setColor(new Color(191 - (int) (191 * (this.getMass() / Mass.maxMass)), 191 - (int) (191 * (this.getMass() / Mass.maxMass)), 191 - (int) (191 * (this
 				.getMass() / Mass.maxMass))));
 		g.fillOval((int) (this.xCenter - radius), (int) (this.yCenter - radius), (int) (2 * radius), (int) (2 * radius));
 
-		final PolarPoint p = new PolarPoint(Math.sqrt(Math.pow(this.getxV(), 2) + Math.pow(this.getyV(), 2)), Math.atan2(this.getyV(), this.getxV()));
+		final PolarPoint p = new PolarPoint(100000 * Math.sqrt(Math.pow(this.getxV(), 2) + Math.pow(this.getyV(), 2)), Math.atan2(this.getyV(), this.getxV()));
 		g.setColor(Color.RED);
 		g.drawLine((int) this.getxCenter(), (int) this.getyCenter(), (int) (p.getX() + this.getxCenter()), (int) (p.getY() + this.getyCenter()));
+	}
+
+	public void repell(final Mass mass, final double strength)
+	{
+		// F = G * M1 * M2 / r^2
+		final double force = -Mass.EXPLOSION_CONSTANT * strength * (this.getMass() * mass.getMass() / Math.pow(this.distanceTo(mass), 1));
+		final double angle = this.angleTo(mass);
+
+		final double xForce = force * Math.cos(angle);
+		final double yForce = force * Math.sin(angle);
+
+		// F = m * a
+
+		final double xAcceleration = xForce / mass.getMass();
+		final double yAcceleration = yForce / mass.getMass();
+
+		final double deltaXVelocity = xAcceleration * Mass.timeStep;
+		final double deltaYVelocity = yAcceleration * Mass.timeStep;
+
+		mass.setxV(mass.getxV() + deltaXVelocity);
+		mass.setyV(mass.getyV() + deltaYVelocity);
+
+		if (!(MathUtil.isFinite(mass.getyV()) || MathUtil.isFinite(mass.getxV()) || MathUtil.isFinite(mass.getxCenter()) || MathUtil
+				.isFinite(mass.getyCenter())))
+		{
+			System.out.println(this.toString() + " " + mass.toString());
+			mass.reset();
+		}
+	}
+
+	public void repellAll(final ArrayList<Mass> masses, final double strength)
+	{
+		for (final Mass mass : masses)
+			if (!this.equals(mass)) this.repell(mass, strength);
 	}
 
 	public void reset()
