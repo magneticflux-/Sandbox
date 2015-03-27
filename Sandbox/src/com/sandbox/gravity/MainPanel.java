@@ -12,8 +12,8 @@ import javax.swing.JFrame;
 
 public class MainPanel extends JComponent
 {
-	public static final int		logSize				= 300;
-	public static final int		updateSpeed			= 1;
+	public static final int		logSize				= 100;
+	public static final int		updateSpeed			= 0;
 	private static long			lastTime			= 1;
 	private static final long	serialVersionUID	= 1L;
 
@@ -43,14 +43,15 @@ public class MainPanel extends JComponent
 				{
 					synchronized (component)
 					{
-						Mass mass = new Mass((int) (Math.random() * 720), (int) (Math.random() * 720), (int) (Math.random() * 10));
+						Mass mass = new Mass((int) (Math.random() * component.getWidth()), (int) (Math.random() * component.getHeight()),
+								(int) (Math.random() * 100));
 						mass.setxV((Math.random() - 0.5) * 0.0001);
 						mass.setyV((Math.random() - 0.5) * 0.0001);
 						component.masses.add(mass);
 					}
 					try
 					{
-						Thread.sleep(20);
+						Thread.sleep(100);
 					}
 					catch (final Exception e)
 					{
@@ -59,7 +60,7 @@ public class MainPanel extends JComponent
 				}
 			}
 		};
-		r.start();
+		//r.start();
 	}
 
 	private final LinkedList<Long>	fpsLog	= new LinkedList<Long>();
@@ -68,11 +69,20 @@ public class MainPanel extends JComponent
 
 	public MainPanel()
 	{
-		for (int i = 0; i < 250; i++)
+		for (int i = 0; i < 0; i++)
 		{
 			this.masses.add(new Mass((int) (Math.random() * 720), (int) (Math.random() * 720), (int) (Math.random() * 200)));
 			this.masses.get(i).setxV((Math.random() - 0.5) * 0.0001);
 			this.masses.get(i).setyV((Math.random() - 0.5) * 0.0001);
+		}
+
+		for (int x = 0; x < 720; x += 20)
+		{
+			for (int y = 0; y < 720; y += 20)
+			{
+				Mass m = new Mass(x, y, 10);
+				this.masses.add(m);
+			}
 		}
 
 		final boolean extra = false;
@@ -84,23 +94,22 @@ public class MainPanel extends JComponent
 			this.masses.get(0).setxV(2.777777777);
 			this.masses.get(1).setxV(-7);
 		}
-
 	}
 
 	@Override
 	public void paintComponent(final Graphics g)
 	{
+		final long startTime = System.nanoTime();
+		final Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+		g2d.translate(0, this.getHeight() / 2);
+		g2d.scale(1, -1);
+		g2d.translate(0, -this.getHeight() / 2);
+
 		synchronized (this)
 		{
-			final long startTime = System.nanoTime();
-			final Graphics2D g2d = (Graphics2D) g;
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-			g2d.translate(0, this.getHeight() / 2);
-			g2d.scale(1, -1);
-			g2d.translate(0, -this.getHeight() / 2);
-
 			for (int i = 0; i < this.masses.size(); i++)
 			{
 				final boolean wallCollide = true;
@@ -133,40 +142,40 @@ public class MainPanel extends JComponent
 			for (final Mass m : this.masses)
 			{
 				m.stepTime();
-				m.paint(g);
+				m.paint(g2d);
 			}
-
-			g2d.translate(0, this.getHeight() / 2);
-			g2d.scale(1, -1);
-			g2d.translate(0, -this.getHeight() / 2);
-
-			g2d.setColor(Color.BLACK);
-			g2d.drawString(String.format("FPS: %08.2f Timestep: %06.5f", 1 / (MainPanel.lastTime / 1000000000d), Mass.timeStep), 10, this.getHeight() - 10);
-
-			for (int i = 0; i < MainPanel.logSize && i < this.fpsLog.size(); i++)
-				g2d.drawLine(this.getWidth() - i, this.getHeight(), this.getWidth() - i, this.getHeight() - (int) (this.fpsLog.get(i) / 200000));
-
-			if (this.fpsLog.size() > MainPanel.logSize) this.fpsLog.removeLast();
-
-			try
-			{
-				if (MainPanel.updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
-					Thread.sleep((long) (MainPanel.updateSpeed - (System.nanoTime() - startTime) / 1000000d));
-				else
-				{
-				}
-			}
-			catch (final InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-			while (MainPanel.updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
-			{
-			}
-			MainPanel.lastTime = System.nanoTime() - startTime;
-			this.fpsLog.addFirst(MainPanel.lastTime);
-			Mass.setTimeStep(1000000 / MainPanel.getFPS());
-			this.repaint();
 		}
+		g2d.translate(0, this.getHeight() / 2);
+		g2d.scale(1, -1);
+		g2d.translate(0, -this.getHeight() / 2);
+
+		g2d.setColor(Color.BLACK);
+		g2d.drawString(String.format("FPS: %08.2f Timestep: %06.5f", 1 / (MainPanel.lastTime / 1000000000d), Mass.timeStep), 10, this.getHeight() - 10);
+
+		for (int i = 0; i < MainPanel.logSize && i < this.fpsLog.size(); i++)
+			g2d.drawLine(this.getWidth() - i, this.getHeight(), this.getWidth() - i, this.getHeight() - (int) (this.fpsLog.get(i) / 200000));
+
+		if (this.fpsLog.size() > MainPanel.logSize) this.fpsLog.removeLast();
+
+		try
+		{
+			if (MainPanel.updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
+				Thread.sleep((long) (MainPanel.updateSpeed - (System.nanoTime() - startTime) / 1000000d));
+			else
+			{
+			}
+		}
+		catch (final InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		while (MainPanel.updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
+		{
+		}
+		MainPanel.lastTime = System.nanoTime() - startTime;
+		this.fpsLog.addFirst(MainPanel.lastTime);
+		Mass.setTimeStep(100000 / MainPanel.getFPS());
+
+		this.repaint();
 	}
 }

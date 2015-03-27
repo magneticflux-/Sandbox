@@ -1,7 +1,8 @@
 package com.sandbox.gravity;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -12,19 +13,11 @@ public class Mass
 {
 	public static final double	EXPLOSION_CONSTANT		= Math.pow(10, -11);
 	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, -11);
+	public static final double	DENSITY_CONSTANT		= 5;
+	public static final double	TIME_SHIFT				= 100;
 	public static double		timeStep				= 1 / 500d;
 
 	public static double		maxMass					= 0;
-
-	public static void decrementTimeStep()
-	{
-		if (Mass.timeStep > 1) Mass.timeStep = 1 / (1 / Mass.timeStep - 1);
-	}
-
-	public static void incrementTimeStep()
-	{
-		Mass.timeStep = 1 / (1 / Mass.timeStep + 1);
-	}
 
 	public static void setTimeStep(final double timeStep)
 	{
@@ -37,21 +30,51 @@ public class Mass
 
 	private double	xV, yV;
 
+	@Override
+	public Mass clone()
+	{
+		Mass m = new Mass(xCenter, yCenter, mass);
+		m.setxV(xV);
+		m.setyV(yV);
+		return m;
+	}
+
 	public Mass(final double xCenter, final double yCenter, final double mass)
 	{
 		this.xCenter = xCenter;
 		this.yCenter = yCenter;
 		this.mass = mass;
-		this.setxV(0);
-		this.setyV(0);
+		this.xV = 0;
+		this.yV = 0;
 
 		if (mass == 0) this.mass = 1;
 	}
 
-	public void paintTarget(String name, Graphics g)
+	public void paintTarget(String name, Graphics2D g)
 	{
 		double radius = 10;
+		double scale = Math.sqrt(2) / 2;
 		g.drawOval((int) (this.getxCenter() - radius), (int) (this.getyCenter() - radius), (int) (radius * 2), (int) (radius * 2));
+		g.drawLine((int) (this.getxCenter()), (int) (this.getyCenter() + (radius / 2)), (int) (this.getxCenter()), (int) (this.getyCenter() + (3 * radius / 2)));
+		g.drawLine((int) (this.getxCenter()), (int) (this.getyCenter() - (radius / 2)), (int) (this.getxCenter()), (int) (this.getyCenter() - (3 * radius / 2)));
+		g.drawLine((int) (this.getxCenter() + (radius / 2)), (int) (this.getyCenter()), (int) (this.getxCenter() + (3 * radius / 2)), (int) (this.getyCenter()));
+		g.drawLine((int) (this.getxCenter() - (radius / 2)), (int) (this.getyCenter()), (int) (this.getxCenter() - (3 * radius / 2)), (int) (this.getyCenter()));
+		g.drawLine((int) (this.getxCenter() + (scale * radius)), (int) (this.getyCenter() + (scale * radius)),
+				(int) (this.getxCenter() + (scale * 3 * radius / 2)), (int) (this.getyCenter() + (scale * 3 * radius / 2)));
+		Font restore = g.getFont();
+		Font f = new Font("Sans-Serif", Font.PLAIN, -15);
+		g.setFont(f);
+
+		g.translate(g.getClipBounds().getWidth() / 2, 0);
+		g.scale(-1, 1);
+		g.translate(-g.getClipBounds().getWidth() / 2, 0);
+		g.drawString(name, (int) (g.getClipBounds().getWidth() - (this.getxCenter() + (scale * 3 * radius / 2))), (int) (this.getyCenter() + (scale * 3
+				* radius / 2)));
+		g.translate(g.getClipBounds().getWidth() / 2, 0);
+		g.scale(-1, 1);
+		g.translate(-g.getClipBounds().getWidth() / 2, 0);
+
+		g.setFont(restore);
 	}
 
 	public double angleTo(final Mass mass)
@@ -107,7 +130,7 @@ public class Mass
 					this.setyV((this.getyV() * this.getMass() + mass.getyV() * mass.getMass()) / (this.getMass() + mass.getMass()));
 					final double strength = Math.sqrt(Math.pow(this.getMass(), 2) + Math.pow(mass.getMass(), 2))
 							* Math.sqrt(Math.pow(this.getVelocity(), 2) + Math.pow(mass.getVelocity(), 2));
-					this.setMass(this.getMass() + mass.getMass());
+					this.setMass(this.getMass() + mass.getMass() - (Math.random() * 3 * mass.getMass() / 10));
 					i.remove();
 					this.repellAll(masses, strength);
 				}
@@ -132,7 +155,7 @@ public class Mass
 
 	public double getRadius()
 	{
-		return Math.sqrt(this.mass / Math.PI) * (100 / (100 + Math.pow(Math.E, this.mass / 1000))) + this.mass / 250000 + 2;
+		return Math.sqrt(this.mass / (Math.PI * Mass.DENSITY_CONSTANT)) * (100 / (100 + Math.pow(Math.E, this.mass / 1000))) + this.mass / 250000 + 1;
 	}
 
 	public double getVelocity()
@@ -160,7 +183,7 @@ public class Mass
 		return this.yV;
 	}
 
-	public void paint(final Graphics g)
+	public void paint(final Graphics2D g)
 	{
 		final double radius = this.getRadius();
 		boolean hold = false;
@@ -182,9 +205,9 @@ public class Mass
 		g.setColor(Color.RED);
 		g.drawLine((int) this.getxCenter(), (int) this.getyCenter(), (int) (p.getX() + this.getxCenter()), (int) (p.getY() + this.getyCenter()));
 
-		if (this.getMass() > 10000)
+		if (this.getMass() > 6500)
 		{
-			this.paintTarget("", g);
+			this.paintTarget(String.format("Mass: %06.0f", this.mass), g);
 		}
 	}
 
