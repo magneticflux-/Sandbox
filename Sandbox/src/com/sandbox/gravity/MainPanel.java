@@ -76,9 +76,9 @@ public class MainPanel extends JComponent
 			this.masses.get(i).setyV((Math.random() - 0.5) * 0.0001);
 		}
 
-		for (int x = 0; x < 720; x += 20)
+		for (int x = 0; x <= 720; x += 80)
 		{
-			for (int y = 0; y < 720; y += 20)
+			for (int y = 0; y <= 720; y += 80)
 			{
 				Mass m = new Mass(x, y, 10);
 				this.masses.add(m);
@@ -174,7 +174,7 @@ public class MainPanel extends JComponent
 		}
 		MainPanel.lastTime = System.nanoTime() - startTime;
 		this.fpsLog.addFirst(MainPanel.lastTime);
-		Mass.setTimeStep(100000 / MainPanel.getFPS());
+		Mass.setTimeStep(1000000 / MainPanel.getFPS());
 
 		this.repaint();
 	}
