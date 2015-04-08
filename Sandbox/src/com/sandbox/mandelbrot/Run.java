@@ -19,7 +19,7 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static final int		maxIteration	= 25;
+	public static final int		maxIteration	= 250;
 
 	public static void main(String[] args)
 	{
@@ -41,7 +41,7 @@ public class Run
 				final int height = this.getHeight();
 				final double max = maxIteration;
 
-				ExecutorService executor = Executors.newFixedThreadPool(8);
+				ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 				for (int x = 0; x < width; x += renderResolution)
 				{
 					final int temp1 = x;
@@ -95,6 +95,7 @@ public class Run
 		JFrame frame = new JFrame();
 		frame.add(comp);
 		frame.setBackground(Color.WHITE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		// frame.setSize(200, 1000);
 		frame.setVisible(true);
