@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
@@ -20,15 +19,15 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static final int		maxIteration	= 200;
+	public static final int		maxIteration	= 25;
 
 	public static void main(String[] args)
 	{
 		JPanel comp = new JPanel()
 		{
 			private static final long	serialVersionUID	= 1L;
-			public int					renderResolution	= 2;
-			public double				scale				= 200;
+			public int					renderResolution	= 1;
+			public double				scale				= 400;
 			public double				xTarget				= 0;
 			public double				yTarget				= 0;
 			public double				zoomMultiplier		= 1;
@@ -38,12 +37,11 @@ public class Run
 			public void paintComponent(Graphics g)
 			{
 				long startTime = System.nanoTime();
-				double normalizedValue = 0;
 				final int width = this.getWidth();
 				final int height = this.getHeight();
 				final double max = maxIteration;
 
-				final LinkedList<Thread> threads = new LinkedList<Thread>();
+				ExecutorService executor = Executors.newFixedThreadPool(8);
 				for (int x = 0; x < width; x += renderResolution)
 				{
 					final int temp1 = x;
@@ -54,46 +52,24 @@ public class Run
 						@Override
 						public void run()
 						{
-							System.out.println("Thread for column " + column + " reporting for duty, sir!");
+							// System.out.println("Thread for column " + column + " reporting for duty, sir!");
 							for (int y = 0; y < height; y += renderResolution)
 							{
-								synchronized (normalizedValues)
-								{
-									normalizedValues.put(new Point(column, y), 1 - (mandelbrotDivergeRate(new Complex((column - (width / 2) + xTarget) / scale,
-											(y - (height / 2) + yTarget) / scale)) / max));
-								}
+								normalizedValues.put(new Point(column, y), 1 - (mandelbrotDivergeRate(new Complex((column - (width / 2) + xTarget) / scale, (y
+										- (height / 2) + yTarget)
+										/ scale)) / max));
 							}
-							System.out.println("Thread for column " + column + " has completed its task.");
+							// System.out.println("Thread for column " + column + " has completed its task.");
 						}
 					};
 					t.setDaemon(true);
-					t.setPriority(Thread.MIN_PRIORITY);
-					threads.addLast(t);
-
-					boolean test = false;
-					if (test)
-					{
-						for (int y = 0; y < height; y += renderResolution)
-						{
-							Complex c = new Complex((x - (width / 2) + xTarget) / scale, (y - (height / 2) + yTarget) / scale);
-							normalizedValue = 1 - (mandelbrotDivergeRate(c) / max);
-							g.setColor(Run.getRainbow(normalizedValue * 5));
-							g.fillRect(x, y, renderResolution, renderResolution);
-						}
-					}
-
-					// System.out.println(String.format("%d / %d - %.3f", x, width, 100 * x / (double) width) + "%");
-				}
-
-				ExecutorService executor = Executors.newFixedThreadPool(1024);
-				for (Thread t : threads)
-				{
 					executor.execute(t);
+					// System.out.println(String.format("%d / %d - %.3f", x, width, 100 * x / (double) width) + "%");
 				}
 				executor.shutdown();
 				try
 				{
-					executor.awaitTermination(120, TimeUnit.SECONDS);
+					executor.awaitTermination(365, TimeUnit.DAYS);
 					System.out.println("Waiting for all threads to finish.");
 				}
 				catch (InterruptedException e)
@@ -103,7 +79,7 @@ public class Run
 
 				for (Entry<Point, Double> e : normalizedValues.entrySet())
 				{
-					g.setColor(Run.getRainbow(e.getValue() * 5));
+					g.setColor(Run.getRainbow(e.getValue() * 10));
 					g.fillRect(e.getKey().x, e.getKey().y, renderResolution, renderResolution);
 				}
 				// renderResolution--;
@@ -120,9 +96,8 @@ public class Run
 		frame.add(comp);
 		frame.setBackground(Color.WHITE);
 		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		//frame.setSize(200, 900);
+		// frame.setSize(200, 1000);
 		frame.setVisible(true);
-		System.out.println(comp.getSize());
 	}
 
 	public static int mandelbrotDivergeRate(Complex c)
