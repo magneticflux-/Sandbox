@@ -19,7 +19,7 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static final int		maxIteration	= 250;
+	public static int			maxIteration	= 1;
 
 	public static void main(String[] args)
 	{
@@ -27,8 +27,8 @@ public class Run
 		{
 			private static final long	serialVersionUID	= 1L;
 			public int					renderResolution	= 1;
-			public double				scale				= 400;
-			public double				xTarget				= 0;
+			public double				scale				= 300;
+			public double				xTarget				= -100;
 			public double				yTarget				= 0;
 			public double				zoomMultiplier		= 1;
 			public Map<Point, Double>	normalizedValues	= Collections.synchronizedMap(new HashMap<Point, Double>());
@@ -42,6 +42,7 @@ public class Run
 				final double max = maxIteration;
 
 				ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+				System.out.println(Runtime.getRuntime().availableProcessors() + " processors available.");
 				for (int x = 0; x < width; x += renderResolution)
 				{
 					final int temp1 = x;
@@ -79,7 +80,7 @@ public class Run
 
 				for (Entry<Point, Double> e : normalizedValues.entrySet())
 				{
-					g.setColor(Run.getRainbow(e.getValue() * 10));
+					g.setColor(Run.getRainbow(e.getValue() * Math.PI * 2));
 					g.fillRect(e.getKey().x, e.getKey().y, renderResolution, renderResolution);
 				}
 				// renderResolution--;
@@ -88,7 +89,8 @@ public class Run
 				xTarget *= zoomMultiplier;
 				yTarget *= zoomMultiplier;
 				System.out.println(String.format("Frame took %.4f seconds to render.", (System.nanoTime() - startTime) / 1000000000d));
-				// repaint();
+				maxIteration++;
+				repaint();
 			}
 		};
 
