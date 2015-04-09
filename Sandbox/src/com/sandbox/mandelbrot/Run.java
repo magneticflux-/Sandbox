@@ -26,7 +26,7 @@ public class Run
 		JPanel comp = new JPanel()
 		{
 			private static final long	serialVersionUID	= 1L;
-			public int					renderResolution	= 1;
+			public int					renderResolution	= 4;
 			public double				scale				= 300;
 			public double				xTarget				= -100;
 			public double				yTarget				= 0;
@@ -88,6 +88,8 @@ public class Run
 				scale *= zoomMultiplier;
 				xTarget *= zoomMultiplier;
 				yTarget *= zoomMultiplier;
+				g.setColor(Color.BLACK);
+				g.drawString("Max iterations: " + maxIteration, 20, 20);
 				System.out.println(String.format("Frame took %.4f seconds to render.", (System.nanoTime() - startTime) / 1000000000d));
 				maxIteration++;
 				repaint();
