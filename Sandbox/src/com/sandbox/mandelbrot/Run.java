@@ -19,14 +19,14 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static int			maxIteration	= 50;
+	public static int			maxIteration	= 250;
 
 	public static void main(String[] args)
 	{
 		JPanel comp = new JPanel()
 		{
 			private static final long	serialVersionUID	= 1L;
-			public int					renderResolution	= 2;
+			public int					renderResolution	= 1;
 			public double				scale				= 400;
 			public double				xTarget				= 100;
 			public double				yTarget				= 0;
