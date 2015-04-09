@@ -19,18 +19,18 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static int			maxIteration	= 1;
+	public static int			maxIteration	= 50;
 
 	public static void main(String[] args)
 	{
 		JPanel comp = new JPanel()
 		{
 			private static final long	serialVersionUID	= 1L;
-			public int					renderResolution	= 4;
-			public double				scale				= 300;
-			public double				xTarget				= -100;
+			public int					renderResolution	= 2;
+			public double				scale				= 400;
+			public double				xTarget				= 100;
 			public double				yTarget				= 0;
-			public double				zoomMultiplier		= 1;
+			public double				zoomMultiplier		= 1.5;
 			public Map<Point, Double>	normalizedValues	= Collections.synchronizedMap(new HashMap<Point, Double>());
 
 			@Override
@@ -54,12 +54,14 @@ public class Run
 						public void run()
 						{
 							// System.out.println("Thread for column " + column + " reporting for duty, sir!");
+							HashMap<Point, Double> tempMap = new HashMap<Point, Double>();
 							for (int y = 0; y < height; y += renderResolution)
 							{
-								normalizedValues.put(new Point(column, y), 1 - (mandelbrotDivergeRate(new Complex((column - (width / 2) + xTarget) / scale, (y
+								tempMap.put(new Point(column, y), 1 - (mandelbrotDivergeRate(new Complex((column - (width / 2) + xTarget) / scale, (y
 										- (height / 2) + yTarget)
 										/ scale)) / max));
 							}
+							normalizedValues.putAll(tempMap);
 							// System.out.println("Thread for column " + column + " has completed its task.");
 						}
 					};
@@ -91,7 +93,7 @@ public class Run
 				g.setColor(Color.BLACK);
 				g.drawString("Max iterations: " + maxIteration, 20, 20);
 				System.out.println(String.format("Frame took %.4f seconds to render.", (System.nanoTime() - startTime) / 1000000000d));
-				maxIteration++;
+				// maxIteration++;
 				repaint();
 			}
 		};
@@ -107,6 +109,9 @@ public class Run
 
 	public static int mandelbrotDivergeRate(Complex c)
 	{
+		double p = Math.sqrt(Math.pow(c.getReal() - 0.25, 2) + Math.pow(c.getImaginary(), 2));
+		if (c.getReal() < p - 2 * Math.pow(p, 2) + 0.25 || Math.pow(c.getReal() + 1, 2) + Math.pow(c.getImaginary(), 2) < 0.0625) return -1;
+
 		for (int i = 0; i < maxIteration; i++)
 		{
 			if (getMandelbrotIteration(c, i).abs() > bound) return i;
