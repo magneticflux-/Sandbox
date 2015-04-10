@@ -9,7 +9,7 @@ public class Run
 	{
 		InputValue var1 = new InputValue(3d);
 		InputValue var2 = new InputValue(4d);
-		Population p = new Population(10000, "4 2 4 1", new InputValue[] { var1, var2 }, new double[] { var1.getOutput() * var2.getOutput() });
+		Population p = new Population(100000, "3 3 1", new InputValue[] { var1, var2 }, new double[] { var1.getOutput() * var2.getOutput() });
 		//p.viewStatus();
 		Network[] victors = p.select(5);
 		System.out.println(Arrays.toString(victors));

@@ -70,6 +70,11 @@ public class Neuron implements HasOutput
 		return bias;
 	}
 
+	public void setBias(double bias)
+	{
+		this.bias = bias;
+	}
+
 	@Override
 	public String toString()
 	{

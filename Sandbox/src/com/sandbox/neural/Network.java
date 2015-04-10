@@ -125,10 +125,13 @@ public class Network
 				}
 				double skew = r.nextDouble();
 
-				n[0].neurons[layer][neuron].setWeight(crossoverPoint, skew * this.neurons[layer][neuron].getWeight(crossoverPoint) + (1 - skew)
+				n[0].neurons[layer][neuron].setWeight(crossoverPoint, (skew) * this.neurons[layer][neuron].getWeight(crossoverPoint) + (1 - skew)
 						* mate.neurons[layer][neuron].getWeight(crossoverPoint));
-				n[1].neurons[layer][neuron].setWeight(crossoverPoint, skew * this.neurons[layer][neuron].getWeight(crossoverPoint) + (1 - skew)
+				n[1].neurons[layer][neuron].setWeight(crossoverPoint, (1 - skew) * this.neurons[layer][neuron].getWeight(crossoverPoint) + (skew)
 						* mate.neurons[layer][neuron].getWeight(crossoverPoint));
+
+				n[0].neurons[layer][neuron].setBias((skew) * this.neurons[layer][neuron].getBias() + (1 - skew) * mate.neurons[layer][neuron].getBias());
+				n[1].neurons[layer][neuron].setBias((1 - skew) * this.neurons[layer][neuron].getBias() + (skew) * mate.neurons[layer][neuron].getBias());
 			}
 		}
 
