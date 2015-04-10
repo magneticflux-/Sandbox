@@ -7,10 +7,10 @@ public class Population
 	ArrayList<Network>	networks;
 	double[]			actual;
 
-	public Population(int size, String layout, double[] input, double[] output)
+	public Population(int size, String layout, double[] input, double[] actual)
 	{
 		networks = new ArrayList<Network>(size);
-		this.actual = output;
+		this.actual = actual;
 
 		for (int i = 0; i < size; i++)
 		{

@@ -7,10 +7,12 @@ public class Network
 {
 	InputValue[]	inputs;
 	Neuron[][]		neurons;
+	String			layout;
 
 	public Network(String layout, double[] input)
 	// Example "2 2 1" would create a neural net with 2 inputs, two layers of two neurons each, and then a final neuron.
 	{
+		this.layout = layout;
 		inputs = new InputValue[input.length];
 		for (int i = 0; i < input.length; i++)
 		{
@@ -83,5 +85,10 @@ public class Network
 		}
 
 		return output;
+	}
+
+	public Network breed(Network mate)
+	{
+		return null;
 	}
 }
