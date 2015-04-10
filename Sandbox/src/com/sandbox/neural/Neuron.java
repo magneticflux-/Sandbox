@@ -9,7 +9,7 @@ public class Neuron implements HasOutput
 {
 	private ArrayList<Double>		weights	= new ArrayList<Double>();
 	private ArrayList<HasOutput>	inputs	= new ArrayList<HasOutput>();
-	private Double					threshold;
+	private Double					bias;
 	private final Random			r		= new Random();
 
 	public Neuron(List<HasOutput> inputs)
@@ -19,7 +19,7 @@ public class Neuron implements HasOutput
 			this.inputs.add(n);
 			weights.add(1d); // Default initializer
 		}
-		threshold = new Double(1);
+		bias = new Double(1);
 	}
 
 	public void randomizeWeights(double min, double max)
@@ -30,9 +30,9 @@ public class Neuron implements HasOutput
 		}
 	}
 
-	public void randomizeThreshold(double min, double max)
+	public void randomizeBias(double min, double max)
 	{
-		threshold = (r.nextDouble() * (max - min)) + min;
+		bias = (r.nextDouble() * (max - min)) + min;
 	}
 
 	public List<HasOutput> getInputs()
@@ -47,7 +47,7 @@ public class Neuron implements HasOutput
 
 	public Double getThreshold()
 	{
-		return threshold;
+		return bias;
 	}
 
 	public Double getOutput()
@@ -61,7 +61,13 @@ public class Neuron implements HasOutput
 			sum += i1.next().getOutput() * i2.next();
 		}
 
-		return 1 / (Math.pow(10, -1) + Math.exp(-sum - threshold));
+		// return 1 / (Math.pow(10, -1) + Math.exp(-sum - bias));
+		return sum * bias;
+	}
+
+	public double getBias()
+	{
+		return bias;
 	}
 
 	@Override
@@ -81,5 +87,10 @@ public class Neuron implements HasOutput
 		{
 			weights.set(i, d);
 		}
+	}
+
+	public double getWeight(int index)
+	{
+		return weights.get(index);
 	}
 }
