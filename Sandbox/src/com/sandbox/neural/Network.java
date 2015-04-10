@@ -25,18 +25,63 @@ public class Network
 		{
 			int layerSize = Integer.parseInt(s.next());
 			neurons[o] = new Neuron[layerSize];
-			for (int i = 0; i < neurons[o].length; i++)
+			if (o != 0)
+				for (int i = 0; i < neurons[o].length; i++)
+				{
+					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) neurons[o - 1]));
+					neurons[o][i].randomizeWeights(-2, 2);
+					neurons[o][i].randomizeThreshold(-10, 10);
+				}
+			else
 			{
-				neurons[o][i] = new Neuron(Arrays.asList(neurons[o - 1]));
+				for (int i = 0; i < neurons[o].length; i++)
+				{
+					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) inputs));
+					neurons[o][i].randomizeWeights(-2, 2);
+					neurons[o][i].randomizeThreshold(-10, 10);
+				}
 			}
 			o++;
 		}
 		s.close();
 
-		System.out.println(neurons.length + " layers.");
-		for (int i = 0; i < neurons.length; i++)
+		if (Run.DEBUG)
 		{
-			System.out.println("  " + neurons[i].length + " neurons on layer " + i);
+			System.out.println(neurons.length + " layers.");
+			for (int i = 0; i < neurons.length; i++)
+			{
+				System.out.println("  " + neurons[i].length + " neurons on layer " + i);
+				for (int j = 0; j < neurons[i].length; j++)
+				{
+					System.out.println("    Item " + j + " has a value of " + neurons[i][j]);
+				}
+			}
 		}
+	}
+
+	public void setInputs(double[] input)
+	{
+		for (int i = 0; i < input.length; i++)
+		{
+			this.inputs[i].setValue(input[i]);
+		}
+	}
+
+	public void evalNet()
+	{
+		System.out.println("Input cases: " + neurons[0][0].getInputs());
+		System.out.println("Total actual: " + Arrays.toString(this.getOutputs()));
+	}
+
+	public double[] getOutputs()
+	{
+		double[] output = new double[neurons[neurons.length - 1].length]; // Size of last layer
+
+		for (int i = 0; i < neurons[neurons.length - 1].length; i++)
+		{
+			output[i] = neurons[neurons.length - 1][i].getOutput();
+		}
+
+		return output;
 	}
 }

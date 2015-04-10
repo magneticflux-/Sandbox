@@ -7,34 +7,35 @@ import java.util.Random;
 
 public class Neuron implements HasOutput
 {
-	private List<Double>	weights	= new ArrayList<Double>();
-	private List<Neuron>	inputs	= new ArrayList<Neuron>();
-	private Double			threshold;
+	private ArrayList<Double>		weights	= new ArrayList<Double>();
+	private ArrayList<HasOutput>	inputs	= new ArrayList<HasOutput>();
+	private Double					threshold;
+	private final Random			r		= new Random();
 
-	public Neuron()
+	public Neuron(List<HasOutput> inputs)
 	{
-	}
-
-	public Neuron(List<Neuron> inputs)
-	{
-		for (Neuron n : inputs)
+		for (HasOutput n : inputs)
 		{
-			inputs.add(n);
+			this.inputs.add(n);
 			weights.add(1d); // Default initializer
 		}
-		threshold = new Double(-1);
+		threshold = new Double(1);
 	}
 
 	public void randomizeWeights(double min, double max)
 	{
-		Random r = new Random();
 		for (int i = 0; i < weights.size(); i++)
 		{
 			weights.set(i, (r.nextDouble() * (max - min)) + min);
 		}
 	}
 
-	public List<Neuron> getInputs()
+	public void randomizeThreshold(double min, double max)
+	{
+		threshold = (r.nextDouble() * (max - min)) + min;
+	}
+
+	public List<HasOutput> getInputs()
 	{
 		return inputs;
 	}
@@ -52,15 +53,33 @@ public class Neuron implements HasOutput
 	public Double getOutput()
 	{
 		double sum = 0;
-		Iterator<Neuron> i1 = inputs.iterator();
+		Iterator<HasOutput> i1 = inputs.iterator();
 		Iterator<Double> i2 = weights.iterator();
 
 		while (i1.hasNext() && i2.hasNext())
 		{
 			sum += i1.next().getOutput() * i2.next();
 		}
-		sum -= threshold;
 
-		return sum;
+		return 1 / (Math.pow(10, -1) + Math.exp(-sum - threshold));
+	}
+
+	@Override
+	public String toString()
+	{
+		return "This neuron has weights of " + this.weights;
+	}
+
+	public void setWeight(int index, double d)
+	{
+		weights.set(index, d);
+	}
+
+	public void setAllWeight(double d)
+	{
+		for (int i = 0; i < weights.size(); i++)
+		{
+			weights.set(i, d);
+		}
 	}
 }

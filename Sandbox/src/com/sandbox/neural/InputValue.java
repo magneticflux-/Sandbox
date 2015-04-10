@@ -20,4 +20,9 @@ public class InputValue implements HasOutput
 	{
 		return "Input: " + output;
 	}
+
+	public void setValue(double d)
+	{
+		output = d;
+	}
 }
