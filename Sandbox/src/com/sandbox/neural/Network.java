@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Network
 {
-	InputValue[]	inputs;
+	InputValue[]	environment;
 	Neuron[][]		neurons;
 	String			layout;
 	Random			r	= new Random();
@@ -17,32 +17,32 @@ public class Network
 		return "Network output: " + Arrays.toString(this.getOutputs());
 	}
 
-	public Network(String layout, InputValue[] input)
+	public Network(String layout, InputValue[] inputLink)
 	// Example "2 2 1" would create a neural net with 2 inputs, two layers of two neurons each, and then a final neuron.
 	{
 		this.layout = layout;
-		this.inputs = input;
+		this.environment = inputLink;
 
 		Scanner s = new Scanner(layout);
 		neurons = new Neuron[(layout.length() + 1) / 2][]; // Makes the array the number of layers there will be.
 
 		int o = 0;
 		while (s.hasNext())
-		{
-			int layerSize = Integer.parseInt(s.next());
-			neurons[o] = new Neuron[layerSize];
-			if (o != 0)
+		{// For each layer
+			int layerSize = Integer.parseInt(s.next()); //Get the size of the layer
+			neurons[o] = new Neuron[layerSize]; // And set it
+			if (o != 0) // If the layer isn't first, set the neuron to have inputs of the neurons above
 				for (int i = 0; i < neurons[o].length; i++)
 				{
 					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) neurons[o - 1]));
 					neurons[o][i].randomizeWeights(-2, 2);
 					neurons[o][i].randomizeBias(-10, 10);
 				}
-			else
+			else // If the layer is first, set each Neuron's inputs to be the Network's environment
 			{
 				for (int i = 0; i < neurons[o].length; i++)
 				{
-					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) inputs));
+					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) environment));
 					neurons[o][i].randomizeWeights(-2, 2);
 					neurons[o][i].randomizeBias(-10, 10);
 				}
@@ -53,23 +53,23 @@ public class Network
 
 		if (Config.DEBUG)
 		{
-			System.out.println(neurons.length + " layers.");
+			System.out.println(neurons.length + " layers created.");
 			for (int i = 0; i < neurons.length; i++)
 			{
-				System.out.println("  " + neurons[i].length + " neurons on layer " + i);
+				System.out.println("  " + neurons[i].length + " neurons created on layer " + i);
 				for (int j = 0; j < neurons[i].length; j++)
 				{
-					System.out.println("    Item " + j + " has a value of " + neurons[i][j]);
+					System.out.println("    Neuron " + neurons[i][j]);
 				}
 			}
 		}
 	}
 
-	public void setInputs(double[] input)
+	public void setEnvironment(double[] input) // Sets the environment while preserving the links in the top layer Neurons
 	{
 		for (int i = 0; i < input.length; i++)
 		{
-			this.inputs[i].setValue(input[i]);
+			this.environment[i].setValue(input[i]);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class Network
 
 	public Network[] breed(Network mate)
 	{
-		Network[] n = new Network[] { new Network(this.layout, this.inputs), new Network(this.layout, this.inputs) };
+		Network[] n = new Network[] { new Network(this.layout, this.environment), new Network(this.layout, this.environment) };
 
 		for (int layer = 0; layer < this.neurons.length; layer++)
 		{ // For each layer
