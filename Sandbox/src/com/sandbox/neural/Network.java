@@ -12,84 +12,108 @@ public class Network
 	Random			r;
 	double			fitness;
 
-	public double getFitness()
-	{
-		return fitness;
-	}
-
-	public void setFitness(double fitness)
-	{
-		this.fitness = fitness;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "Network output: " + Arrays.toString(this.getOutputs());
-	}
-
-	public Network(String layout, InputValue[] inputLink, Random r)
+	public Network(final String layout, final InputValue[] inputLink, final Random r)
 	// Example "2 2 1" would create a neural net with 2 inputs, two layers of two neurons each, and then a final neuron.
 	{
 		this.r = r;
 		this.layout = layout;
 		this.environment = inputLink;
 
-		Scanner s = new Scanner(layout);
-		neurons = new Neuron[(layout.length() + 1) / 2][]; // Makes the array the number of layers there will be.
+		final Scanner s = new Scanner(layout);
+		this.neurons = new Neuron[(layout.length() + 1) / 2][]; // Makes the array the number of layers there will be.
 
 		int o = 0;
 		while (s.hasNext())
 		{// For each layer
-			int layerSize = Integer.parseInt(s.next()); // Get the size of the layer
-			neurons[o] = new Neuron[layerSize]; // And set it
+			final int layerSize = Integer.parseInt(s.next()); // Get the size of the layer
+			this.neurons[o] = new Neuron[layerSize]; // And set it
 			if (o != 0) // If the layer isn't first, set the neuron to have inputs of the neurons above
-				for (int i = 0; i < neurons[o].length; i++)
+				for (int i = 0; i < this.neurons[o].length; i++)
 				{
-					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) neurons[o - 1]), r);
-					neurons[o][i].randomizeWeights(-2, 2);
-					neurons[o][i].randomizeBias(-10, 10);
+					this.neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) this.neurons[o - 1]), r);
+					this.neurons[o][i].randomizeWeights(-Config.RANDOM_WEIGHT_INIT_RANGE, Config.RANDOM_WEIGHT_INIT_RANGE);
+					this.neurons[o][i].randomizeBias(-Config.RANDOM_BIAS_INIT_RANGE, Config.RANDOM_BIAS_INIT_RANGE);
 				}
 			else
-			// If the layer is first, set each Neuron's inputs to be the Network's environment
-			{
-				for (int i = 0; i < neurons[o].length; i++)
+				for (int i = 0; i < this.neurons[o].length; i++)
 				{
-					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) environment), r);
-					neurons[o][i].randomizeWeights(-2, 2);
-					neurons[o][i].randomizeBias(-10, 10);
+					this.neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) this.environment), r);
+					this.neurons[o][i].randomizeWeights(-Config.RANDOM_WEIGHT_INIT_RANGE, Config.RANDOM_WEIGHT_INIT_RANGE);
+					this.neurons[o][i].randomizeBias(-Config.RANDOM_BIAS_INIT_RANGE, Config.RANDOM_BIAS_INIT_RANGE);
 				}
-			}
 			o++;
 		}
 		s.close();
 
 		if (Config.DEBUG)
 		{
-			System.out.println(neurons.length + " layers created.");
-			for (int i = 0; i < neurons.length; i++)
+			System.out.println(this.neurons.length + " layers created.");
+			for (int i = 0; i < this.neurons.length; i++)
 			{
-				System.out.println("  " + neurons[i].length + " neurons created on layer " + i);
-				for (int j = 0; j < neurons[i].length; j++)
-				{
-					System.out.println("    Neuron " + neurons[i][j]);
-				}
+				System.out.println("  " + this.neurons[i].length + " neurons created on layer " + i);
+				for (int j = 0; j < this.neurons[i].length; j++)
+					System.out.println("    Neuron " + this.neurons[i][j]);
 			}
 		}
 	}
 
-	public void setEnvironment(double[] input) // Sets the environment while preserving the links in the top layer Neurons
+	public Network[] breed(final Network mate)
 	{
-		for (int i = 0; i < input.length; i++)
-		{
-			this.environment[i].setValue(input[i]);
-		}
+		final Network[] n = new Network[] { new Network(this.layout, this.environment, this.r), new Network(this.layout, this.environment, this.r) };
+
+		for (int layer = 0; layer < this.neurons.length; layer++)
+			for (int neuron = 0; neuron < this.neurons[layer].length; neuron++)
+			{ // For each neuron in each layer
+				final int crossoverPoint = this.r.nextInt(this.neurons[layer][neuron].getWeights().size());
+				for (int weight = 0; weight < crossoverPoint; weight++)
+				{
+					n[0].neurons[layer][neuron].setWeight(weight, this.neurons[layer][neuron].getWeight(weight)); // Passed from the father
+					n[1].neurons[layer][neuron].setWeight(weight, mate.neurons[layer][neuron].getWeight(weight)); // Passed from the mother
+
+					if (this.r.nextDouble() < Config.MUTATION_RATE) n[0].neurons[layer][neuron].mutateWeight(weight);
+					if (this.r.nextDouble() < Config.MUTATION_RATE) n[1].neurons[layer][neuron].mutateWeight(weight);
+				}
+				for (int weight = crossoverPoint; weight < this.neurons[layer][neuron].getWeights().size(); weight++)
+				{
+					n[0].neurons[layer][neuron].setWeight(weight, mate.neurons[layer][neuron].getWeight(weight)); // Passed from the mother
+					n[1].neurons[layer][neuron].setWeight(weight, this.neurons[layer][neuron].getWeight(weight)); // Passed from the father
+
+					if (this.r.nextDouble() < Config.MUTATION_RATE) n[0].neurons[layer][neuron].mutateWeight(weight);
+					if (this.r.nextDouble() < Config.MUTATION_RATE) n[1].neurons[layer][neuron].mutateWeight(weight);
+				}
+				final double skew = this.r.nextDouble();
+
+				n[0].neurons[layer][neuron].setWeight(crossoverPoint, skew * this.neurons[layer][neuron].getWeight(crossoverPoint) + (1 - skew)
+						* mate.neurons[layer][neuron].getWeight(crossoverPoint));
+				n[1].neurons[layer][neuron].setWeight(crossoverPoint, (1 - skew) * this.neurons[layer][neuron].getWeight(crossoverPoint) + skew
+						* mate.neurons[layer][neuron].getWeight(crossoverPoint));
+
+				n[0].neurons[layer][neuron].setBias(skew * this.neurons[layer][neuron].getBias() + (1 - skew) * mate.neurons[layer][neuron].getBias());
+				n[1].neurons[layer][neuron].setBias((1 - skew) * this.neurons[layer][neuron].getBias() + skew * mate.neurons[layer][neuron].getBias());
+			}
+
+		return n;
 	}
 
 	public void evalNet()
 	{
-		System.out.println("Input cases: " + neurons[0][0].getInputs());
+		System.out.println("Input cases: " + this.neurons[0][0].getInputs());
 		System.out.println("Total actual: " + Arrays.toString(this.getOutputs()));
+	}
+
+	public double getFitness()
+	{
+		return this.fitness;
+	}
+
+	public double[] getOutputs()
+	{
+		final double[] output = new double[this.neurons[this.neurons.length - 1].length]; // Size of last layer
+
+		for (int i = 0; i < this.neurons[this.neurons.length - 1].length; i++)
+			output[i] = this.neurons[this.neurons.length - 1][i].getOutput();
+
+		return output;
 	}
 
 	public void inspectNet()
@@ -98,78 +122,44 @@ public class Network
 		{
 			System.out.println("  Layer " + layer + ":");
 			for (int neuron = 0; neuron < this.neurons[layer].length; neuron++)
-			{
 				System.out.println("    Neuron " + neuron + " has weights of " + this.neurons[layer][neuron].getWeights() + " and an output bias of "
 						+ this.neurons[layer][neuron].getBias());
-			}
 		}
 	}
 
-	public double[] getOutputs()
+	public void randomizeBiases(final double min, final double max)
 	{
-		double[] output = new double[neurons[neurons.length - 1].length]; // Size of last layer
-
-		for (int i = 0; i < neurons[neurons.length - 1].length; i++)
-		{
-			output[i] = neurons[neurons.length - 1][i].getOutput();
-		}
-
-		return output;
+		for (final Neuron[] neuron2 : this.neurons)
+			for (int neuron = 0; neuron < neuron2.length; neuron++)
+				neuron2[neuron].randomizeBias(min, max);
 	}
 
-	public Network[] breed(Network mate)
+	public void randomizeWeights(final double min, final double max)
 	{
-		Network[] n = new Network[] { new Network(this.layout, this.environment, r), new Network(this.layout, this.environment, r) };
-
-		for (int layer = 0; layer < this.neurons.length; layer++)
-		{ // For each layer
-			for (int neuron = 0; neuron < this.neurons[layer].length; neuron++)
-			{ // For each neuron in each layer
-				int crossoverPoint = r.nextInt(this.neurons[layer][neuron].getWeights().size());
-				for (int weight = 0; weight < crossoverPoint; weight++)
-				{
-					n[0].neurons[layer][neuron].setWeight(weight, this.neurons[layer][neuron].getWeight(weight)); // Passed from the father
-					n[1].neurons[layer][neuron].setWeight(weight, mate.neurons[layer][neuron].getWeight(weight)); // Passed from the mother
-				}
-				for (int weight = crossoverPoint; weight < this.neurons[layer][neuron].getWeights().size(); weight++)
-				{
-					n[0].neurons[layer][neuron].setWeight(weight, mate.neurons[layer][neuron].getWeight(weight)); // Passed from the mother
-					n[1].neurons[layer][neuron].setWeight(weight, this.neurons[layer][neuron].getWeight(weight)); // Passed from the father
-				}
-				double skew = r.nextDouble();
-
-				n[0].neurons[layer][neuron].setWeight(crossoverPoint, (skew) * this.neurons[layer][neuron].getWeight(crossoverPoint) + (1 - skew)
-						* mate.neurons[layer][neuron].getWeight(crossoverPoint));
-				n[1].neurons[layer][neuron].setWeight(crossoverPoint, (1 - skew) * this.neurons[layer][neuron].getWeight(crossoverPoint) + (skew)
-						* mate.neurons[layer][neuron].getWeight(crossoverPoint));
-
-				n[0].neurons[layer][neuron].setBias((skew) * this.neurons[layer][neuron].getBias() + (1 - skew) * mate.neurons[layer][neuron].getBias());
-				n[1].neurons[layer][neuron].setBias((1 - skew) * this.neurons[layer][neuron].getBias() + (skew) * mate.neurons[layer][neuron].getBias());
-			}
-		}
-
-		return n;
+		for (final Neuron[] neuron2 : this.neurons)
+			for (int neuron = 0; neuron < neuron2.length; neuron++)
+				neuron2[neuron].randomizeWeights(min, max);
 	}
 
-	public void randomizeWeights(double min, double max)
+	public void setEnvironment(final double[] input) // Sets the environment while preserving the links in the top layer Neurons
 	{
-		for (int layer = 0; layer < this.neurons.length; layer++)
-		{
-			for (int neuron = 0; neuron < this.neurons[layer].length; neuron++)
-			{
-				this.neurons[layer][neuron].randomizeWeights(min, max);
-			}
-		}
+		for (int i = 0; i < input.length; i++)
+			this.environment[i].setValue(input[i]);
 	}
 
-	public void randomizeBiases(double min, double max)
+	public void setFitness(final double fitness)
 	{
-		for (int layer = 0; layer < this.neurons.length; layer++)
-		{
-			for (int neuron = 0; neuron < this.neurons[layer].length; neuron++)
-			{
-				this.neurons[layer][neuron].randomizeBias(min, max);
-			}
-		}
+		this.fitness = fitness;
+	}
+
+	public void setRandom(final Random r)
+	{
+		this.r = r;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Network output: " + Arrays.toString(this.getOutputs());
 	}
 }

@@ -4,7 +4,7 @@ public class InputValue implements HasOutput
 {
 	private Double	output;
 
-	public InputValue(Double output)
+	public InputValue(final Double output)
 	{
 		this.output = output;
 	}
@@ -12,17 +12,17 @@ public class InputValue implements HasOutput
 	@Override
 	public Double getOutput()
 	{
-		return output;
+		return this.output;
+	}
+
+	public void setValue(final double d)
+	{
+		this.output = d;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Input: " + output;
-	}
-
-	public void setValue(double d)
-	{
-		output = d;
+		return "Input: " + this.output;
 	}
 }
