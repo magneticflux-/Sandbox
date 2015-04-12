@@ -10,10 +10,11 @@ public class Neuron implements HasOutput
 	private ArrayList<Double>		weights	= new ArrayList<Double>();
 	private ArrayList<HasOutput>	inputs	= new ArrayList<HasOutput>();
 	private Double					bias;
-	private final Random			r		= new Random();
+	private final Random			r;
 
-	public Neuron(List<HasOutput> inputs)
+	public Neuron(List<HasOutput> inputs, Random r)
 	{
+		this.r = r;
 		for (HasOutput n : inputs)
 		{
 			this.inputs.add(n);
@@ -78,7 +79,7 @@ public class Neuron implements HasOutput
 	@Override
 	public String toString()
 	{
-		return "This neuron has weights of " + this.weights;
+		return "[Weights=" + this.weights + "; Bias=" + this.bias + "]";
 	}
 
 	public void setWeight(int index, double d)

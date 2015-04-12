@@ -9,7 +9,18 @@ public class Network
 	InputValue[]	environment;
 	Neuron[][]		neurons;
 	String			layout;
-	Random			r	= new Random();
+	Random			r;
+	double			fitness;
+
+	public double getFitness()
+	{
+		return fitness;
+	}
+
+	public void setFitness(double fitness)
+	{
+		this.fitness = fitness;
+	}
 
 	@Override
 	public String toString()
@@ -17,9 +28,10 @@ public class Network
 		return "Network output: " + Arrays.toString(this.getOutputs());
 	}
 
-	public Network(String layout, InputValue[] inputLink)
+	public Network(String layout, InputValue[] inputLink, Random r)
 	// Example "2 2 1" would create a neural net with 2 inputs, two layers of two neurons each, and then a final neuron.
 	{
+		this.r = r;
 		this.layout = layout;
 		this.environment = inputLink;
 
@@ -29,20 +41,21 @@ public class Network
 		int o = 0;
 		while (s.hasNext())
 		{// For each layer
-			int layerSize = Integer.parseInt(s.next()); //Get the size of the layer
+			int layerSize = Integer.parseInt(s.next()); // Get the size of the layer
 			neurons[o] = new Neuron[layerSize]; // And set it
 			if (o != 0) // If the layer isn't first, set the neuron to have inputs of the neurons above
 				for (int i = 0; i < neurons[o].length; i++)
 				{
-					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) neurons[o - 1]));
+					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) neurons[o - 1]), r);
 					neurons[o][i].randomizeWeights(-2, 2);
 					neurons[o][i].randomizeBias(-10, 10);
 				}
-			else // If the layer is first, set each Neuron's inputs to be the Network's environment
+			else
+			// If the layer is first, set each Neuron's inputs to be the Network's environment
 			{
 				for (int i = 0; i < neurons[o].length; i++)
 				{
-					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) environment));
+					neurons[o][i] = new Neuron(Arrays.asList((HasOutput[]) environment), r);
 					neurons[o][i].randomizeWeights(-2, 2);
 					neurons[o][i].randomizeBias(-10, 10);
 				}
@@ -106,7 +119,7 @@ public class Network
 
 	public Network[] breed(Network mate)
 	{
-		Network[] n = new Network[] { new Network(this.layout, this.environment), new Network(this.layout, this.environment) };
+		Network[] n = new Network[] { new Network(this.layout, this.environment, r), new Network(this.layout, this.environment, r) };
 
 		for (int layer = 0; layer < this.neurons.length; layer++)
 		{ // For each layer
