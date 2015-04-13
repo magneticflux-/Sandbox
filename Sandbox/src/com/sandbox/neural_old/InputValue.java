@@ -1,4 +1,4 @@
-package com.sandbox.neural;
+package com.sandbox.neural_old;
 
 public class InputValue implements HasOutput
 {

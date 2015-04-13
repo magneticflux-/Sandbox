@@ -1,4 +1,4 @@
-package com.sandbox.neural;
+package com.sandbox.neural_old;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -111,7 +111,7 @@ public class Network
 		final double[] output = new double[this.neurons[this.neurons.length - 1].length]; // Size of last layer
 
 		for (int i = 0; i < this.neurons[this.neurons.length - 1].length; i++)
-			output[i] = this.neurons[this.neurons.length - 1][i].getOutput();
+			output[i] = this.neurons[this.neurons.length - 1][i].getOutput() * Config.NETWORK_OUTPUT_RANGE;
 
 		return output;
 	}
