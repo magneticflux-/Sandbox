@@ -11,11 +11,17 @@ public class InputNode extends AbstractNode
 	@Override
 	public double getOutput()
 	{
-		return output;
+		return this.output;
 	}
 
-	public void setOutput(double output)
+	public void setOutput(final double output)
 	{
 		this.output = output;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "InputNode value: " + this.output;
 	}
 }

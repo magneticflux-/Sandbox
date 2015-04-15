@@ -7,10 +7,10 @@ import java.util.Random;
 
 public class Neuron implements HasOutput
 {
-	private final ArrayList<Double>		weights	= new ArrayList<Double>();
-	private final ArrayList<HasOutput>	inputs	= new ArrayList<HasOutput>();
 	private Double						bias;
+	private final ArrayList<HasOutput>	inputs	= new ArrayList<HasOutput>();
 	private final Random				r;
+	private final ArrayList<Double>		weights	= new ArrayList<Double>();
 
 	public Neuron(final List<HasOutput> inputs, final Random r)
 	{
@@ -45,7 +45,7 @@ public class Neuron implements HasOutput
 
 		// return 1 / (Math.pow(10, -1) + Math.exp(-sum - bias));
 		// return 2 / (1 + Math.exp(sum + this.bias)) - 1;
-		return Math.tanh(sum - bias);
+		return Math.tanh(sum - this.bias);
 		// return sum + bias;
 	}
 

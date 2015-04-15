@@ -7,10 +7,10 @@ import java.util.Scanner;
 public class Network
 {
 	InputValue[]	environment;
-	Neuron[][]		neurons;
-	String			layout;
-	Random			r;
 	double			fitness;
+	String			layout;
+	Neuron[][]		neurons;
+	Random			r;
 
 	public Network(final String layout, final InputValue[] inputLink, final Random r)
 	// Example "2 2 1" would create a neural net with 2 inputs, two layers of two neurons each, and then a final neuron.
@@ -130,15 +130,15 @@ public class Network
 	public void randomizeBiases(final double min, final double max)
 	{
 		for (final Neuron[] neuron2 : this.neurons)
-			for (int neuron = 0; neuron < neuron2.length; neuron++)
-				neuron2[neuron].randomizeBias(min, max);
+			for (final Neuron element : neuron2)
+				element.randomizeBias(min, max);
 	}
 
 	public void randomizeWeights(final double min, final double max)
 	{
 		for (final Neuron[] neuron2 : this.neurons)
-			for (int neuron = 0; neuron < neuron2.length; neuron++)
-				neuron2[neuron].randomizeWeights(min, max);
+			for (final Neuron element : neuron2)
+				element.randomizeWeights(min, max);
 	}
 
 	public void setEnvironment(final double[] input) // Sets the environment while preserving the links in the top layer Neurons

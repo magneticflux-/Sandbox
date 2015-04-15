@@ -217,7 +217,7 @@ public class Run
 			{
 				Thread.sleep(500);
 			}
-			catch (InterruptedException e)
+			catch (final InterruptedException e)
 			{
 				e.printStackTrace();
 			}
@@ -226,7 +226,7 @@ public class Run
 			{
 				Thread.sleep(500);
 			}
-			catch (InterruptedException e)
+			catch (final InterruptedException e)
 			{
 				e.printStackTrace();
 			}

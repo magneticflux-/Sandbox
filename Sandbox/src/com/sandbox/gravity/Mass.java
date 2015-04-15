@@ -11,13 +11,13 @@ import com.electronauts.mathutil.PolarPoint;
 
 public class Mass
 {
+	public static final double	DENSITY_CONSTANT		= 5;
 	public static final double	EXPLOSION_CONSTANT		= Math.pow(10, -11);
 	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, -11);
-	public static final double	DENSITY_CONSTANT		= 5;
-	public static final double	TIME_SHIFT				= 100;
-	public static double		timeStep				= 1 / 500d;
-
 	public static double		maxMass					= 0;
+	public static final double	TIME_SHIFT				= 100;
+
+	public static double		timeStep				= 1 / 500d;
 
 	public static void setTimeStep(final double timeStep)
 	{
@@ -30,15 +30,6 @@ public class Mass
 
 	private double	xV, yV;
 
-	@Override
-	public Mass clone()
-	{
-		Mass m = new Mass(xCenter, yCenter, mass);
-		m.setxV(xV);
-		m.setyV(yV);
-		return m;
-	}
-
 	public Mass(final double xCenter, final double yCenter, final double mass)
 	{
 		this.xCenter = xCenter;
@@ -48,33 +39,6 @@ public class Mass
 		this.yV = 0;
 
 		if (mass == 0) this.mass = 1;
-	}
-
-	public void paintTarget(String name, Graphics2D g)
-	{
-		double radius = 10;
-		double scale = Math.sqrt(2) / 2;
-		g.drawOval((int) (this.getxCenter() - radius), (int) (this.getyCenter() - radius), (int) (radius * 2), (int) (radius * 2));
-		g.drawLine((int) (this.getxCenter()), (int) (this.getyCenter() + (radius / 2)), (int) (this.getxCenter()), (int) (this.getyCenter() + (3 * radius / 2)));
-		g.drawLine((int) (this.getxCenter()), (int) (this.getyCenter() - (radius / 2)), (int) (this.getxCenter()), (int) (this.getyCenter() - (3 * radius / 2)));
-		g.drawLine((int) (this.getxCenter() + (radius / 2)), (int) (this.getyCenter()), (int) (this.getxCenter() + (3 * radius / 2)), (int) (this.getyCenter()));
-		g.drawLine((int) (this.getxCenter() - (radius / 2)), (int) (this.getyCenter()), (int) (this.getxCenter() - (3 * radius / 2)), (int) (this.getyCenter()));
-		g.drawLine((int) (this.getxCenter() + (scale * radius)), (int) (this.getyCenter() + (scale * radius)),
-				(int) (this.getxCenter() + (scale * 3 * radius / 2)), (int) (this.getyCenter() + (scale * 3 * radius / 2)));
-		Font restore = g.getFont();
-		Font f = new Font("Sans-Serif", Font.PLAIN, -15);
-		g.setFont(f);
-
-		g.translate(g.getClipBounds().getWidth() / 2, 0);
-		g.scale(-1, 1);
-		g.translate(-g.getClipBounds().getWidth() / 2, 0);
-		g.drawString(name, (int) (g.getClipBounds().getWidth() - (this.getxCenter() + (scale * 3 * radius / 2))), (int) (this.getyCenter() + (scale * 3
-				* radius / 2)));
-		g.translate(g.getClipBounds().getWidth() / 2, 0);
-		g.scale(-1, 1);
-		g.translate(-g.getClipBounds().getWidth() / 2, 0);
-
-		g.setFont(restore);
 	}
 
 	public double angleTo(final Mass mass)
@@ -116,6 +80,15 @@ public class Mass
 			if (!this.equals(mass)) this.attract(mass);
 	}
 
+	@Override
+	public Mass clone()
+	{
+		final Mass m = new Mass(this.xCenter, this.yCenter, this.mass);
+		m.setxV(this.xV);
+		m.setyV(this.yV);
+		return m;
+	}
+
 	public void collideAll(final ArrayList<Mass> masses)
 	{
 		final Iterator<Mass> i = masses.iterator();
@@ -130,7 +103,7 @@ public class Mass
 					this.setyV((this.getyV() * this.getMass() + mass.getyV() * mass.getMass()) / (this.getMass() + mass.getMass()));
 					final double strength = Math.sqrt(Math.pow(this.getMass(), 2) + Math.pow(mass.getMass(), 2))
 							* Math.sqrt(Math.pow(this.getVelocity(), 2) + Math.pow(mass.getVelocity(), 2));
-					this.setMass(this.getMass() + mass.getMass() - (Math.random() * 3 * mass.getMass() / 10));
+					this.setMass(this.getMass() + mass.getMass() - Math.random() * 3 * mass.getMass() / 10);
 					i.remove();
 					this.repellAll(masses, strength);
 				}
@@ -186,7 +159,7 @@ public class Mass
 	public void paint(final Graphics2D g)
 	{
 		final double radius = this.getRadius();
-		boolean hold = false;
+		final boolean hold = false;
 		if (this.getMass() >= Mass.maxMass)
 		{
 			Mass.maxMass = this.getMass();
@@ -205,10 +178,34 @@ public class Mass
 		g.setColor(Color.RED);
 		g.drawLine((int) this.getxCenter(), (int) this.getyCenter(), (int) (p.getX() + this.getxCenter()), (int) (p.getY() + this.getyCenter()));
 
-		if (this.getMass() > 6500)
-		{
-			this.paintTarget(String.format("Mass: %06.0f", this.mass), g);
-		}
+		if (this.getMass() > 6500) this.paintTarget(String.format("Mass: %06.0f", this.mass), g);
+	}
+
+	public void paintTarget(final String name, final Graphics2D g)
+	{
+		final double radius = 10;
+		final double scale = Math.sqrt(2) / 2;
+		g.drawOval((int) (this.getxCenter() - radius), (int) (this.getyCenter() - radius), (int) (radius * 2), (int) (radius * 2));
+		g.drawLine((int) this.getxCenter(), (int) (this.getyCenter() + radius / 2), (int) this.getxCenter(), (int) (this.getyCenter() + 3 * radius / 2));
+		g.drawLine((int) this.getxCenter(), (int) (this.getyCenter() - radius / 2), (int) this.getxCenter(), (int) (this.getyCenter() - 3 * radius / 2));
+		g.drawLine((int) (this.getxCenter() + radius / 2), (int) this.getyCenter(), (int) (this.getxCenter() + 3 * radius / 2), (int) this.getyCenter());
+		g.drawLine((int) (this.getxCenter() - radius / 2), (int) this.getyCenter(), (int) (this.getxCenter() - 3 * radius / 2), (int) this.getyCenter());
+		g.drawLine((int) (this.getxCenter() + scale * radius), (int) (this.getyCenter() + scale * radius), (int) (this.getxCenter() + scale * 3 * radius / 2),
+				(int) (this.getyCenter() + scale * 3 * radius / 2));
+		final Font restore = g.getFont();
+		final Font f = new Font("Sans-Serif", Font.PLAIN, -15);
+		g.setFont(f);
+
+		g.translate(g.getClipBounds().getWidth() / 2, 0);
+		g.scale(-1, 1);
+		g.translate(-g.getClipBounds().getWidth() / 2, 0);
+		g.drawString(name, (int) (g.getClipBounds().getWidth() - (this.getxCenter() + scale * 3 * radius / 2)), (int) (this.getyCenter() + scale * 3 * radius
+				/ 2));
+		g.translate(g.getClipBounds().getWidth() / 2, 0);
+		g.scale(-1, 1);
+		g.translate(-g.getClipBounds().getWidth() / 2, 0);
+
+		g.setFont(restore);
 	}
 
 	public void repell(final Mass mass, final double strength)

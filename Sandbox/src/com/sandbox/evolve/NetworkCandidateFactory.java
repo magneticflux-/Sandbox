@@ -11,10 +11,10 @@ import com.sandbox.neural.NodeLayer;
 
 public class NetworkCandidateFactory extends AbstractCandidateFactory<FeedforwardNetwork>
 {
-	private String	networkLayout;
-	private double	weightRange;
+	private final String	networkLayout;
+	private final double	weightRange;
 
-	public NetworkCandidateFactory(String networkLayout, double weightRange)
+	public NetworkCandidateFactory(final String networkLayout, final double weightRange)
 	{
 		super();
 		this.networkLayout = networkLayout;
@@ -22,22 +22,13 @@ public class NetworkCandidateFactory extends AbstractCandidateFactory<Feedforwar
 	}
 
 	@Override
-	public FeedforwardNetwork generateRandomCandidate(Random rng)
+	public FeedforwardNetwork generateRandomCandidate(final Random rng)
 	{
-		FeedforwardNetwork n = new FeedforwardNetwork(networkLayout);
-		for (NodeLayer l : n.getLayers())
-		{
-			for (AbstractNode abn : l.getNodes())
-			{
-				if (abn instanceof NeuronNode)
-				{
-					for (int i = 0; i < ((NeuronNode) abn).getWeights().size(); i++)
-					{
-						((NeuronNode) abn).getWeights().set(i, 2 * (rng.nextDouble() - 0.5) * weightRange);
-					}
-				}
-			}
-		}
+		final FeedforwardNetwork n = new FeedforwardNetwork(this.networkLayout);
+		for (final NodeLayer l : n.getLayers())
+			for (final AbstractNode abn : l.getNodes())
+				if (abn instanceof NeuronNode) for (int i = 0; i < ((NeuronNode) abn).getWeights().size(); i++)
+					((NeuronNode) abn).getWeights().set(i, 2 * (rng.nextDouble() - 0.5) * this.weightRange);
 		return n;
 	}
 }

@@ -6,20 +6,20 @@ public abstract class AbstractNode
 {
 	protected ArrayList<AbstractNode>	parents;
 
+	public void addParent(final AbstractNode n)
+	{
+		this.parents.add(n);
+	}
+
 	public abstract double getOutput();
 
 	public ArrayList<AbstractNode> getParents()
 	{
-		return parents;
+		return this.parents;
 	}
 
-	public void setParents(ArrayList<AbstractNode> parents)
+	public void setParents(final ArrayList<AbstractNode> parents)
 	{
 		this.parents = parents;
-	}
-
-	public void addParent(AbstractNode n)
-	{
-		this.parents.add(n);
 	}
 }

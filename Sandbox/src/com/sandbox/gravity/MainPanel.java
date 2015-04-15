@@ -33,7 +33,7 @@ public class MainPanel extends JComponent
 		frame.getContentPane().add(component);
 		frame.setVisible(true);
 
-		final Thread r = new Thread()
+		new Thread()
 		{
 
 			@Override
@@ -43,7 +43,7 @@ public class MainPanel extends JComponent
 				{
 					synchronized (component)
 					{
-						Mass mass = new Mass((int) (Math.random() * component.getWidth()), (int) (Math.random() * component.getHeight()),
+						final Mass mass = new Mass((int) (Math.random() * component.getWidth()), (int) (Math.random() * component.getHeight()),
 								(int) (Math.random() * 100));
 						mass.setxV((Math.random() - 0.5) * 0.0001);
 						mass.setyV((Math.random() - 0.5) * 0.0001);
@@ -60,7 +60,6 @@ public class MainPanel extends JComponent
 				}
 			}
 		};
-		//r.start();
 	}
 
 	private final LinkedList<Long>	fpsLog	= new LinkedList<Long>();
@@ -77,13 +76,11 @@ public class MainPanel extends JComponent
 		}
 
 		for (int x = 0; x <= 720; x += 80)
-		{
 			for (int y = 0; y <= 720; y += 80)
 			{
-				Mass m = new Mass(x, y, 10);
+				final Mass m = new Mass(x, y, 10);
 				this.masses.add(m);
 			}
-		}
 
 		final boolean extra = false;
 		if (extra)

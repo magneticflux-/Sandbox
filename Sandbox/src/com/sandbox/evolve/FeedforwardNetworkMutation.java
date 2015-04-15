@@ -18,12 +18,12 @@ public class FeedforwardNetworkMutation implements EvolutionaryOperator<Feedforw
 {
 	private final NumberGenerator<Probability>	mutationProbability;
 
-	public FeedforwardNetworkMutation(NumberGenerator<Probability> mutationProbability)
+	public FeedforwardNetworkMutation(final NumberGenerator<Probability> mutationProbability)
 	{
 		this.mutationProbability = mutationProbability;
 	}
 
-	public FeedforwardNetworkMutation(Probability mutationProbability)
+	public FeedforwardNetworkMutation(final Probability mutationProbability)
 	{
 		this(new ConstantGenerator<Probability>(mutationProbability));
 	}
@@ -31,18 +31,17 @@ public class FeedforwardNetworkMutation implements EvolutionaryOperator<Feedforw
 	@Override
 	public List<FeedforwardNetwork> apply(final List<FeedforwardNetwork> selectedCandidates, final Random rng)
 	{
-		List<FeedforwardNetwork> mutatedPopulation = new ArrayList<FeedforwardNetwork>(selectedCandidates.size());
-		for (FeedforwardNetwork n : selectedCandidates)
+		final List<FeedforwardNetwork> mutatedPopulation = new ArrayList<FeedforwardNetwork>(selectedCandidates.size());
+		for (final FeedforwardNetwork selectedNetwork : selectedCandidates)
 		{
+			final FeedforwardNetwork n = selectedNetwork.getDeepCopy();
 			for (final NodeLayer l : n.getLayers())
 				for (final AbstractNode abn : l.getNodes())
 					if (abn instanceof NeuronNode)
 						for (int i = 0; i < ((NeuronNode) abn).getWeights().size(); i++)
-							if (mutationProbability.nextValue().nextEvent(rng))
-							{
+							if (this.mutationProbability.nextValue().nextEvent(rng))
 								((NeuronNode) abn).getWeights().set(i,
 										((NeuronNode) abn).getWeights().get(i) * (2 * (rng.nextDouble() - 0.5) * 1.25) + 2 * (rng.nextDouble() - 0.5));
-							}
 			mutatedPopulation.add(n);
 		}
 		return mutatedPopulation;

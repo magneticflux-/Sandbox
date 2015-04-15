@@ -24,49 +24,46 @@ import org.uncommons.watchmaker.framework.termination.TargetFitness;
 
 public class StringEvolve
 {
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		System.out.print("Input Target String: ");
-		Scanner s = new Scanner(System.in);
-		String target = s.nextLine();
-		char[] chars = new char[57];
+		final Scanner s = new Scanner(System.in);
+		final String target = s.nextLine();
+		final char[] chars = new char[57];
 		for (char c = 'A'; c <= 'Z'; c++)
-		{
 			chars[c - 'A'] = c;
-		}
 		for (char c = 'a'; c <= 'z'; c++)
-		{
-			chars[(c - 'a') + 26] = c;
-		}
+			chars[c - 'a' + 26] = c;
 		chars[52] = ' ';
 		chars[53] = ',';
 		chars[54] = '-';
 		chars[55] = '.';
 		chars[56] = ';';
-		CandidateFactory<String> factory = new StringFactory(chars, target.length());
+		final CandidateFactory<String> factory = new StringFactory(chars, target.length());
 
-		List<EvolutionaryOperator<String>> operators = new LinkedList<EvolutionaryOperator<String>>();
+		final List<EvolutionaryOperator<String>> operators = new LinkedList<EvolutionaryOperator<String>>();
 		operators.add(new StringCrossover(2));
-		operators.add(new StringMutation(chars, new Probability(0.025)));
-		EvolutionaryOperator<String> pipeline = new EvolutionPipeline<String>(operators);
+		operators.add(new StringMutation(chars, new Probability(0.03)));
+		final EvolutionaryOperator<String> pipeline = new EvolutionPipeline<String>(operators);
 
-		FitnessEvaluator<String> fitnessEvaluator = new StringEvaluator(target);
+		final FitnessEvaluator<String> fitnessEvaluator = new StringEvaluator(target);
 
-		SelectionStrategy<Object> selection = new RouletteWheelSelection();
+		final SelectionStrategy<Object> selection = new RouletteWheelSelection();
 
-		Random rng = new MersenneTwisterRNG();
+		final Random rng = new MersenneTwisterRNG();
 
-		EvolutionEngine<String> engine = new GenerationalEvolutionEngine<String>(factory, pipeline, fitnessEvaluator, selection, rng);
+		final EvolutionEngine<String> engine = new GenerationalEvolutionEngine<String>(factory, pipeline, fitnessEvaluator, selection, rng);
 
 		engine.addEvolutionObserver(new EvolutionObserver<String>()
-		{
-			public void populationUpdate(PopulationData<? extends String> data)
+				{
+			@Override
+			public void populationUpdate(final PopulationData<? extends String> data)
 			{
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
 			}
-		});
+				});
 
-		String result = engine.evolve(1000, 10, new TargetFitness(target.length(), true));
+		final String result = engine.evolve(1000, 10, new TargetFitness(target.length(), true));
 		System.out.println(result);
 	}
 
@@ -74,30 +71,27 @@ public class StringEvolve
 
 class StringEvaluator implements FitnessEvaluator<String>
 {
-	private String	targetString;
+	private final String	targetString;
 
 	/**
 	 * Assigns one "fitness point" for every character in the candidate String that matches the corresponding position in the target string.
 	 */
-	public StringEvaluator(String target)
+	public StringEvaluator(final String target)
 	{
 		super();
 		this.targetString = target;
 	}
 
-	public double getFitness(String candidate, List<? extends String> population)
+	@Override
+	public double getFitness(final String candidate, final List<? extends String> population)
 	{
 		int matches = 0;
 		for (int i = 0; i < candidate.length(); i++)
-		{
-			if (candidate.charAt(i) == targetString.charAt(i))
-			{
-				matches++;
-			}
-		}
+			if (candidate.charAt(i) == this.targetString.charAt(i)) matches++;
 		return matches;
 	}
 
+	@Override
 	public boolean isNatural()
 	{
 		return true;

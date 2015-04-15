@@ -18,8 +18,8 @@ public class Population
 		return 1 / (0.001 + difference);
 	}
 
-	ArrayList<Network>	networks;
 	double[]			actual;
+	ArrayList<Network>	networks;
 
 	Random				r;
 
@@ -66,13 +66,13 @@ public class Population
 
 		final ArrayList<Network> sorted = new ArrayList<Network>(this.networks);
 		Collections.sort(sorted, new Comparator<Network>()
-		{
+				{
 			@Override
 			public int compare(final Network o1, final Network o2)
 			{
 				return -new Double(o1.getFitness()).compareTo(new Double(o2.getFitness()));
 			}
-		});
+				});
 
 		for (int i = 0; i < victors.length; i++)
 			victors[i] = sorted.get(i);
