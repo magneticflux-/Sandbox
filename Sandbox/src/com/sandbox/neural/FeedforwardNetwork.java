@@ -66,6 +66,23 @@ public class FeedforwardNetwork
 		return n;
 	}
 
+	public double[] evaluate(double[] inputs)
+	{
+		if (inputs.length != this.inputs.getNodes().size()) throw new IllegalArgumentException("Invalid input size! Cannot evaluate neural net.");
+
+		for (int i = 0; i < inputs.length; i++)
+		{
+			((InputNode) this.inputs.getNode(i)).setOutput(inputs[i]);
+		}
+
+		double[] outputs = new double[layers.get(layers.size() - 1).getNodes().size()];
+		for (int i = 0; i < outputs.length; i++)
+		{
+			outputs[i] = layers.get(layers.size() - 1).getNode(i).getOutput();
+		}
+		return outputs;
+	}
+
 	public NodeLayer getInputs()
 	{
 		return this.inputs;
