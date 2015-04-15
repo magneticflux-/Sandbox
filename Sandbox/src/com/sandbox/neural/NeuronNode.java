@@ -14,7 +14,7 @@ public class NeuronNode extends AbstractNode
 		return Math.tanh(x);
 	}
 
-	protected ArrayList<Double>	weights;
+	private ArrayList<Double>	weights;
 
 	public NeuronNode(ArrayList<AbstractNode> parents)
 	{
@@ -25,6 +25,16 @@ public class NeuronNode extends AbstractNode
 		{
 			weights.add(1d);
 		}
+	}
+
+	public ArrayList<Double> getWeights()
+	{
+		return weights;
+	}
+
+	public void setWeights(ArrayList<Double> weights)
+	{
+		this.weights = weights;
 	}
 
 	@Override

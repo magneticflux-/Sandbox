@@ -12,6 +12,11 @@ public class FeedforwardNetwork
 	{
 		return inputs;
 	}
+	
+	public ArrayList<NodeLayer> getLayers()
+	{
+		return layers;
+	}
 
 	public FeedforwardNetwork(String layout)
 	/*
