@@ -1,6 +1,7 @@
 package com.sandbox.neural;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NeuronNode extends AbstractNode
 {
@@ -14,7 +15,7 @@ public class NeuronNode extends AbstractNode
 		return Math.tanh(x);
 	}
 
-	private ArrayList<Double>	weights;
+	private List<Double>	weights;
 
 	public NeuronNode(ArrayList<AbstractNode> parents)
 	{
@@ -27,12 +28,12 @@ public class NeuronNode extends AbstractNode
 		}
 	}
 
-	public ArrayList<Double> getWeights()
+	public List<Double> getWeights()
 	{
 		return weights;
 	}
 
-	public void setWeights(ArrayList<Double> weights)
+	public void setWeights(List<Double> weights)
 	{
 		this.weights = weights;
 	}

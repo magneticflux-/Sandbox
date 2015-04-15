@@ -7,15 +7,21 @@ public class FeedforwardNetwork
 {
 	private ArrayList<NodeLayer>	layers;
 	private NodeLayer				inputs;
+	private final String			layout;
 
 	public NodeLayer getInputs()
 	{
 		return inputs;
 	}
-	
+
 	public ArrayList<NodeLayer> getLayers()
 	{
 		return layers;
+	}
+
+	public String getLayout()
+	{
+		return layout;
 	}
 
 	public FeedforwardNetwork(String layout)
@@ -24,6 +30,7 @@ public class FeedforwardNetwork
 	 * of two NeuronNodes, and a layer of one NeuronNode. To set the inputs to the neural net, set the input node's value and then recompute.
 	 */
 	{
+		this.layout = layout;
 		Scanner s = new Scanner(layout);
 		while (s.hasNext())
 		{
