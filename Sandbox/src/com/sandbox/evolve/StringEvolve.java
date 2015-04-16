@@ -21,6 +21,7 @@ import org.uncommons.watchmaker.framework.operators.StringCrossover;
 import org.uncommons.watchmaker.framework.operators.StringMutation;
 import org.uncommons.watchmaker.framework.selection.RouletteWheelSelection;
 import org.uncommons.watchmaker.framework.termination.TargetFitness;
+import org.uncommons.watchmaker.swing.evolutionmonitor.EvolutionMonitor;
 
 public class StringEvolve
 {
@@ -29,6 +30,7 @@ public class StringEvolve
 		System.out.print("Input Target String: ");
 		final Scanner s = new Scanner(System.in);
 		final String target = s.nextLine();
+		s.close();
 		final char[] chars = new char[57];
 		for (char c = 'A'; c <= 'Z'; c++)
 			chars[c - 'A'] = c;
@@ -55,18 +57,19 @@ public class StringEvolve
 		final EvolutionEngine<String> engine = new GenerationalEvolutionEngine<String>(factory, pipeline, fitnessEvaluator, selection, rng);
 
 		engine.addEvolutionObserver(new EvolutionObserver<String>()
-				{
+		{
 			@Override
 			public void populationUpdate(final PopulationData<? extends String> data)
 			{
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
 			}
-				});
-
-		final String result = engine.evolve(1000, 10, new TargetFitness(target.length(), true));
-		System.out.println(result);
+		});
+		EvolutionMonitor<String> monitor = new EvolutionMonitor<String>();
+		monitor.showInFrame("Evolution", true);
+		engine.addEvolutionObserver(monitor);
+		final String result = engine.evolve(100, 50, new TargetFitness(target.length(), true));
+		System.out.println("Fittest individual: " + result);
 	}
-
 }
 
 class StringEvaluator implements FitnessEvaluator<String>

@@ -50,6 +50,7 @@ public class FeedforwardNetwork
 				this.layers.add(nl);
 			}
 		}
+		s.close();
 	}
 
 	@SuppressWarnings("unchecked")
