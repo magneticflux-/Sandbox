@@ -50,4 +50,13 @@ public class NeuronNode extends AbstractNode
 	{
 		return "Neuron has weights of " + this.weights;
 	}
+
+	@Override
+	public void randomizeWeights()
+	{
+		for (int i = 0; i < this.weights.size(); i++)
+		{
+			this.weights.set(i, 16 * (Math.random() - 0.5));
+		}
+	}
 }

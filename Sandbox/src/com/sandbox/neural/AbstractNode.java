@@ -22,4 +22,6 @@ public abstract class AbstractNode
 	{
 		this.parents = parents;
 	}
+	
+	public abstract void randomizeWeights();
 }

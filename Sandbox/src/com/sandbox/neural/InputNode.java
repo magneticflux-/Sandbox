@@ -24,4 +24,10 @@ public class InputNode extends AbstractNode
 	{
 		return "InputNode value: " + this.output;
 	}
+
+	@Override
+	public void randomizeWeights()
+	{
+	}
+
 }

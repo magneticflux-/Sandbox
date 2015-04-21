@@ -67,6 +67,17 @@ public class FeedforwardNetwork
 		return n;
 	}
 
+	public void randomizeWeights()
+	{
+		for (NodeLayer l : this.layers)
+		{
+			for (AbstractNode n : l.getNodes())
+			{
+				n.randomizeWeights();
+			}
+		}
+	}
+
 	public double[] evaluate(double[] inputs)
 	{
 		if (inputs.length != this.inputs.getNodes().size()) throw new IllegalArgumentException("Invalid input size! Cannot evaluate neural net.");
