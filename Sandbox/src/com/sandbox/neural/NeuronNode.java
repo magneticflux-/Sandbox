@@ -2,6 +2,7 @@ package com.sandbox.neural;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class NeuronNode extends AbstractNode
 {
@@ -52,11 +53,11 @@ public class NeuronNode extends AbstractNode
 	}
 
 	@Override
-	public void randomizeWeights()
+	public void randomizeWeights(Random rng, double range)
 	{
 		for (int i = 0; i < this.weights.size(); i++)
 		{
-			this.weights.set(i, 16 * (Math.random() - 0.5));
+			this.weights.set(i, range * 2 * (rng.nextDouble() - 0.5));
 		}
 	}
 }

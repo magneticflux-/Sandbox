@@ -1,6 +1,7 @@
 package com.sandbox.neural;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public abstract class AbstractNode
 {
@@ -22,6 +23,6 @@ public abstract class AbstractNode
 	{
 		this.parents = parents;
 	}
-	
-	public abstract void randomizeWeights();
+
+	public abstract void randomizeWeights(Random rng, double range);
 }

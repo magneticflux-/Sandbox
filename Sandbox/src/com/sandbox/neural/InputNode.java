@@ -1,5 +1,7 @@
 package com.sandbox.neural;
 
+import java.util.Random;
+
 public class InputNode extends AbstractNode
 {
 	private double	output;
@@ -26,7 +28,7 @@ public class InputNode extends AbstractNode
 	}
 
 	@Override
-	public void randomizeWeights()
+	public void randomizeWeights(Random rng, double range)
 	{
 	}
 

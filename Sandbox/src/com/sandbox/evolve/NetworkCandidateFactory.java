@@ -4,10 +4,7 @@ import java.util.Random;
 
 import org.uncommons.watchmaker.framework.factories.AbstractCandidateFactory;
 
-import com.sandbox.neural.AbstractNode;
 import com.sandbox.neural.FeedforwardNetwork;
-import com.sandbox.neural.NeuronNode;
-import com.sandbox.neural.NodeLayer;
 
 public class NetworkCandidateFactory extends AbstractCandidateFactory<FeedforwardNetwork>
 {
@@ -25,10 +22,7 @@ public class NetworkCandidateFactory extends AbstractCandidateFactory<Feedforwar
 	public FeedforwardNetwork generateRandomCandidate(final Random rng)
 	{
 		final FeedforwardNetwork n = new FeedforwardNetwork(this.networkLayout);
-		for (final NodeLayer l : n.getLayers())
-			for (final AbstractNode abn : l.getNodes())
-				if (abn instanceof NeuronNode) for (int i = 0; i < ((NeuronNode) abn).getWeights().size(); i++)
-					((NeuronNode) abn).getWeights().set(i, 2 * (rng.nextDouble() - 0.5) * this.weightRange);
+		n.randomizeWeights(rng, weightRange);
 		return n;
 	}
 }

@@ -17,11 +17,16 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 	// observer, and renders it fighting with the requested FeedforwardNetwork.
 	private FeedforwardNetwork	bestNetwork;
 
+	public FeedforwardNetworkRenderer(String layout)
+	{
+		this.bestNetwork = new FeedforwardNetwork(layout);
+	}
+
 	@Override
 	public FeedforwardNetworkRendererComponent render(FeedforwardNetwork entity)
 	{
 		final FeedforwardNetwork input = entity;
-		return new FeedforwardNetworkRendererComponent(input, bestNetwork);
+		return new FeedforwardNetworkRendererComponent(input, input);// bestNetwork);
 	}
 
 	@Override
@@ -37,13 +42,14 @@ class FeedforwardNetworkRendererComponent extends JComponent
 	private final Arena			arena;
 	private final Arena.Fighter	fighter1;
 	private final Arena.Fighter	fighter2;
+	private static final double	updateSpeed			= 16.666666666;
 
 	public FeedforwardNetworkRendererComponent(FeedforwardNetwork competitor, FeedforwardNetwork champ)
 	{
 		super();
-		arena = new Arena(new Rectangle(0, 0, 500, 500), -1);
-		fighter1 = arena.new Fighter(competitor.getDeepCopy(), 50, 50, arena);
-		fighter2 = arena.new Fighter(champ.getDeepCopy(), 50, 50, arena);
+		arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
+		fighter1 = arena.new Fighter(competitor.getDeepCopy(), 200, 300, Math.PI, arena);
+		fighter2 = arena.new Fighter(champ.getDeepCopy(), 400, 300, 0, arena);
 		arena.addFighter(fighter1);
 		arena.addFighter(fighter2);
 	}
@@ -51,6 +57,27 @@ class FeedforwardNetworkRendererComponent extends JComponent
 	@Override
 	public void paintComponent(Graphics g)
 	{
+		long startTime = System.nanoTime();
+
 		super.paintComponent(g);
+		arena.updatePhysics();
+		arena.paint(g);
+
+		try
+		{
+			if (updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
+				Thread.sleep((long) (updateSpeed - (System.nanoTime() - startTime) / 1000000d));
+			else
+			{
+			}
+		}
+		catch (final InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		while (updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
+		{
+		}
+		this.repaint();
 	}
 }

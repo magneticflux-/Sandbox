@@ -2,6 +2,7 @@ package com.sandbox.neural;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class FeedforwardNetwork
@@ -67,13 +68,13 @@ public class FeedforwardNetwork
 		return n;
 	}
 
-	public void randomizeWeights()
+	public void randomizeWeights(Random rng, double range)
 	{
 		for (NodeLayer l : this.layers)
 		{
 			for (AbstractNode n : l.getNodes())
 			{
-				n.randomizeWeights();
+				n.randomizeWeights(rng, range);
 			}
 		}
 	}

@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -13,6 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.uncommons.maths.random.MersenneTwisterRNG;
 
 import com.electronauts.mathutil.MathUtil;
 import com.electronauts.mathutil.PolarPoint;
@@ -30,15 +32,16 @@ public class Arena
 		private boolean						isShooting	= false;
 		private int							shootDelay	= 0;
 		private final Color					team		= new Color((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256));
-		private int							score;
+		private double						score;
 
 		public Fighter(final FeedforwardNetwork brain, final double x, final double y, final Arena arena)
 		{
 			this(brain, x, y, 0, arena);
 		}
 
-		public int getScore()
+		public double getScore()
 		{
+			if (this.score < 0) return 0;
 			return this.score;
 		}
 
@@ -46,7 +49,7 @@ public class Arena
 		{
 			super(x, y, null);
 
-			if (!(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 6 && Integer.parseInt(brain.getLayout().substring(brain.getLayout().length() - 1,
+			if (!(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 3 && Integer.parseInt(brain.getLayout().substring(brain.getLayout().length() - 1,
 					brain.getLayout().length())) >= 4)) throw new IllegalArgumentException("Insufficient brain in/out space.");
 
 			this.angle = angle;
@@ -65,9 +68,14 @@ public class Arena
 			return (this.y - (this.arena.bounds.y - this.arena.bounds.height)) / this.arena.bounds.height;
 		}
 
-		public void incrementScore()
+		public void incrementScore(double i)
 		{
-			this.score++;
+			this.score += i;
+		}
+
+		public void decrementScore(double i)
+		{
+			this.score -= i;
 		}
 
 		@Override
@@ -97,28 +105,43 @@ public class Arena
 		public void reactTo(final double[] enviroment)
 		{
 			final double[] reaction = this.brain.evaluate(enviroment);
-			this.xV = reaction[0];
-			this.yV = reaction[1];
-			this.angleV = reaction[2] / (Math.PI * 10);
+			PolarPoint p1 = new PolarPoint(reaction[0] * 2, this.angle);
+			PolarPoint p2 = new PolarPoint(reaction[1] * 2, this.angle + Math.PI / 2);
+			this.xV = (p1.getX() + p2.getX());
+			this.yV = (p1.getY() + p2.getY());
+			this.angleV = reaction[2] / (Math.PI * 4);
 			this.isShooting = reaction[3] > 0;
+		}
+
+		public void react()
+		{
+			this.reactTo(new double[] {
+					MathUtil.angleTo(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
+							.getOtherFighter(this).getY()))
+							- this.angle,
+					this.arena.getOtherFighter(this).angle,
+					MathUtil.distance(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
+							.getOtherFighter(this).getY())) });
 		}
 
 		@Override
 		public void updatePosition()
 		{
-			this.reactTo(new double[] { this.arena.age, this.getNormalizedX(), this.getNormalizedY(), this.angle, this.score,
-					this.arena.getOtherFighter(this).getNormalizedX(), this.arena.getOtherFighter(this).getNormalizedY(),
-					this.arena.getOtherFighter(this).angle, this.arena.getOtherFighter(this).score });
 			super.updatePosition();
+
 			this.angle += this.angleV;
+			if (Math.abs(angle) >= Math.PI * 2)
+			{
+				angle = (Math.PI * 2 + angle) % (Math.PI * 2);
+			}
 
 			if (this.shootDelay > 0)
 				this.shootDelay--;
 			else if (this.isShooting)
 			{
-				this.shootDelay = 10;
+				this.shootDelay = 5;
 				final PolarPoint p1 = new PolarPoint(Fighter.radius + 10, this.angle);
-				final PolarPoint p2 = new PolarPoint(30, this.angle);
+				final PolarPoint p2 = new PolarPoint(5, this.angle);
 				this.arena.addProjectile(new Projectile(p1.getX() + this.getX(), p1.getY() + this.getY(), p2.getX(), p2.getY(), this));
 			}
 		}
@@ -193,12 +216,12 @@ public class Arena
 	public static void main(final String[] args)
 	{
 		final JFrame frame = new JFrame("Frame");
-		final Arena a = new Arena(new Rectangle(10, 10, 700, 700), -1);
-		FeedforwardNetwork n = new FeedforwardNetwork("9 4 4 4 4");
-		for (int i = 0; i < 1000; i++)
+		final Arena a = new Arena(new Rectangle(10, 10, 700, 700), 1000);
+		FeedforwardNetwork n = new FeedforwardNetwork("3 4 4");
+		for (int i = 0; i < 10; i++)
 		{
-			n.randomizeWeights();
-			a.addFighter(a.new Fighter(n.getDeepCopy(), Math.random() * 600 + 10, Math.random() * 600 + 10, Math.random() * Math.PI * 2, a));
+			n.randomizeWeights(new MersenneTwisterRNG(), 2);
+			a.addFighter(a.new Fighter(n.getDeepCopy(), Math.random() * 400 + 200, Math.random() * 400 + 200, Math.random() * Math.PI * 2, a));
 		}
 		// a.getFighters().get(0).isShooting = true;
 		// a.getFighters().get(0).xV = 1;
@@ -207,7 +230,7 @@ public class Arena
 		final JComponent jc = new JComponent()
 		{
 			private static final long	serialVersionUID	= 1L;
-			private static final double	updateSpeed			= 16.66666666;
+			private static final double	updateSpeed			= 0;
 
 			@Override
 			public void paintComponent(final Graphics g)
@@ -295,6 +318,11 @@ public class Arena
 		return this.terrain;
 	}
 
+	public boolean isYoung()
+	{
+		return this.age < this.maxAge;
+	}
+
 	public void paint(final Graphics g)
 	{
 		final Graphics2D g2d = (Graphics2D) g;
@@ -322,8 +350,31 @@ public class Arena
 			for (final Iterator<Fighter> i = this.fighters.iterator(); i.hasNext();)
 			{
 				final Fighter f = i.next();
+				f.react();
+
+				if (!this.bounds.contains(f.getX(), f.getY()))
+				{
+					if (f.getX() > this.bounds.getMaxX() && f.xV > 0)
+					{
+						f.xV = 0;
+					}
+					else if (f.getX() < this.bounds.getMinX() && f.xV < 0)
+					{
+						f.xV = 0;
+					}
+
+					if (f.getY() > this.bounds.getMaxY() && f.yV > 0)
+					{
+						f.yV = 0;
+					}
+					else if (f.getY() < this.bounds.getMinY() && f.yV < 0)
+					{
+						f.yV = 0;
+					}
+				}
+
 				f.updatePosition();
-				if (!this.bounds.contains(f.getX(), f.getY())) i.remove();
+				// if (!this.bounds.contains(f.getX(), f.getY())) i.remove();
 			}
 			for (final Iterator<Projectile> i = this.projectiles.iterator(); i.hasNext();)
 			{
@@ -338,7 +389,8 @@ public class Arena
 						if (MathUtil.distance(p.getX(), p.getY(), f.getX(), f.getY()) <= Projectile.radius + Fighter.radius)
 						{
 							i.remove();
-							if (p.getOwner() != null) p.getOwner().incrementScore();
+							if (p.getOwner() != null) p.getOwner().incrementScore(1);
+							f.decrementScore(0);
 							break;
 						}
 					}
