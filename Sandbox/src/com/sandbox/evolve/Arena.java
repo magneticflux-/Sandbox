@@ -121,7 +121,8 @@ public class Arena
 							- this.angle,
 					this.arena.getOtherFighter(this).angle,
 					MathUtil.distance(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
-							.getOtherFighter(this).getY())) });
+							.getOtherFighter(this).getY()))
+							/ this.arena.getMaxDistance() });
 		}
 
 		@Override
@@ -269,9 +270,9 @@ public class Arena
 	private final Rectangle				bounds;
 	private final ArrayList<Fighter>	fighters;
 	private final int					maxAge;
-
 	private final ArrayList<Projectile>	projectiles;
 	private final ArrayList<Polygon>	terrain;
+	private final double				maxDistance;
 
 	public Arena(final Rectangle bounds, final int maxAge)
 	{
@@ -281,6 +282,12 @@ public class Arena
 		this.bounds = bounds;
 		this.age = 0;
 		this.maxAge = maxAge;
+		maxDistance = Math.sqrt(Math.pow(bounds.getWidth(), 2) + Math.pow(bounds.getHeight(), 2));
+	}
+
+	public double getMaxDistance()
+	{
+		return this.maxDistance;
 	}
 
 	public Fighter getOtherFighter(Fighter f)

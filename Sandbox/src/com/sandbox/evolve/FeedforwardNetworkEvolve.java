@@ -26,11 +26,11 @@ public class FeedforwardNetworkEvolve
 	public static void main(String[] args)
 	{
 		String layout = "3 6 4";
-		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(layout, 32);
+		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(layout, 64);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.01)));
+		operators.add(new FeedforwardNetworkMutation(new Probability(0.03)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
