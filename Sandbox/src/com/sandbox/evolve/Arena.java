@@ -49,7 +49,7 @@ public class Arena
 		{
 			super(x, y, null);
 
-			if (!(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 3 && Integer.parseInt(brain.getLayout().substring(brain.getLayout().length() - 1,
+			if (!(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 5 && Integer.parseInt(brain.getLayout().substring(brain.getLayout().length() - 1,
 					brain.getLayout().length())) >= 4)) throw new IllegalArgumentException("Insufficient brain in/out space.");
 
 			this.angle = angle;
@@ -119,6 +119,8 @@ public class Arena
 					MathUtil.angleTo(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
 							.getOtherFighter(this).getY()))
 							- this.angle,
+					this.arena.getOtherFighter(this).xV,
+					this.arena.getOtherFighter(this).yV,
 					this.arena.getOtherFighter(this).angle,
 					MathUtil.distance(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
 							.getOtherFighter(this).getY()))
@@ -388,7 +390,10 @@ public class Arena
 				final Projectile p = i.next();
 				p.updatePosition();
 				if (!this.bounds.contains(p.getX(), p.getY()))
+				{
 					i.remove();
+					if (p.getOwner() != null) p.getOwner().incrementScore(-1);
+				}
 				else
 				{
 					for (Fighter f : this.fighters)
@@ -397,7 +402,7 @@ public class Arena
 						{
 							i.remove();
 							if (p.getOwner() != null) p.getOwner().incrementScore(1);
-							f.decrementScore(0);
+							f.decrementScore(0.25);
 							break;
 						}
 					}

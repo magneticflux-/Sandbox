@@ -25,7 +25,7 @@ public class FeedforwardNetworkEvolve
 {
 	public static void main(String[] args)
 	{
-		String layout = "3 6 4";
+		String layout = "5 12 4";
 		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(layout, 64);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
