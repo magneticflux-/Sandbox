@@ -15,6 +15,7 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 {
 	// Must be added as a Renderer<FeedforwardNetwork, JComponent> AND as an EvolutionObserver<FeedforwardNetwork>. It receives the best candidate from the
 	// observer, and renders it fighting with the requested FeedforwardNetwork.
+	@SuppressWarnings("unused")
 	private FeedforwardNetwork	bestNetwork;
 
 	public FeedforwardNetworkRenderer(String layout)
@@ -48,8 +49,10 @@ class FeedforwardNetworkRendererComponent extends JComponent
 	{
 		super();
 		arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
-		fighter1 = arena.new Fighter(competitor.getDeepCopy(), 200, 300, Math.PI, arena);
-		fighter2 = arena.new Fighter(champ.getDeepCopy(), 400, 300, 0, arena);
+		fighter1 = arena.new Fighter(competitor.getDeepCopy(), arena.r.nextDouble() * arena.getBounds().getWidth(), arena.r.nextDouble()
+				* arena.getBounds().getHeight(), arena.r.nextDouble() * Math.PI * 2, arena);
+		fighter2 = arena.new Fighter(champ.getDeepCopy(), arena.r.nextDouble() * arena.getBounds().getWidth(), arena.r.nextDouble()
+				* arena.getBounds().getHeight(), arena.r.nextDouble() * Math.PI * 2, arena);
 		arena.addFighter(fighter1);
 		arena.addFighter(fighter2);
 	}

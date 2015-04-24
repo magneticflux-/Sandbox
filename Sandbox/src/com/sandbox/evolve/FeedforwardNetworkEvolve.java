@@ -1,8 +1,14 @@
 package com.sandbox.evolve;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
@@ -16,7 +22,7 @@ import org.uncommons.watchmaker.framework.PopulationData;
 import org.uncommons.watchmaker.framework.SelectionStrategy;
 import org.uncommons.watchmaker.framework.operators.EvolutionPipeline;
 import org.uncommons.watchmaker.framework.selection.TournamentSelection;
-import org.uncommons.watchmaker.framework.termination.Stagnation;
+import org.uncommons.watchmaker.framework.termination.UserAbort;
 import org.uncommons.watchmaker.swing.evolutionmonitor.EvolutionMonitor;
 
 import com.sandbox.neural.FeedforwardNetwork;
@@ -25,7 +31,7 @@ public class FeedforwardNetworkEvolve
 {
 	public static void main(String[] args)
 	{
-		String layout = "5 12 4";
+		String layout = "5 4 4 4";
 		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(layout, 64);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
@@ -52,11 +58,39 @@ public class FeedforwardNetworkEvolve
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
 			}
 		});
-
+		final UserAbort abort = new UserAbort();
 		EvolutionMonitor<FeedforwardNetwork> monitor = new EvolutionMonitor<FeedforwardNetwork>(new FeedforwardNetworkRenderer(layout), false);
+
+		((JTabbedPane) monitor.getGUIComponent().getComponents()[0]).add(new JPanel()
+		{
+			private static final long	serialVersionUID	= 1L;
+
+			{
+				setName("Abort Button");
+				add(new JButton()
+				{
+					private static final long	serialVersionUID	= 1L;
+
+					{
+						setName("ABORT");
+						addActionListener(new ActionListener()
+						{
+
+							@Override
+							public void actionPerformed(ActionEvent e)
+							{
+								abort.abort();
+								System.out.println("*** ABORT SEQUENCE ACTIVATED ***\n");
+							}
+						});
+					}
+				});
+			}
+		});
+
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
-		final FeedforwardNetwork result = engine.evolve(1000, 2, new Stagnation(1000, true));
+		final FeedforwardNetwork result = engine.evolve(1000, 2, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }

@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -105,11 +106,11 @@ public class Arena
 		public void reactTo(final double[] enviroment)
 		{
 			final double[] reaction = this.brain.evaluate(enviroment);
-			PolarPoint p1 = new PolarPoint(reaction[0] * 2, this.angle);
-			PolarPoint p2 = new PolarPoint(reaction[1] * 2, this.angle + Math.PI / 2);
+			PolarPoint p1 = new PolarPoint(reaction[0] * 4, this.angle);
+			PolarPoint p2 = new PolarPoint(reaction[1] * 4, this.angle + Math.PI / 2);
 			this.xV = (p1.getX() + p2.getX());
 			this.yV = (p1.getY() + p2.getY());
-			this.angleV = reaction[2] / (Math.PI * 4);
+			this.angleV = reaction[2] / (Math.PI * 2);
 			this.isShooting = reaction[3] > 0;
 		}
 
@@ -142,7 +143,7 @@ public class Arena
 				this.shootDelay--;
 			else if (this.isShooting)
 			{
-				this.shootDelay = 5;
+				this.shootDelay = 10;
 				final PolarPoint p1 = new PolarPoint(Fighter.radius + 10, this.angle);
 				final PolarPoint p2 = new PolarPoint(5, this.angle);
 				this.arena.addProjectile(new Projectile(p1.getX() + this.getX(), p1.getY() + this.getY(), p2.getX(), p2.getY(), this));
@@ -275,6 +276,7 @@ public class Arena
 	private final ArrayList<Projectile>	projectiles;
 	private final ArrayList<Polygon>	terrain;
 	private final double				maxDistance;
+	public final Random					r	= new MersenneTwisterRNG();
 
 	public Arena(final Rectangle bounds, final int maxAge)
 	{
@@ -290,6 +292,11 @@ public class Arena
 	public double getMaxDistance()
 	{
 		return this.maxDistance;
+	}
+
+	public Rectangle getBounds()
+	{
+		return this.bounds;
 	}
 
 	public Fighter getOtherFighter(Fighter f)
@@ -392,7 +399,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().incrementScore(-1);
+					if (p.getOwner() != null) p.getOwner().decrementScore(0.1);
 				}
 				else
 				{

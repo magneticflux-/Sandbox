@@ -3,7 +3,6 @@ package com.sandbox.evolve;
 import java.awt.Rectangle;
 import java.util.List;
 
-import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.watchmaker.framework.PopulationData;
@@ -25,16 +24,10 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 		// TODO Auto-generated method stub
 		Arena a = new Arena(new Rectangle(0, 0, 600, 600), 1000);
 
-		if ((new MersenneTwisterRNG()).nextBoolean())
-		{
-			a.addFighter(a.new Fighter(candidate, 200, 300, Math.PI, a));
-			a.addFighter(a.new Fighter(this.previousBest, 400, 300, 0, a));
-		}
-		else
-		{
-			a.addFighter(a.new Fighter(candidate, 400, 300, 0, a));
-			a.addFighter(a.new Fighter(this.previousBest, 200, 300, Math.PI, a));
-		}
+		a.addFighter(a.new Fighter(candidate, a.r.nextDouble() * a.getBounds().getWidth(), a.r.nextDouble() * a.getBounds().getHeight(), a.r.nextDouble()
+				* Math.PI * 2, a));
+		a.addFighter(a.new Fighter(this.previousBest, a.r.nextDouble() * a.getBounds().getWidth(), a.r.nextDouble() * a.getBounds().getHeight(), a.r
+				.nextDouble() * Math.PI * 2, a));
 
 		while (a.isYoung())
 			a.updatePhysics();
