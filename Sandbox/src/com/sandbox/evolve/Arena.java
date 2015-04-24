@@ -402,7 +402,7 @@ public class Arena
 						{
 							i.remove();
 							if (p.getOwner() != null) p.getOwner().incrementScore(1);
-							f.decrementScore(0.25);
+							f.decrementScore(0.1);
 							break;
 						}
 					}
