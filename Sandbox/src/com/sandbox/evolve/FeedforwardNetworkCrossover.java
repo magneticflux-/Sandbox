@@ -21,6 +21,12 @@ public class FeedforwardNetworkCrossover extends AbstractCrossover<FeedforwardNe
 		this(1);
 	}
 
+	protected FeedforwardNetworkCrossover(final int crossoverPoints)
+	{
+		super(crossoverPoints);
+		this.weightCrossover = new ListCrossover<Double>(crossoverPoints);
+	}
+
 	public FeedforwardNetworkCrossover(final int crossoverPoints, final Probability crossoverProbability)
 	{
 		super(crossoverPoints, crossoverProbability);
@@ -37,12 +43,6 @@ public class FeedforwardNetworkCrossover extends AbstractCrossover<FeedforwardNe
 	{
 		super(crossoverPointsVariable, crossoverProbabilityVariable);
 		this.weightCrossover = new ListCrossover<Double>(crossoverPointsVariable, crossoverProbabilityVariable);
-	}
-
-	protected FeedforwardNetworkCrossover(final int crossoverPoints)
-	{
-		super(crossoverPoints);
-		this.weightCrossover = new ListCrossover<Double>(crossoverPoints);
 	}
 
 	@Override

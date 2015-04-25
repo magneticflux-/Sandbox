@@ -2,6 +2,7 @@ package com.sandbox.evolve;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.Random;
 
 import javax.swing.JComponent;
 
@@ -18,58 +19,59 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 	@SuppressWarnings("unused")
 	private FeedforwardNetwork	bestNetwork;
 
-	public FeedforwardNetworkRenderer(String layout)
+	public FeedforwardNetworkRenderer(final String layout)
 	{
 		this.bestNetwork = new FeedforwardNetwork(layout);
 	}
 
 	@Override
-	public FeedforwardNetworkRendererComponent render(FeedforwardNetwork entity)
+	public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 	{
-		final FeedforwardNetwork input = entity;
-		return new FeedforwardNetworkRendererComponent(input, input);// bestNetwork);
+		this.bestNetwork = data.getBestCandidate().getDeepCopy();
 	}
 
 	@Override
-	public void populationUpdate(PopulationData<? extends FeedforwardNetwork> data)
+	public FeedforwardNetworkRendererComponent render(final FeedforwardNetwork entity)
 	{
-		this.bestNetwork = data.getBestCandidate().getDeepCopy();
+		final FeedforwardNetwork input = entity;
+		return new FeedforwardNetworkRendererComponent(input, input);// bestNetwork);
 	}
 }
 
 class FeedforwardNetworkRendererComponent extends JComponent
 {
 	private static final long	serialVersionUID	= 1L;
+	private static final double	updateSpeed			= 16.666666666;
 	private final Arena			arena;
 	private final Arena.Fighter	fighter1;
 	private final Arena.Fighter	fighter2;
-	private static final double	updateSpeed			= 16.666666666;
 
-	public FeedforwardNetworkRendererComponent(FeedforwardNetwork competitor, FeedforwardNetwork champ)
+	public FeedforwardNetworkRendererComponent(final FeedforwardNetwork competitor, final FeedforwardNetwork champ)
 	{
 		super();
-		arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
-		fighter1 = arena.new Fighter(competitor.getDeepCopy(), arena.r.nextDouble() * arena.getBounds().getWidth(), arena.r.nextDouble()
-				* arena.getBounds().getHeight(), arena.r.nextDouble() * Math.PI * 2, arena);
-		fighter2 = arena.new Fighter(champ.getDeepCopy(), arena.r.nextDouble() * arena.getBounds().getWidth(), arena.r.nextDouble()
-				* arena.getBounds().getHeight(), arena.r.nextDouble() * Math.PI * 2, arena);
-		arena.addFighter(fighter1);
-		arena.addFighter(fighter2);
+		final Random r = new Random();
+		this.arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
+		this.fighter1 = this.arena.new Fighter(competitor.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
+				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, this.arena);
+		this.fighter2 = this.arena.new Fighter(champ.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
+				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, this.arena);
+		this.arena.addFighter(this.fighter1);
+		this.arena.addFighter(this.fighter2);
 	}
 
 	@Override
-	public void paintComponent(Graphics g)
+	public void paintComponent(final Graphics g)
 	{
-		long startTime = System.nanoTime();
+		final long startTime = System.nanoTime();
 
 		super.paintComponent(g);
-		arena.updatePhysics();
-		arena.paint(g);
+		this.arena.updatePhysics();
+		this.arena.paint(g);
 
 		try
 		{
-			if (updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
-				Thread.sleep((long) (updateSpeed - (System.nanoTime() - startTime) / 1000000d));
+			if (FeedforwardNetworkRendererComponent.updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
+				Thread.sleep((long) (FeedforwardNetworkRendererComponent.updateSpeed - (System.nanoTime() - startTime) / 1000000d));
 			else
 			{
 			}
@@ -78,7 +80,7 @@ class FeedforwardNetworkRendererComponent extends JComponent
 		{
 			e.printStackTrace();
 		}
-		while (updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
+		while (FeedforwardNetworkRendererComponent.updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
 		{
 		}
 		this.repaint();

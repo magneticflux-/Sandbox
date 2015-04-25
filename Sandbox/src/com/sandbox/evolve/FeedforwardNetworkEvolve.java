@@ -1,5 +1,10 @@
 package com.sandbox.evolve;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
@@ -29,10 +34,10 @@ import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkEvolve
 {
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		String layout = "5 4 4 4";
-		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(layout, 64);
+		final String layout = "6 6 4 4";
+		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(layout, 4);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
@@ -51,45 +56,54 @@ public class FeedforwardNetworkEvolve
 				rng);
 		engine.addEvolutionObserver(eval);
 		engine.addEvolutionObserver(new EvolutionObserver<FeedforwardNetwork>()
-		{
+				{
 			@Override
 			public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 			{
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
 			}
-		});
-		final UserAbort abort = new UserAbort();
-		EvolutionMonitor<FeedforwardNetwork> monitor = new EvolutionMonitor<FeedforwardNetwork>(new FeedforwardNetworkRenderer(layout), false);
-
-		((JTabbedPane) monitor.getGUIComponent().getComponents()[0]).add(new JPanel()
-		{
-			private static final long	serialVersionUID	= 1L;
-
-			{
-				setName("Abort Button");
-				add(new JButton()
-				{
-					private static final long	serialVersionUID	= 1L;
-
-					{
-						setName("ABORT");
-						addActionListener(new ActionListener()
-						{
-
-							@Override
-							public void actionPerformed(ActionEvent e)
-							{
-								abort.abort();
-								System.out.println("*** ABORT SEQUENCE ACTIVATED ***\n");
-							}
-						});
-					}
 				});
-			}
-		});
+		final UserAbort abort = new UserAbort();
+		final EvolutionMonitor<FeedforwardNetwork> monitor = new EvolutionMonitor<FeedforwardNetwork>(new FeedforwardNetworkRenderer(layout), false);
+
+		synchronized (monitor.getGUIComponent().getTreeLock())
+		{
+			((JTabbedPane) monitor.getGUIComponent().getComponents()[0]).add(new JPanel()
+			{
+				private static final long	serialVersionUID	= 1L;
+
+				{
+					this.setName("Abort Button");
+					this.setLayout(new GridBagLayout());
+					this.add(new JButton()
+					{
+						private static final long	serialVersionUID	= 1L;
+
+						{
+							this.setName("ABORT");
+							this.setMaximumSize(new Dimension(50, 50));
+							this.setPreferredSize(new Dimension(50, 50));
+							this.setBackground(Color.RED);
+
+							this.addActionListener(new ActionListener()
+							{
+								@Override
+								public void actionPerformed(final ActionEvent e)
+								{
+									abort.abort();
+									System.out.println("*** ABORT SEQUENCE ACTIVATED ***\n");
+								}
+							});
+						}
+					}, new GridBagConstraints(0, 0, 1, 1, .5, .5, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+				}
+			});
+			monitor.getGUIComponent().validate();
+		}
 
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
+
 		final FeedforwardNetwork result = engine.evolve(1000, 2, abort);
 		System.out.println("Fittest individual: " + result);
 	}

@@ -41,6 +41,13 @@ public class NeuronNode extends AbstractNode
 		return this.weights;
 	}
 
+	@Override
+	public void randomizeWeights(final Random rng, final double range)
+	{
+		for (int i = 0; i < this.weights.size(); i++)
+			this.weights.set(i, range * 2 * (rng.nextDouble() - 0.5));
+	}
+
 	public void setWeights(final List<Double> weights)
 	{
 		this.weights = weights;
@@ -50,14 +57,5 @@ public class NeuronNode extends AbstractNode
 	public String toString()
 	{
 		return "Neuron has weights of " + this.weights;
-	}
-
-	@Override
-	public void randomizeWeights(Random rng, double range)
-	{
-		for (int i = 0; i < this.weights.size(); i++)
-		{
-			this.weights.set(i, range * 2 * (rng.nextDouble() - 0.5));
-		}
 	}
 }

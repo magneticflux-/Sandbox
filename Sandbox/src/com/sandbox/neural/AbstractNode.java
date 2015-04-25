@@ -19,10 +19,10 @@ public abstract class AbstractNode
 		return this.parents;
 	}
 
+	public abstract void randomizeWeights(Random rng, double range);
+
 	public void setParents(final ArrayList<AbstractNode> parents)
 	{
 		this.parents = parents;
 	}
-
-	public abstract void randomizeWeights(Random rng, double range);
 }

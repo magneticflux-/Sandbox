@@ -16,6 +16,11 @@ public class InputNode extends AbstractNode
 		return this.output;
 	}
 
+	@Override
+	public void randomizeWeights(final Random rng, final double range)
+	{
+	}
+
 	public void setOutput(final double output)
 	{
 		this.output = output;
@@ -25,11 +30,6 @@ public class InputNode extends AbstractNode
 	public String toString()
 	{
 		return "InputNode value: " + this.output;
-	}
-
-	@Override
-	public void randomizeWeights(Random rng, double range)
-	{
 	}
 
 }

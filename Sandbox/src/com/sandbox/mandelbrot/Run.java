@@ -79,8 +79,8 @@ public class Run
 								tempMap.put(
 										new Point(this.column, y),
 										1
-												- Run.mandelbrotDivergeRate(new Complex((this.column - width / 2 + xTarget) / scale, (y - height / 2 + yTarget)
-														/ scale)) / max);
+										- Run.mandelbrotDivergeRate(new Complex((this.column - width / 2 + xTarget) / scale, (y - height / 2 + yTarget)
+												/ scale)) / max);
 							normalizedValues.putAll(tempMap);
 							// System.out.println("Thread for column " + column + " has completed its task.");
 						}

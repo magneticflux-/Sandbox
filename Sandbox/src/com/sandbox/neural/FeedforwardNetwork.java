@@ -54,6 +54,19 @@ public class FeedforwardNetwork
 		s.close();
 	}
 
+	public double[] evaluate(final double[] inputs)
+	{
+		if (inputs.length != this.inputs.getNodes().size()) throw new IllegalArgumentException("Invalid input size! Cannot evaluate neural net.");
+
+		for (int i = 0; i < inputs.length; i++)
+			((InputNode) this.inputs.getNode(i)).setOutput(inputs[i]);
+
+		final double[] outputs = new double[this.layers.get(this.layers.size() - 1).getNodes().size()];
+		for (int i = 0; i < outputs.length; i++)
+			outputs[i] = this.layers.get(this.layers.size() - 1).getNode(i).getOutput();
+		return outputs;
+	}
+
 	@SuppressWarnings("unchecked")
 	public FeedforwardNetwork getDeepCopy()
 	{
@@ -66,34 +79,6 @@ public class FeedforwardNetwork
 							.get(layer).getNode(node)).getWeights()).clone());
 
 		return n;
-	}
-
-	public void randomizeWeights(Random rng, double range)
-	{
-		for (NodeLayer l : this.layers)
-		{
-			for (AbstractNode n : l.getNodes())
-			{
-				n.randomizeWeights(rng, range);
-			}
-		}
-	}
-
-	public double[] evaluate(double[] inputs)
-	{
-		if (inputs.length != this.inputs.getNodes().size()) throw new IllegalArgumentException("Invalid input size! Cannot evaluate neural net.");
-
-		for (int i = 0; i < inputs.length; i++)
-		{
-			((InputNode) this.inputs.getNode(i)).setOutput(inputs[i]);
-		}
-
-		double[] outputs = new double[layers.get(layers.size() - 1).getNodes().size()];
-		for (int i = 0; i < outputs.length; i++)
-		{
-			outputs[i] = layers.get(layers.size() - 1).getNode(i).getOutput();
-		}
-		return outputs;
 	}
 
 	public NodeLayer getInputs()
@@ -109,6 +94,13 @@ public class FeedforwardNetwork
 	public String getLayout()
 	{
 		return this.layout;
+	}
+
+	public void randomizeWeights(final Random rng, final double range)
+	{
+		for (final NodeLayer l : this.layers)
+			for (final AbstractNode n : l.getNodes())
+				n.randomizeWeights(rng, range);
 	}
 
 	@Override

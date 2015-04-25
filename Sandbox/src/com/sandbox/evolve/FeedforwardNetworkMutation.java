@@ -40,10 +40,14 @@ public class FeedforwardNetworkMutation implements EvolutionaryOperator<Feedforw
 					if (abn instanceof NeuronNode)
 						for (int i = 0; i < ((NeuronNode) abn).getWeights().size(); i++)
 							if (this.mutationProbability.nextValue().nextEvent(rng))
-								((NeuronNode) abn).getWeights().set(i,
-										((NeuronNode) abn).getWeights().get(i) * (2 * (rng.nextDouble() - 0.5) * 1.25) + 2 * (rng.nextDouble() - 0.5));
+								((NeuronNode) abn).getWeights().set(i, this.mutate(((NeuronNode) abn).getWeights().get(i), rng));
 			mutatedPopulation.add(n);
 		}
 		return mutatedPopulation;
+	}
+
+	private double mutate(final double value, final Random rng)
+	{
+		return value + rng.nextDouble() * 2 - 1;
 	}
 }

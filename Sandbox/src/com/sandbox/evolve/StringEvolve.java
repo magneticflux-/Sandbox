@@ -28,6 +28,35 @@ import org.uncommons.watchmaker.framework.selection.RouletteWheelSelection;
 import org.uncommons.watchmaker.framework.termination.TargetFitness;
 import org.uncommons.watchmaker.swing.evolutionmonitor.EvolutionMonitor;
 
+class StringEvaluator implements FitnessEvaluator<String>
+{
+	private final String	targetString;
+
+	/**
+	 * Assigns one "fitness point" for every character in the candidate String that matches the corresponding position in the target string.
+	 */
+	public StringEvaluator(final String target)
+	{
+		super();
+		this.targetString = target;
+	}
+
+	@Override
+	public double getFitness(final String candidate, final List<? extends String> population)
+	{
+		int matches = 0;
+		for (int i = 0; i < candidate.length(); i++)
+			if (candidate.charAt(i) == this.targetString.charAt(i)) matches++;
+		return matches;
+	}
+
+	@Override
+	public boolean isNatural()
+	{
+		return true;
+	}
+}
+
 public class StringEvolve
 {
 	public static void main(final String[] args)
@@ -69,7 +98,7 @@ public class StringEvolve
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
 			}
 		});
-		EvolutionMonitor<String> monitor = new EvolutionMonitor<String>(new StringRenderer(), false);
+		final EvolutionMonitor<String> monitor = new EvolutionMonitor<String>(new StringRenderer(), false);
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
 		final String result = engine.evolve(10000, 500, new TargetFitness(target.length(), true));
@@ -80,57 +109,28 @@ public class StringEvolve
 class StringRenderer implements Renderer<String, JComponent>
 {
 	@Override
-	public JComponent render(String entity)
+	public JComponent render(final String entity)
 	{
 		final String input = entity;
-		JComponent jc = new JComponent()
+		final JComponent jc = new JComponent()
 		{
 			private static final long	serialVersionUID	= 1L;
 			private final String		toRender			= input;
 			private double				inc					= 0;
 
 			@Override
-			public void paintComponent(Graphics g)
+			public void paintComponent(final Graphics g)
 			{
-				g.setColor(new Color((int) (128 + 127 * Math.sin(inc + (2 * Math.PI / 3))), (int) (128 + 127 * Math.sin(inc + (4 * Math.PI / 3))),
-						(int) (128 + 127 * Math.sin(inc + (0 * Math.PI / 3)))));
+				g.setColor(new Color((int) (128 + 127 * Math.sin(this.inc + 2 * Math.PI / 3)), (int) (128 + 127 * Math.sin(this.inc + 4 * Math.PI / 3)),
+						(int) (128 + 127 * Math.sin(this.inc + 0 * Math.PI / 3))));
 				g.fillRect(0, 0, this.getWidth(), this.getHeight());
-				g.setColor(new Color((int) (128 + 127 * Math.sin(inc + 0)), (int) (128 + 127 * Math.sin(inc + (2 * Math.PI / 3))), (int) (128 + 127 * Math
-						.sin(inc + (4 * Math.PI / 3)))));
-				g.drawString(toRender, 50, 50);
-				inc += 0.001;
-				repaint();
+				g.setColor(new Color((int) (128 + 127 * Math.sin(this.inc + 0)), (int) (128 + 127 * Math.sin(this.inc + 2 * Math.PI / 3)),
+						(int) (128 + 127 * Math.sin(this.inc + 4 * Math.PI / 3))));
+				g.drawString(this.toRender, 50, 50);
+				this.inc += 0.001;
+				this.repaint();
 			}
 		};
 		return jc;
-	}
-}
-
-class StringEvaluator implements FitnessEvaluator<String>
-{
-	private final String	targetString;
-
-	/**
-	 * Assigns one "fitness point" for every character in the candidate String that matches the corresponding position in the target string.
-	 */
-	public StringEvaluator(final String target)
-	{
-		super();
-		this.targetString = target;
-	}
-
-	@Override
-	public double getFitness(final String candidate, final List<? extends String> population)
-	{
-		int matches = 0;
-		for (int i = 0; i < candidate.length(); i++)
-			if (candidate.charAt(i) == this.targetString.charAt(i)) matches++;
-		return matches;
-	}
-
-	@Override
-	public boolean isNatural()
-	{
-		return true;
 	}
 }

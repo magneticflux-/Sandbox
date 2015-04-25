@@ -22,7 +22,7 @@ public class NetworkCandidateFactory extends AbstractCandidateFactory<Feedforwar
 	public FeedforwardNetwork generateRandomCandidate(final Random rng)
 	{
 		final FeedforwardNetwork n = new FeedforwardNetwork(this.networkLayout);
-		n.randomizeWeights(rng, weightRange);
+		n.randomizeWeights(rng, this.weightRange);
 		return n;
 	}
 }
