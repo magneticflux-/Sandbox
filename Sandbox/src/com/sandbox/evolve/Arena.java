@@ -7,12 +7,14 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.eclipse.jdt.annotation.Nullable;
 import org.uncommons.maths.random.MersenneTwisterRNG;
@@ -34,6 +36,7 @@ public class Arena
 		private int							shootDelay	= 0;
 		private final Color					team		= new Color((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256));
 		private BigFraction					score;
+		private CircularFifoQueue<Double>	memory;
 
 		public Fighter(final FeedforwardNetwork brain, final double x, final double y, final Arena arena)
 		{
@@ -44,13 +47,15 @@ public class Arena
 		{
 			super(x, y, null);
 
-			if (!(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 6 && Integer.parseInt(brain.getLayout().substring(brain.getLayout().length() - 1,
-					brain.getLayout().length())) >= 4)) throw new IllegalArgumentException("Insufficient brain in/out space.");
+			if (!(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 9 && Integer.parseInt(brain.getLayout().substring(brain.getLayout().length() - 1,
+					brain.getLayout().length())) >= 5)) throw new IllegalArgumentException("Insufficient brain in/out space.");
 
 			this.angle = angle;
 			this.brain = brain;
 			this.arena = arena;
 			this.score = new BigFraction(0);
+			this.memory = new CircularFifoQueue<Double>(3);
+			this.memory.addAll(Arrays.asList(0d, 0d, 0d));
 		}
 
 		public void decrementScore(final BigFraction i)
@@ -106,15 +111,18 @@ public class Arena
 		public void react()
 		{
 			this.reactTo(new double[] {
+					this.memory.get(0),
+					this.memory.get(1),
+					this.memory.get(2),
 					MathUtil.angleTo(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
 							.getOtherFighter(this).getY()))
 							- this.angle,
-							this.arena.getOtherFighter(this).xV,
-							this.arena.getOtherFighter(this).yV,
-							this.arena.getOtherFighter(this).angle,
-							MathUtil.distance(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
-									.getOtherFighter(this).getY()))
-									/ this.arena.getMaxDistance(), this.arena.r.nextDouble() * 2 - 1 });
+					this.arena.getOtherFighter(this).xV,
+					this.arena.getOtherFighter(this).yV,
+					this.arena.getOtherFighter(this).angle,
+					MathUtil.distance(new Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena
+							.getOtherFighter(this).getY()))
+							/ this.arena.getMaxDistance(), this.arena.r.nextDouble() * 2 - 1 });
 		}
 
 		public void reactTo(final double[] enviroment)
@@ -126,6 +134,7 @@ public class Arena
 			this.yV = p1.getY() + p2.getY();
 			this.angleV = reaction[2] / (Math.PI * 2);
 			this.isShooting = reaction[3] > 0;
+			this.memory.add(reaction[4]);
 		}
 
 		@Override
