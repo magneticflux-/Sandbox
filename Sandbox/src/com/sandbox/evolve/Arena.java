@@ -34,7 +34,7 @@ public class Arena
 		private final FeedforwardNetwork	brain;
 		private boolean						isShooting	= false;
 		private int							shootDelay	= 0;
-		private final Color					team		= new Color((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256));
+		public final Color					team		= new Color((int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256));
 		private BigFraction					score;
 		private CircularFifoQueue<Double>	memory;
 
@@ -304,11 +304,10 @@ public class Arena
 		this.projectiles.add(p);
 	}
 
-	private void drawString(final Graphics g, final String text, final int x, int y)
-	{
-		for (final String line : text.split("\n"))
-			g.drawString(line, x, y += g.getFontMetrics().getHeight());
-	}
+	/*
+	 * private void drawString(final Graphics g, final String text, final int x, int y) { for (final String line : text.split("\n")) g.drawString(line, x, y +=
+	 * g.getFontMetrics().getHeight()); }
+	 */
 
 	public Rectangle getBounds()
 	{
@@ -358,11 +357,16 @@ public class Arena
 
 		g2d.setColor(Color.BLACK);
 
-		final StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < this.fighters.size(); i++)
-			sb.append("Fighter " + (i + 1) + ": " + this.fighters.get(i).getScore().bigDecimalValue() + "pts.\n");
+		{
+			g2d.setColor(Color.BLACK);
+			g2d.drawString("Fighter " + (i + 1) + ": " + this.fighters.get(i).getScore().bigDecimalValue() + "pts.", 50, 20 + i
+					* g2d.getFontMetrics().getHeight());
 
-		this.drawString(g2d, sb.toString(), 50, 20);
+			g2d.setColor(this.fighters.get(i).team);
+			g2d.fillRect(50 - g2d.getFontMetrics().getHeight(), 20 + (i - 1) * g2d.getFontMetrics().getHeight(), g2d.getFontMetrics().getHeight(), g2d
+					.getFontMetrics().getHeight());
+		}
 	}
 
 	public void updatePhysics()

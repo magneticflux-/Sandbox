@@ -7,8 +7,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -33,6 +35,7 @@ import org.uncommons.watchmaker.framework.termination.UserAbort;
 import org.uncommons.watchmaker.swing.evolutionmonitor.EvolutionMonitor;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.sandbox.neural.FeedforwardNetwork;
 
@@ -40,12 +43,27 @@ public class FeedforwardNetworkEvolve
 {
 	public static void main(final String[] args)
 	{
+		final Kryo kryo = new Kryo();
+
+		Input input = null;
+		try
+		{
+			input = new Input(new FileInputStream("codex/generation_19.pop"));
+		}
+		catch (FileNotFoundException e2)
+		{
+			e2.printStackTrace();
+		}
+		@SuppressWarnings("unchecked")
+		PopulationData<FeedforwardNetwork> oldPop = kryo.readObject(input, PopulationData.class);
+		input.close();
+
 		final String layout = "9 9 5 5";
-		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(layout, 4);
+		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.03)));
+		operators.add(new FeedforwardNetworkMutation(new Probability(0.015)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
@@ -59,8 +77,6 @@ public class FeedforwardNetworkEvolve
 		final EvolutionEngine<FeedforwardNetwork> engine = new GenerationalEvolutionEngine<FeedforwardNetwork>(factory, pipeline, fitnessEvaluator, selection,
 				rng);
 
-		final Kryo kryo = new Kryo();
-
 		engine.addEvolutionObserver(eval);
 		engine.addEvolutionObserver(new EvolutionObserver<FeedforwardNetwork>()
 		{
@@ -72,7 +88,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/generation_" + data.getGenerationNumber() + ".pop"));
+					output = new Output(new FileOutputStream("codex/generation_" + (data.getGenerationNumber() + 4081) + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{
