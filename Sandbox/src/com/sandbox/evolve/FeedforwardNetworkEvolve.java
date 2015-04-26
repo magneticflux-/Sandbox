@@ -45,7 +45,7 @@ public class FeedforwardNetworkEvolve
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.02)));
+		operators.add(new FeedforwardNetworkMutation(new Probability(0.03)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
@@ -68,14 +68,18 @@ public class FeedforwardNetworkEvolve
 			public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 			{
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
+
+				Output output = null;
 				try
 				{
-					kryo.writeObject(new Output(new FileOutputStream("generation_" + data.getGenerationNumber() + ".pop")), data);
+					output = new Output(new FileOutputStream("codex/generation_" + data.getGenerationNumber() + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{
 					e1.printStackTrace();
 				}
+				kryo.writeObject(output, data);
+				output.close();
 			}
 		});
 		final UserAbort abort = new UserAbort();
