@@ -48,7 +48,7 @@ public class FeedforwardNetworkEvolve
 		Input input = null;
 		try
 		{
-			input = new Input(new FileInputStream("codex/generation_19.pop"));
+			input = new Input(new FileInputStream("codex/generation_9132.pop"));
 		}
 		catch (FileNotFoundException e2)
 		{
@@ -88,7 +88,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/generation_" + (data.getGenerationNumber() + 4081) + ".pop"));
+					output = new Output(new FileOutputStream("codex/generation_" + (data.getGenerationNumber() + 9133) + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{
