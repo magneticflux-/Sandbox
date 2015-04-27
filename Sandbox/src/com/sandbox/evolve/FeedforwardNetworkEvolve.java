@@ -18,6 +18,7 @@ import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
@@ -43,12 +44,21 @@ public class FeedforwardNetworkEvolve
 {
 	public static void main(final String[] args)
 	{
+		try
+		{
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
 		final Kryo kryo = new Kryo();
 
 		Input input = null;
 		try
 		{
-			input = new Input(new FileInputStream("codex/generation_9132.pop"));
+			input = new Input(new FileInputStream("codex/generation_4084.pop"));
 		}
 		catch (FileNotFoundException e2)
 		{
@@ -94,7 +104,7 @@ public class FeedforwardNetworkEvolve
 				{
 					e1.printStackTrace();
 				}
-				kryo.writeObject(output, data);
+				// kryo.writeObject(output, data);
 				output.close();
 			}
 		});
@@ -110,15 +120,14 @@ public class FeedforwardNetworkEvolve
 				{
 					this.setName("Abort Button");
 					this.setLayout(new GridBagLayout());
-					this.add(new JButton()
+					this.add(new JButton("ABORT")
 					{
 						private static final long	serialVersionUID	= 1L;
 
 						{
-							this.setName("ABORT");
-							this.setMaximumSize(new Dimension(50, 50));
-							this.setPreferredSize(new Dimension(50, 50));
 							this.setBackground(Color.RED);
+							this.setMaximumSize(new Dimension(100, 50));
+							this.setPreferredSize(new Dimension(100, 50));
 
 							this.addActionListener(new ActionListener()
 							{
