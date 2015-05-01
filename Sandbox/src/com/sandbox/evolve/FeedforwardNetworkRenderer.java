@@ -41,7 +41,7 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 class FeedforwardNetworkRendererComponent extends JComponent
 {
 	private static final long	serialVersionUID	= 1L;
-	private static final double	updateSpeed			= 16.666666666;
+	private static final double	updateSpeed			= 50 / 3d;
 	private final Arena			arena;
 	private final Arena.Fighter	fighter1;
 	private final Arena.Fighter	fighter2;
@@ -52,9 +52,9 @@ class FeedforwardNetworkRendererComponent extends JComponent
 		final Random r = new Random();
 		this.arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
 		this.fighter1 = this.arena.new Fighter(competitor.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
-				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, this.arena);
+				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, true, this.arena);
 		this.fighter2 = this.arena.new Fighter(champ.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
-				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, this.arena);
+				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, true, this.arena);
 		this.arena.addFighter(this.fighter1);
 		this.arena.addFighter(this.fighter2);
 	}

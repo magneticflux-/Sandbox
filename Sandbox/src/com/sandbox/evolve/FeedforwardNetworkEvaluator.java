@@ -27,9 +27,9 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 		final Random r = new Random();
 
 		a.addFighter(a.new Fighter(candidate, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble() * Math.PI
-				* 2, a));
+				* 2, true, a));
 		a.addFighter(a.new Fighter(this.previousBest, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble()
-				* Math.PI * 2, a));
+				* Math.PI * 2, true, a));
 
 		while (a.isYoung())
 			a.updatePhysics();

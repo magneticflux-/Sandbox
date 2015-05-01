@@ -68,7 +68,7 @@ public class FeedforwardNetworkEvolve
 		PopulationData<FeedforwardNetwork> oldPop = kryo.readObject(input, PopulationData.class);
 		input.close();
 
-		final String layout = "9 9 5 5";
+		final String layout = "5 8 8 7";
 		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
