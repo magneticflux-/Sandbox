@@ -53,27 +53,39 @@ public class FeedforwardNetworkEvolve
 			e.printStackTrace();
 		}
 
+		final boolean loadPrevious = true;
+		final int loadValue = 27889;
+		CandidateFactory<FeedforwardNetwork> factory = null;
+
 		final Kryo kryo = new Kryo();
-
-		Input input = null;
-		try
+		if (loadPrevious)
 		{
-			input = new Input(new FileInputStream("codex/generation_4084.pop"));
-		}
-		catch (FileNotFoundException e2)
-		{
-			e2.printStackTrace();
-		}
-		@SuppressWarnings("unchecked")
-		PopulationData<FeedforwardNetwork> oldPop = kryo.readObject(input, PopulationData.class);
-		input.close();
 
-		final String layout = "5 8 8 7";
-		final CandidateFactory<FeedforwardNetwork> factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
+			Input input = null;
+			try
+			{
+				input = new Input(new FileInputStream("codex/generation_" + loadValue + ".pop"));
+			}
+			catch (FileNotFoundException e2)
+			{
+				e2.printStackTrace();
+			}
+			@SuppressWarnings("unchecked")
+			PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+			input.close();
+			factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
+		}
+
+		final String layout = "5 16 7";
+
+		if (!loadPrevious)
+		{
+			factory = new NetworkCandidateFactory(layout, 16);
+		}
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.015)));
+		operators.add(new FeedforwardNetworkMutation(new Probability(0.06)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
@@ -98,13 +110,13 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/generation_" + (data.getGenerationNumber() + 9133) + ".pop"));
+					output = new Output(new FileOutputStream("codex/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{
 					e1.printStackTrace();
 				}
-				// kryo.writeObject(output, data);
+				kryo.writeClassAndObject(output, data);
 				output.close();
 			}
 		});
@@ -148,7 +160,7 @@ public class FeedforwardNetworkEvolve
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
 
-		final FeedforwardNetwork result = engine.evolve(1000, 2, abort);
+		final FeedforwardNetwork result = engine.evolve(1000, 10, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }

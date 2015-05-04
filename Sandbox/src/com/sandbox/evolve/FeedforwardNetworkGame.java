@@ -85,19 +85,19 @@ public class FeedforwardNetworkGame
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_W)
+				if (e.getKeyCode() == KeyEvent.VK_W && player.yV <= 0)
 				{
 					player.yV += SPEED;
 				}
-				if (e.getKeyCode() == KeyEvent.VK_S)
+				if (e.getKeyCode() == KeyEvent.VK_S && player.yV >= 0)
 				{
 					player.yV -= SPEED;
 				}
-				if (e.getKeyCode() == KeyEvent.VK_A)
+				if (e.getKeyCode() == KeyEvent.VK_A && player.xV >= 0)
 				{
 					player.xV -= SPEED;
 				}
-				if (e.getKeyCode() == KeyEvent.VK_D)
+				if (e.getKeyCode() == KeyEvent.VK_D && player.xV <= 0)
 				{
 					player.xV += SPEED;
 				}
@@ -202,7 +202,7 @@ public class FeedforwardNetworkGame
 											{
 												Input i = null;
 												i = new Input(new FileInputStream(directory));
-												action.actionPerformed(new ActionEvent(kryo.readObject(i, PopulationData.class), 0, SAVE_FILE));
+												action.actionPerformed(new ActionEvent(kryo.readClassAndObject(i), 0, SAVE_FILE));
 												i.close();
 
 											}

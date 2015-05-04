@@ -152,7 +152,7 @@ public class Arena
 
 		public void react()
 		{
-			if (this.isRobot)
+			if (this.isRobot && this.brain != null)
 				this.reactTo(new double[] { this.memory.get(0), this.memory.get(1), this.memory.get(2), this.getNumVisibleProjectiles(),
 						this.getNumVisibleFighters() });
 			/*
@@ -171,11 +171,11 @@ public class Arena
 			final PolarPoint p2 = new PolarPoint(reaction[1] * 4, this.angle + Math.PI / 2);
 			this.xV = p1.getX() + p2.getX();
 			this.yV = p1.getY() + p2.getY();
-			this.angleV = reaction[2] / (Math.PI * 2);
+			this.angleV = reaction[2] / (Math.PI * 4);
 			this.isShooting = reaction[3] > 0;
 			this.memory.add(reaction[4]);
-			if (this.fov + reaction[5] >= 0 && this.fov + reaction[5] <= 2 * Math.PI / 3) this.fov += reaction[5];
-			if (this.range + reaction[6] >= 0) this.range += reaction[6];
+			if (this.fov + (reaction[5] / 10) >= 0 && this.fov + (reaction[5] / 10) <= Math.PI) this.fov += (reaction[5] / 10);
+			if (this.range + (reaction[6] * 10) >= 0) this.range += (reaction[6] * 10);
 		}
 
 		@Override
@@ -183,7 +183,6 @@ public class Arena
 		{
 			super.updatePosition();
 
-			this.angle += this.angleV;
 			if (Math.abs(this.angle) >= Math.PI * 2) this.angle = (Math.PI * 2 + this.angle) % (Math.PI * 2);
 
 			if (this.shootDelay > 0)
@@ -293,7 +292,7 @@ public class Arena
 	}
 
 	public static final double	AIR_DENSITY	= 0.00075;
-	public static final double	SPHERE_CD	= 0.15;
+	public static final double	SPHERE_CD	= 0.1;
 
 	public static void main(final String[] args)
 	{
@@ -473,7 +472,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(new BigFraction(1, 10));
+					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ONE);
 				}
 				else
 					for (final Fighter f : this.fighters)
@@ -481,7 +480,7 @@ public class Arena
 						{
 							i.remove();
 							if (p.getOwner() != null) p.getOwner().incrementScore(BigFraction.ONE);
-							f.decrementScore(new BigFraction(1, 10));
+							f.decrementScore(BigFraction.ONE);
 							break;
 						}
 			}
