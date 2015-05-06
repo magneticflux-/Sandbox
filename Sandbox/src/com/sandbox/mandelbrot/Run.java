@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -22,11 +25,11 @@ public class Run
 {
 	public static final double	bound			= 2;
 	public static int			maxIteration	= 1;
-	public static Complex		constant		= new Complex(0.1, 0.5);
+	public static Complex		constant		= new Complex(-0.225747112829, 0);
 
-	public static Complex getNextMandelbrotIteration(final Complex c)
+	public static Complex getNextMandelbrotIteration(final Complex c, final Complex initial)
 	{
-		return c.pow(2).add(constant).pow(-1);
+		return c.pow(2).exp().add(initial).add(constant);
 	}
 
 	public static Color getRainbow(final double i)
@@ -47,10 +50,10 @@ public class Run
 			private static final long	serialVersionUID	= 1L;
 			public Map<Point, Integer>	normalizedValues	= Collections.synchronizedMap(new HashMap<Point, Integer>());
 			public int					renderResolution	= 1;
-			public double				scale				= 100;
-			public double				xTarget				= 0;															// 90.664;
+			public double				scale				= 200;
+			public double				xTarget				= -130.5837;													// 90.664;
 			public double				yTarget				= 0;															// 61.475;
-			public double				zoomMultiplier		= 1;
+			public double				zoomMultiplier		= 1.025;
 
 			@Override
 			public void paintComponent(final Graphics g)
@@ -105,6 +108,15 @@ public class Run
 					// bImg.setRGB(e.getKey().x, e.getKey().y, Run.getRainbow(e.getValue() * Math.PI * 2).getRGB());
 				}
 
+				try
+				{
+					ImageIO.write(bImg, "png", new File(String.format("images/test_%04d.png", maxIteration)));
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+
 				g.drawImage(bImg, 0, 0, this);
 
 				// renderResolution--;
@@ -126,15 +138,17 @@ public class Run
 		frame.add(comp);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.setSize(600, 600);
+		frame.setSize(1000, 900);
 		frame.setVisible(true);
 	}
 
 	public static int mandelbrotDivergeRate(Complex c)
 	{
+		final Complex initial = c;
+
 		for (int i = 0; i < Run.maxIteration; i++)
 		{
-			c = Run.getNextMandelbrotIteration(c);
+			c = Run.getNextMandelbrotIteration(c, initial);
 			if (c.abs() > Run.bound) return i;
 		}
 		return -1;

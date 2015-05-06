@@ -28,10 +28,12 @@ public class AdvancedRun
 					for (double complex = -0.5; complex <= 0.5; complex += 0.1)
 					{
 						Complex c = new Complex(real, complex);
+						final Complex initial = c;
+
 						for (int i = 0; i < maxLength; i++)
 						{
 							g.setColor(Run.getRainbow(MathUtils.TWO_PI * i / (double) maxLength));
-							Complex temp = Run.getNextMandelbrotIteration(c);
+							Complex temp = Run.getNextMandelbrotIteration(c, initial);
 							g.drawLine((int) (c.getReal() * scale) + this.getWidth() / 2, (int) (c.getImaginary() * scale) + this.getHeight() / 2,
 									(int) (temp.getReal() * scale) + this.getWidth() / 2, (int) (temp.getImaginary() * scale) + this.getHeight() / 2);
 							c = temp;
