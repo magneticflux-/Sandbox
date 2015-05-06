@@ -2,7 +2,9 @@ package com.sandbox.mandelbrot;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,19 +21,12 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static int			maxIteration	= 20;
-	public static final Complex	constant		= new Complex(0.065, 0.122);
+	public static int			maxIteration	= 1;
+	public static Complex		constant		= new Complex(0.1, 0.5);
 
-	public static Complex getMandelbrotIteration(final Complex c, final int n)
+	public static Complex getNextMandelbrotIteration(final Complex c)
 	{
-		if (n < 1)
-			return c;
-		else
-		{
-			Complex temp = Run.getMandelbrotIteration(c, n - 1);
-
-			return temp.pow(2).sinh().sqrt().add(constant);
-		}
+		return c.pow(2).add(constant).pow(-1);
 	}
 
 	public static Color getRainbow(final double i)
@@ -39,10 +34,10 @@ public class Run
 		final int r = 128 + (int) (127 * Math.sin(i));
 		final int g = 128 + (int) (127 * Math.sin(i + 2 * Math.PI / 3));
 		final int b = 128 + (int) (127 * Math.sin(i + 4 * Math.PI / 3));
-		if (i > 0)
+		if (i >= 0)
 			return new Color(r, g, b);
 		else
-			return new Color(0, 0, 0);
+			return Color.BLACK;// new Color(0, 0, 0);
 	}
 
 	public static void main(final String[] args)
@@ -50,11 +45,11 @@ public class Run
 		final JPanel comp = new JPanel()
 		{
 			private static final long	serialVersionUID	= 1L;
-			public Map<Point, Double>	normalizedValues	= Collections.synchronizedMap(new HashMap<Point, Double>());
+			public Map<Point, Integer>	normalizedValues	= Collections.synchronizedMap(new HashMap<Point, Integer>());
 			public int					renderResolution	= 1;
-			public double				scale				= 200;
-			public double				xTarget				= 0;
-			public double				yTarget				= 0;
+			public double				scale				= 100;
+			public double				xTarget				= 0;															// 90.664;
+			public double				yTarget				= 0;															// 61.475;
 			public double				zoomMultiplier		= 1;
 
 			@Override
@@ -63,7 +58,6 @@ public class Run
 				final long startTime = System.nanoTime();
 				final int width = this.getWidth();
 				final int height = this.getHeight();
-				final double max = Run.maxIteration;
 
 				final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 				System.out.println(Runtime.getRuntime().availableProcessors() + " processors available.");
@@ -78,13 +72,10 @@ public class Run
 						public void run()
 						{
 							// System.out.println("Thread for column " + column + " reporting for duty, sir!");
-							final HashMap<Point, Double> tempMap = new HashMap<Point, Double>();
+							final HashMap<Point, Integer> tempMap = new HashMap<Point, Integer>();
 							for (int y = 0; y < height; y += renderResolution)
-								tempMap.put(
-										new Point(this.column, y),
-										1
-												- Run.mandelbrotDivergeRate(new Complex((this.column - width / 2 + xTarget) / scale, (y - height / 2 + yTarget)
-														/ scale)) / max);
+								tempMap.put(new Point(this.column, y),
+										Run.mandelbrotDivergeRate(new Complex((this.column - width / 2 + xTarget) / scale, (y - height / 2 + yTarget) / scale)));
 							normalizedValues.putAll(tempMap);
 							// System.out.println("Thread for column " + column + " has completed its task.");
 						}
@@ -104,20 +95,29 @@ public class Run
 					e.printStackTrace();
 				}
 
-				for (final Entry<Point, Double> e : this.normalizedValues.entrySet())
+				BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+				Graphics2D g2d = bImg.createGraphics();
+
+				for (final Entry<Point, Integer> e : this.normalizedValues.entrySet())
 				{
-					g.setColor(Run.getRainbow(e.getValue() * Math.PI * 2));
-					g.fillRect(e.getKey().x, e.getKey().y, this.renderResolution, this.renderResolution);
+					g2d.setColor(Run.getRainbow(e.getValue() * Math.PI * 2 / maxIteration));
+					g2d.fillRect(e.getKey().x, e.getKey().y, this.renderResolution, this.renderResolution);
+					// bImg.setRGB(e.getKey().x, e.getKey().y, Run.getRainbow(e.getValue() * Math.PI * 2).getRGB());
 				}
+
+				g.drawImage(bImg, 0, 0, this);
+
 				// renderResolution--;
 				// if (renderResolution < 1) renderResolution = 1;
 				this.scale *= this.zoomMultiplier;
 				this.xTarget *= this.zoomMultiplier;
 				this.yTarget *= this.zoomMultiplier;
-				g.setColor(Color.BLACK);
+				g.setColor(Color.WHITE);
 				g.drawString("Max iterations: " + Run.maxIteration, 20, 20);
-				System.out.println(String.format("Frame took %.4f seconds to render.", (System.nanoTime() - startTime) / 1000000000d));
+				System.out.println(String.format("Frame took %.4f seconds to render at %d iterations.", (System.nanoTime() - startTime) / 1000000000d,
+						maxIteration));
 				maxIteration++;
+				// maxIteration = (int) (maxIteration * this.zoomMultiplier);
 				this.repaint();
 			}
 		};
@@ -130,13 +130,13 @@ public class Run
 		frame.setVisible(true);
 	}
 
-	public static int mandelbrotDivergeRate(final Complex c)
+	public static int mandelbrotDivergeRate(Complex c)
 	{
-		// final double p = Math.sqrt(Math.pow(c.getReal() - 0.25, 2) + Math.pow(c.getImaginary(), 2));
-		// if (c.getReal() < p - 2 * Math.pow(p, 2) + 0.25 || Math.pow(c.getReal() + 1, 2) + Math.pow(c.getImaginary(), 2) < 0.0625) return -1;
-
 		for (int i = 0; i < Run.maxIteration; i++)
-			if (Run.getMandelbrotIteration(c, i).abs() > Run.bound) return i;
+		{
+			c = Run.getNextMandelbrotIteration(c);
+			if (c.abs() > Run.bound) return i;
+		}
 		return -1;
 	}
 }

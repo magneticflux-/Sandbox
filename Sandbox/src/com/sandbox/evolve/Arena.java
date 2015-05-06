@@ -288,13 +288,14 @@ public class Arena
 			this.x += this.xV;
 			this.y += this.yV;
 			this.angle += this.angleV;
+			this.angleV *= 0.99;
 		}
 	}
 
 	public static final double	AIR_DENSITY	= 0.00075;
 	public static final double	SPHERE_CD	= 0.1;
 
-	public static void main(final String[] args)
+	public static void main1(final String[] args)
 	{
 		final JFrame frame = new JFrame("Frame");
 		final Arena a = new Arena(new Rectangle(10, 10, 700, 700), -1);
