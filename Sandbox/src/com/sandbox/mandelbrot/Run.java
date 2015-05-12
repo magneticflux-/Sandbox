@@ -24,12 +24,12 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static int			maxIteration	= 1;
+	public static int			maxIteration	= 50;
 	public static Complex		constant		= new Complex(-0.225747112829, 0);
 
 	public static Complex getNextMandelbrotIteration(final Complex c, final Complex initial)
 	{
-		return c.pow(2).exp().add(initial).add(constant);
+		return c.pow(2).add(initial);
 	}
 
 	public static Color getRainbow(final double i)
@@ -50,10 +50,10 @@ public class Run
 			private static final long	serialVersionUID	= 1L;
 			public Map<Point, Integer>	normalizedValues	= Collections.synchronizedMap(new HashMap<Point, Integer>());
 			public int					renderResolution	= 1;
-			public double				scale				= 200;
-			public double				xTarget				= -130.5837;													// 90.664;
+			public double				scale				= 250;
+			public double				xTarget				= -100;														// 90.664;
 			public double				yTarget				= 0;															// 61.475;
-			public double				zoomMultiplier		= 1.025;
+			public double				zoomMultiplier		= 1;
 
 			@Override
 			public void paintComponent(final Graphics g)
@@ -138,7 +138,7 @@ public class Run
 		frame.add(comp);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		frame.setSize(1000, 900);
+		frame.setSize(900, 700);
 		frame.setVisible(true);
 	}
 

@@ -1,46 +1,103 @@
 package com.sandbox.mandelbrot;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.apache.commons.math3.complex.Complex;
-import org.apache.commons.math3.util.MathUtils;
+
+import com.sandbox.utils.HSLColor;
 
 public class AdvancedRun
 {
+	private static int	maxIteration	= 0;
+
+	public static Complex function(Complex z)
+	{
+		Complex value = z;
+
+		for (int i = 0; i < maxIteration; i++)
+		{
+			value = value.pow(2).add(new Complex(-0.62772, 0.42193));
+		}
+
+		return value;
+	}
+
 	public static void main(String[] args)
 	{
-		JFrame frame = new JFrame("Julia Set");
+		JFrame frame = new JFrame("Complex Plane");
 		frame.add(new JPanel()
 		{
 			private static final long	serialVersionUID	= 1L;
 
 			public void paintComponent(Graphics g)
 			{
+				long start = System.currentTimeMillis();
 				super.paintComponent(g);
 
-				final int maxLength = 10;
-				final double scale = 100;
-				for (double real = -0.5; real <= 0.5; real += 0.1)
-				{
-					for (double complex = -0.5; complex <= 0.5; complex += 0.1)
-					{
-						Complex c = new Complex(real, complex);
-						final Complex initial = c;
+				final int width = this.getWidth();
+				final int height = this.getHeight();
 
-						for (int i = 0; i < maxLength; i++)
+				ExecutorService pool = Executors.newFixedThreadPool(4);
+
+				@SuppressWarnings("unchecked")
+				Future<Complex>[][] pixels = new Future[height][width];
+
+				for (int row = 0; row < pixels.length; row++)
+				{
+					for (int col = 0; col < pixels[row].length; col++)
+					{
+						final double x = (col - width / 2) / 150d;
+						final double y = (row - height / 2) / 150d;
+						pixels[row][col] = pool.submit(new Callable<Complex>()
 						{
-							g.setColor(Run.getRainbow(MathUtils.TWO_PI * i / (double) maxLength));
-							Complex temp = Run.getNextMandelbrotIteration(c, initial);
-							g.drawLine((int) (c.getReal() * scale) + this.getWidth() / 2, (int) (c.getImaginary() * scale) + this.getHeight() / 2,
-									(int) (temp.getReal() * scale) + this.getWidth() / 2, (int) (temp.getImaginary() * scale) + this.getHeight() / 2);
-							c = temp;
-							if (c.abs() > 2) break;
+							@Override
+							public Complex call() throws Exception
+							{
+								// Thread.sleep(0, 0);
+								return function(new Complex(x, y));
+							}
+						});
+					}
+				}
+
+				BufferedImage bi = new BufferedImage(pixels[0].length, pixels.length, BufferedImage.TYPE_INT_ARGB);
+
+				for (int row = 0; row < pixels.length; row++)
+				{
+					for (int col = 0; col < pixels[row].length; col++)
+					{
+						try
+						{
+							bi.setRGB(
+									col,
+									row,
+									HSLColor.toRGB((float) ((-pixels[row][col].get().getArgument()) / (2 * Math.PI)), 1,
+											(float) ((Math.log1p(pixels[row][col].get().abs())) % 1)));
+							// System.out.println("Drew " + col + ", " + row);
+						}
+						catch (InterruptedException e)
+						{
+							e.printStackTrace();
+						}
+						catch (ExecutionException e)
+						{
+							e.printStackTrace();
 						}
 					}
 				}
+				g.drawImage(bi, 0, 0, this);
+				System.out.println("Time elapsed: " + (System.currentTimeMillis() - start) + "ms");
+				maxIteration++;
+				repaint();
 			}
 		});
 		frame.setSize(600, 600);
