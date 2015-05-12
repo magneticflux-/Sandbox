@@ -76,7 +76,7 @@ public class FeedforwardNetworkEvolve
 			factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 		}
 
-		final String layout = "3 4 6 6";
+		final String layout = "3 8 8 6";
 
 		if (!loadPrevious)
 		{
@@ -110,7 +110,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/AI Meta 1/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
+					output = new Output(new FileOutputStream("codex/AI Meta Level 2/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{

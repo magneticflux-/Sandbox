@@ -46,7 +46,7 @@ public class AdvancedRun
 				final int width = this.getWidth();
 				final int height = this.getHeight();
 
-				ExecutorService pool = Executors.newFixedThreadPool(4);
+				ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 				@SuppressWarnings("unchecked")
 				Future<Complex>[][] pixels = new Future[height][width];

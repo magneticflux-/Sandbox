@@ -24,7 +24,7 @@ import org.apache.commons.math3.complex.Complex;
 public class Run
 {
 	public static final double	bound			= 2;
-	public static int			maxIteration	= 50;
+	public static int			maxIteration	= 10;
 	public static Complex		constant		= new Complex(-0.225747112829, 0);
 
 	public static Complex getNextMandelbrotIteration(final Complex c, final Complex initial)
