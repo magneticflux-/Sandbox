@@ -7,14 +7,12 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.math3.fraction.BigFraction;
 import org.apache.commons.math3.util.MathUtils;
 import org.eclipse.jdt.annotation.Nullable;
@@ -28,21 +26,20 @@ public class Arena
 {
 	public class Fighter extends Projectile
 	{
-		private static final double				RADIUS		= 20;
-		public double							fov;
+		private static final double			RADIUS		= 20;
+		public double						fov;
 
-		public final boolean					isRobot;
+		public final boolean				isRobot;
 
-		public boolean							isShooting	= false;
-		public double							range;
-		public final Color						team		= new Color((int) Math.round(Math.random() * 255), (int) Math.round(Math.random() * 255),
-																	(int) Math.round(Math.random() * 255));
-		private final Arena						arena;
+		public boolean						isShooting	= false;
+		public double						range;
+		public final Color					team		= new Color((int) Math.round(Math.random() * 255), (int) Math.round(Math.random() * 255),
+				(int) Math.round(Math.random() * 255));
+		private final Arena					arena;
 		@Nullable
-		private final FeedforwardNetwork		brain;
-		private final CircularFifoQueue<Double>	memory;
-		private BigFraction						score;
-		private int								shootDelay	= 0;
+		private final FeedforwardNetwork	brain;
+		private BigFraction					score;
+		private int							shootDelay	= 0;
 
 		public Fighter(final FeedforwardNetwork brain, final double x, final double y, final boolean isRobot, final Arena arena)
 		{
@@ -54,8 +51,8 @@ public class Arena
 			super(x, y, null);
 
 			if (this.brain != null
-					&& !(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 5 && Integer.parseInt(brain.getLayout().substring(
-							brain.getLayout().length() - 1, brain.getLayout().length())) >= 7))
+					&& !(Integer.parseInt(brain.getLayout().substring(0, 1)) >= 3 && Integer.parseInt(brain.getLayout().substring(
+							brain.getLayout().length() - 1, brain.getLayout().length())) >= 6))
 				throw new IllegalArgumentException("Insufficient brain in/out space.");
 
 			this.angle = angle;
@@ -63,8 +60,6 @@ public class Arena
 			this.brain = brain;
 			this.arena = arena;
 			this.score = new BigFraction(0);
-			this.memory = new CircularFifoQueue<Double>(3);
-			this.memory.addAll(Arrays.asList(0d, 0d, 0d));
 			this.isRobot = isRobot;
 			this.fov = Math.PI / 3;
 			this.range = 400;
@@ -152,16 +147,7 @@ public class Arena
 
 		public void react()
 		{
-			if (this.isRobot && this.brain != null)
-				this.reactTo(new double[] { this.memory.get(0), this.memory.get(1), this.memory.get(2), this.getNumVisibleProjectiles(),
-						this.getNumVisibleFighters() });
-			/*
-			 * this.reactTo(new double[] { this.memory.get(0), this.memory.get(1), this.memory.get(2), MathUtil.angleTo(new Point2D.Double(this.getX(),
-			 * this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena .getOtherFighter(this).getY())) - this.angle,
-			 * this.arena.getOtherFighter(this).xV, this.arena.getOtherFighter(this).yV, this.arena.getOtherFighter(this).angle, MathUtil.distance(new
-			 * Point2D.Double(this.getX(), this.getY()), new Point2D.Double(this.arena.getOtherFighter(this).getX(), this.arena .getOtherFighter(this).getY()))
-			 * / this.arena.getMaxDistance(), this.arena.r.nextDouble() * 2 - 1 });
-			 */
+			if (this.isRobot && this.brain != null) this.reactTo(new double[] { this.angle, this.getNumVisibleProjectiles(), this.getNumVisibleFighters() });
 		}
 
 		public void reactTo(final double[] enviroment)
@@ -173,9 +159,8 @@ public class Arena
 			this.yV = p1.getY() + p2.getY();
 			this.angleV = reaction[2] / (Math.PI * 4);
 			this.isShooting = reaction[3] > 0;
-			this.memory.add(reaction[4]);
-			if (this.fov + (reaction[5] / 10) >= 0 && this.fov + (reaction[5] / 10) <= Math.PI) this.fov += (reaction[5] / 10);
-			if (this.range + (reaction[6] * 10) >= 0) this.range += (reaction[6] * 10);
+			if (this.fov + reaction[4] / 10 >= 0 && this.fov + reaction[4] / 10 <= Math.PI) this.fov += reaction[4] / 10;
+			if (this.range + reaction[5] * 10 >= 0) this.range += reaction[5] * 10;
 		}
 
 		@Override
@@ -473,7 +458,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ONE);
+					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ZERO);
 				}
 				else
 					for (final Fighter f : this.fighters)

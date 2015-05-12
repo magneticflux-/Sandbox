@@ -2,6 +2,8 @@ package com.sandbox.evolve;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Random;
 
 import javax.swing.JComponent;
@@ -10,31 +12,48 @@ import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.PopulationData;
 import org.uncommons.watchmaker.framework.interactive.Renderer;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, JComponent>, EvolutionObserver<FeedforwardNetwork>
 {
 	// Must be added as a Renderer<FeedforwardNetwork, JComponent> AND as an EvolutionObserver<FeedforwardNetwork>. It receives the best candidate from the
 	// observer, and renders it fighting with the requested FeedforwardNetwork.
-	@SuppressWarnings("unused")
 	private FeedforwardNetwork	bestNetwork;
 
 	public FeedforwardNetworkRenderer(final String layout)
 	{
 		this.bestNetwork = new FeedforwardNetwork(layout);
+
+		final Kryo kryo = new Kryo();
+
+		Input input = null;
+		try
+		{
+			input = new Input(new FileInputStream("codex/Basic AI/generation_49598.pop"));
+		}
+		catch (FileNotFoundException e2)
+		{
+			e2.printStackTrace();
+		}
+		@SuppressWarnings("unchecked")
+		PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+		input.close();
+		this.bestNetwork = oldPop.getBestCandidate();
 	}
 
 	@Override
 	public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 	{
-		this.bestNetwork = data.getBestCandidate().getDeepCopy();
+		// this.bestNetwork = data.getBestCandidate().getDeepCopy();
 	}
 
 	@Override
 	public FeedforwardNetworkRendererComponent render(final FeedforwardNetwork entity)
 	{
 		final FeedforwardNetwork input = entity;
-		return new FeedforwardNetworkRendererComponent(input, input);// bestNetwork);
+		return new FeedforwardNetworkRendererComponent(input, this.bestNetwork);
 	}
 }
 

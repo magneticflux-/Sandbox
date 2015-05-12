@@ -53,8 +53,8 @@ public class FeedforwardNetworkEvolve
 			e.printStackTrace();
 		}
 
-		final boolean loadPrevious = true;
-		final int loadValue = 27889;
+		final boolean loadPrevious = false;
+		final int loadValue = 0;
 		CandidateFactory<FeedforwardNetwork> factory = null;
 
 		final Kryo kryo = new Kryo();
@@ -76,16 +76,16 @@ public class FeedforwardNetworkEvolve
 			factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 		}
 
-		final String layout = "5 16 7";
+		final String layout = "3 4 6 6";
 
 		if (!loadPrevious)
 		{
-			factory = new NetworkCandidateFactory(layout, 16);
+			factory = new NetworkCandidateFactory(layout, 4);
 		}
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.06)));
+		operators.add(new FeedforwardNetworkMutation(new Probability(0.03)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
@@ -110,7 +110,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
+					output = new Output(new FileOutputStream("codex/AI Meta 1/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{
@@ -160,7 +160,7 @@ public class FeedforwardNetworkEvolve
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
 
-		final FeedforwardNetwork result = engine.evolve(1000, 10, abort);
+		final FeedforwardNetwork result = engine.evolve(250, 10, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }
