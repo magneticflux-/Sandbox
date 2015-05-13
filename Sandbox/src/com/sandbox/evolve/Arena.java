@@ -34,7 +34,7 @@ public class Arena
 		public boolean						isShooting	= false;
 		public double						range;
 		public final Color					team		= new Color((int) Math.round(Math.random() * 255), (int) Math.round(Math.random() * 255),
-				(int) Math.round(Math.random() * 255));
+																(int) Math.round(Math.random() * 255));
 		private final Arena					arena;
 		@Nullable
 		private final FeedforwardNetwork	brain;
@@ -93,7 +93,8 @@ public class Arena
 			int sum = 0;
 			final Point2D ownPoint = this.getPoint();
 			for (final Fighter f : this.arena.getFighters())
-				if (MathUtil.angleTo(ownPoint, f.getPoint()) - this.angle < this.fov / 2 && MathUtil.distance(ownPoint, f.getPoint()) < this.range) sum++;
+				if (MathUtil.angleTo(ownPoint, f.getPoint()) - this.angle < this.fov / 2 && MathUtil.distance(ownPoint, f.getPoint()) < this.range && f != this)
+					sum++;
 			return sum;
 		}
 
@@ -417,7 +418,8 @@ public class Arena
 		for (int i = 0; i < this.fighters.size(); i++)
 		{
 			g2d.setColor(Color.BLACK);
-			g2d.drawString("Fighter " + (i + 1) + ": " + this.fighters.get(i).getScore().bigDecimalValue() + "pts.", 50, 20 + i
+			g2d.drawString("Fighter " + (i + 1) + ": " + this.fighters.get(i).getScore().bigDecimalValue() + "pts. " + fighters.get(i).getNumVisibleFighters()
+					+ " visible fighters. " + fighters.get(i).getNumVisibleProjectiles() + " visible projectiles.", 50, 20 + i
 					* g2d.getFontMetrics().getHeight());
 
 			g2d.setColor(this.fighters.get(i).team);
@@ -458,7 +460,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ZERO);
+					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ONE);
 				}
 				else
 					for (final Fighter f : this.fighters)

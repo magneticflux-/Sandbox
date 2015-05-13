@@ -12,7 +12,6 @@ import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.PopulationData;
 import org.uncommons.watchmaker.framework.interactive.Renderer;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.sandbox.neural.FeedforwardNetwork;
 
@@ -26,27 +25,27 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 	{
 		this.bestNetwork = new FeedforwardNetwork(layout);
 
-		final Kryo kryo = new Kryo();
+		// final Kryo kryo = new Kryo();
 
 		Input input = null;
 		try
 		{
-			input = new Input(new FileInputStream("codex/Basic AI/generation_13316.pop"));
+			input = new Input(new FileInputStream("codex/AI Meta Level 2/generation_4928.pop"));
 		}
 		catch (FileNotFoundException e2)
 		{
 			e2.printStackTrace();
 		}
-		@SuppressWarnings("unchecked")
-		PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+		// @SuppressWarnings("unchecked")
+		// PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
 		input.close();
-		this.bestNetwork = oldPop.getBestCandidate();
+		// this.bestNetwork = oldPop.getBestCandidate();
 	}
 
 	@Override
 	public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 	{
-		// this.bestNetwork = data.getBestCandidate().getDeepCopy();
+		this.bestNetwork = data.getBestCandidate().getDeepCopy();
 	}
 
 	@Override

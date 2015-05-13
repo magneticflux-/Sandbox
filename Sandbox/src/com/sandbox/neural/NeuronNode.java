@@ -4,27 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.util.FastMath;
+
 public class NeuronNode extends AbstractNode
 {
 	public static double sigmoid(final double x)
 	{
-		return 1 / (1 + Math.exp(-x));
+		return 1 / (1 + FastMath.exp(-x));
 	}
 
 	public static double tanh(final double x)
 	{
-		return Math.tanh(x);
+		return FastMath.tanh(x);
 	}
 
 	private List<Double>	weights;
 
 	public NeuronNode(final ArrayList<AbstractNode> parents)
 	{
-		this.parents = parents;
+		this.parents = new ArrayList<AbstractNode>(parents);
 		this.weights = new ArrayList<Double>(parents.size());
 
 		for (int i = 0; i < parents.size(); i++)
 			this.weights.add(1d);
+	}
+
+	@Override
+	public void addParent(final AbstractNode n)
+	{
+		this.parents.add(n);
+		this.weights.add(1d);
 	}
 
 	@Override

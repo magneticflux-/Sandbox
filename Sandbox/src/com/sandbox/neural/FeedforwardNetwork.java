@@ -19,6 +19,7 @@ public class FeedforwardNetwork
 
 	private NodeLayer					inputs;
 	private final ArrayList<NodeLayer>	layers;
+	private final InputNode				BIAS_NODE;
 
 	private final String				layout;
 
@@ -28,6 +29,8 @@ public class FeedforwardNetwork
 	 * of two NeuronNodes, and a layer of one NeuronNode. To set the inputs to the neural net, set the input node's value and then recompute.
 	 */
 	{
+		BIAS_NODE = new InputNode(1);
+
 		this.layout = layout;
 		this.layers = new ArrayList<NodeLayer>();
 		final Scanner s = new Scanner(layout);
@@ -47,7 +50,11 @@ public class FeedforwardNetwork
 				final NodeLayer parentLayer = this.layers.get(this.layers.size() - 1);
 				final NodeLayer nl = new NodeLayer();
 				for (int i = 0; i < layerSize; i++)
-					nl.addNode(new NeuronNode(parentLayer.getNodes()));
+				{
+					NeuronNode n = new NeuronNode(parentLayer.getNodes());
+					n.addParent(BIAS_NODE);
+					nl.addNode(n);
+				}
 				this.layers.add(nl);
 			}
 		}
@@ -56,7 +63,9 @@ public class FeedforwardNetwork
 
 	public double[] evaluate(final double[] inputs)
 	{
-		if (inputs.length != this.inputs.getNodes().size()) throw new IllegalArgumentException("Invalid input size! Cannot evaluate neural net.");
+		if (inputs.length != this.inputs.getNodes().size())
+			throw new IllegalArgumentException("Invalid input size! Cannot evaluate neural net. Input size: " + inputs.length + " Neural net input size: "
+					+ this.inputs.getNodes().size());
 
 		for (int i = 0; i < inputs.length; i++)
 			((InputNode) this.inputs.getNode(i)).setOutput(inputs[i]);

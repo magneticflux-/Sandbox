@@ -10,6 +10,11 @@ public class InputNode extends AbstractNode
 	{
 	}
 
+	public InputNode(double output)
+	{
+		this.output = output;
+	}
+
 	@Override
 	public double getOutput()
 	{

@@ -85,7 +85,7 @@ public class FeedforwardNetworkEvolve
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.03)));
+		operators.add(new FeedforwardNetworkMutation(new Probability(0.075)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
@@ -110,7 +110,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/AI Meta Level 2/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
+					output = new Output(new FileOutputStream("codex/AI Meta Level 0/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{

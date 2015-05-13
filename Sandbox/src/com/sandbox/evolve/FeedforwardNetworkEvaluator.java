@@ -10,7 +10,6 @@ import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.watchmaker.framework.PopulationData;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.sandbox.neural.FeedforwardNetwork;
 
@@ -22,21 +21,21 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 	{
 		this.previousBest = new FeedforwardNetwork(layout);
 
-		final Kryo kryo = new Kryo();
+		// final Kryo kryo = new Kryo();
 
 		Input input = null;
 		try
 		{
-			input = new Input(new FileInputStream("codex/Basic AI/generation_13316.pop"));
+			input = new Input(new FileInputStream("codex/AI Meta Level 2/generation_4928.pop"));
 		}
 		catch (FileNotFoundException e2)
 		{
 			e2.printStackTrace();
 		}
-		@SuppressWarnings("unchecked")
-		PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+		// @SuppressWarnings("unchecked")
+		// PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
 		input.close();
-		this.previousBest = oldPop.getBestCandidate();
+		// this.previousBest = oldPop.getBestCandidate();
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 	@Override
 	public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 	{
-		// this.previousBest = data.getBestCandidate().getDeepCopy();
+		this.previousBest = data.getBestCandidate().getDeepCopy();
 	}
 
 }
