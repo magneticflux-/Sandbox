@@ -175,7 +175,7 @@ public class Arena
 				this.shootDelay--;
 			else if (this.isShooting)
 			{
-				this.shootDelay = 10;
+				this.shootDelay = 50;
 				final PolarPoint p1 = new PolarPoint(Fighter.RADIUS + 10, this.angle);
 				final PolarPoint p2 = new PolarPoint(25, this.angle);
 				this.arena.addProjectile(new Projectile(p1.getX() + this.getX(), p1.getY() + this.getY(), p2.getX() + this.xV, p2.getY() + this.yV,
@@ -468,7 +468,7 @@ public class Arena
 						{
 							i.remove();
 							if (p.getOwner() != null) p.getOwner().incrementScore(BigFraction.ONE);
-							f.decrementScore(BigFraction.ONE);
+							f.decrementScore(BigFraction.ZERO);
 							break;
 						}
 			}
