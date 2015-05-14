@@ -10,6 +10,7 @@ import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.watchmaker.framework.PopulationData;
 
+import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.sandbox.neural.FeedforwardNetwork;
 
@@ -21,21 +22,23 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 	{
 		this.previousBest = new FeedforwardNetwork(layout);
 
-		// final Kryo kryo = new Kryo();
-
-		Input input = null;
-		try
+		if (FeedforwardNetworkEvolve.USE_FILE_FOR_OPPONENT)
 		{
-			input = new Input(new FileInputStream("codex/AI Meta Level 2/generation_4928.pop"));
+			final Kryo kryo = new Kryo();
+			Input input = null;
+			try
+			{
+				input = new Input(new FileInputStream("codex/AI Meta Level 0/generation_14321.pop"));
+			}
+			catch (FileNotFoundException e2)
+			{
+				e2.printStackTrace();
+			}
+			@SuppressWarnings("unchecked")
+			PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+			input.close();
+			this.previousBest = oldPop.getBestCandidate();
 		}
-		catch (FileNotFoundException e2)
-		{
-			e2.printStackTrace();
-		}
-		// @SuppressWarnings("unchecked")
-		// PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
-		input.close();
-		// this.previousBest = oldPop.getBestCandidate();
 	}
 
 	@Override
@@ -45,10 +48,12 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 		final Arena a = new Arena(new Rectangle(0, 0, 600, 600), 1000);
 		final Random r = new Random();
 
+		if (FeedforwardNetworkEvolve.FIGHT_SELF && !FeedforwardNetworkEvolve.USE_FILE_FOR_OPPONENT) this.previousBest = candidate;
+
 		a.addFighter(a.new Fighter(candidate, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble() * Math.PI
 				* 2, true, a));
-		a.addFighter(a.new Fighter(this.previousBest, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble()
-				* Math.PI * 2, true, a));
+		a.addFighter(a.new Fighter(this.previousBest, r.nextDouble() * a.getBounds().getWidth() + a.getBounds().getMinX(), r.nextDouble()
+				* a.getBounds().getHeight() + a.getBounds().getMinY(), r.nextDouble() * Math.PI * 2, true, a));
 
 		while (a.isYoung())
 			a.updatePhysics();
@@ -65,7 +70,7 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 	@Override
 	public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 	{
-		this.previousBest = data.getBestCandidate().getDeepCopy();
+		if (!FeedforwardNetworkEvolve.USE_FILE_FOR_OPPONENT) this.previousBest = data.getBestCandidate().getDeepCopy();
 	}
 
 }

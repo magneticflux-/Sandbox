@@ -44,7 +44,6 @@ public class FeedforwardNetworkGame
 		final JFrame frame = new JFrame("Game");
 		final MouseListener mouse = new MouseListener()
 		{
-
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{

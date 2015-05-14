@@ -19,7 +19,7 @@ public class FeedforwardNetwork
 
 	private NodeLayer					inputs;
 	private final ArrayList<NodeLayer>	layers;
-	private final InputNode				BIAS_NODE;
+	public static final InputNode		BIAS_NODE	= new InputNode(1);
 
 	private final String				layout;
 
@@ -29,8 +29,6 @@ public class FeedforwardNetwork
 	 * of two NeuronNodes, and a layer of one NeuronNode. To set the inputs to the neural net, set the input node's value and then recompute.
 	 */
 	{
-		BIAS_NODE = new InputNode(1);
-
 		this.layout = layout;
 		this.layers = new ArrayList<NodeLayer>();
 		final Scanner s = new Scanner(layout);

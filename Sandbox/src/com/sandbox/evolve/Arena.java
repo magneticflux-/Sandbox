@@ -158,10 +158,10 @@ public class Arena
 			final PolarPoint p2 = new PolarPoint(reaction[1] * 4, this.angle + Math.PI / 2);
 			this.xV = p1.getX() + p2.getX();
 			this.yV = p1.getY() + p2.getY();
-			this.angleV = reaction[2] / (Math.PI * 4);
+			this.angleV = reaction[2] / (Math.PI * 2);
 			this.isShooting = reaction[3] > 0;
-			if (this.fov + reaction[4] / 10 >= 0 && this.fov + reaction[4] / 10 <= Math.PI) this.fov += reaction[4] / 10;
-			if (this.range + reaction[5] * 10 >= 0) this.range += reaction[5] * 10;
+			if (this.fov + reaction[4] / 5 >= 0 && this.fov + reaction[4] / 5 <= Math.PI) this.fov += reaction[4] / 5;
+			if (this.range + reaction[5] * 5 >= 50) this.range += reaction[5] * 5;
 		}
 
 		@Override
@@ -175,7 +175,7 @@ public class Arena
 				this.shootDelay--;
 			else if (this.isShooting)
 			{
-				this.shootDelay = 50;
+				this.shootDelay = 25;
 				final PolarPoint p1 = new PolarPoint(Fighter.RADIUS + 10, this.angle);
 				final PolarPoint p2 = new PolarPoint(25, this.angle);
 				this.arena.addProjectile(new Projectile(p1.getX() + this.getX(), p1.getY() + this.getY(), p2.getX() + this.xV, p2.getY() + this.yV,
@@ -460,7 +460,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ONE);
+					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ONE_QUARTER);
 				}
 				else
 					for (final Fighter f : this.fighters)

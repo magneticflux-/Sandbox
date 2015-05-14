@@ -42,6 +42,9 @@ import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkEvolve
 {
+	public static boolean	USE_FILE_FOR_OPPONENT	= true;
+	public static boolean	FIGHT_SELF				= false;
+
 	public static void main(final String[] args)
 	{
 		try
@@ -76,7 +79,7 @@ public class FeedforwardNetworkEvolve
 			factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 		}
 
-		final String layout = "3 8 8 6";
+		final String layout = "3 6 6 6";
 
 		if (!loadPrevious)
 		{
@@ -85,7 +88,7 @@ public class FeedforwardNetworkEvolve
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.075)));
+		operators.add(new FeedforwardNetworkMutation(new Probability(0.03)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
@@ -110,7 +113,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/AI Meta Level 0/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
+					output = new Output(new FileOutputStream("codex/AI Meta Level 1/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
 				}
 				catch (FileNotFoundException e1)
 				{
@@ -160,7 +163,7 @@ public class FeedforwardNetworkEvolve
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
 
-		final FeedforwardNetwork result = engine.evolve(250, 10, abort);
+		final FeedforwardNetwork result = engine.evolve(250, 25, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }
