@@ -43,7 +43,9 @@ import com.sandbox.neural.FeedforwardNetwork;
 public class FeedforwardNetworkEvolve
 {
 	public static boolean	USE_FILE_FOR_OPPONENT	= false;
-	public static boolean	FIGHT_SELF				= false;
+	public static boolean	FIGHT_SELF				= true;
+	public static boolean	LOAD_PREVIOUS			= false;
+	public static int		LOAD_NUMBER				= 0;
 
 	public static void main(final String[] args)
 	{
@@ -56,18 +58,16 @@ public class FeedforwardNetworkEvolve
 			e.printStackTrace();
 		}
 
-		final boolean loadPrevious = false;
-		final int loadValue = 0;
 		CandidateFactory<FeedforwardNetwork> factory = null;
 
 		final Kryo kryo = new Kryo();
-		if (loadPrevious)
+		if (LOAD_PREVIOUS)
 		{
 
 			Input input = null;
 			try
 			{
-				input = new Input(new FileInputStream("codex/generation_" + loadValue + ".pop"));
+				input = new Input(new FileInputStream("codex/generation_" + LOAD_NUMBER + ".pop"));
 			}
 			catch (final FileNotFoundException e2)
 			{
@@ -81,7 +81,7 @@ public class FeedforwardNetworkEvolve
 
 		final String layout = "3 12 6";
 
-		if (!loadPrevious) factory = new NetworkCandidateFactory(layout, 4);
+		if (!LOAD_PREVIOUS) factory = new NetworkCandidateFactory(layout, 4);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
@@ -101,7 +101,7 @@ public class FeedforwardNetworkEvolve
 
 		engine.addEvolutionObserver(eval);
 		engine.addEvolutionObserver(new EvolutionObserver<FeedforwardNetwork>()
-				{
+		{
 			@Override
 			public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 			{
@@ -110,7 +110,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/AI Meta Level 1/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
+					output = new Output(new FileOutputStream("codex/AI Meta Level 1/generation_" + (data.getGenerationNumber() + LOAD_NUMBER) + ".pop"));
 				}
 				catch (final FileNotFoundException e1)
 				{
@@ -119,7 +119,7 @@ public class FeedforwardNetworkEvolve
 				kryo.writeClassAndObject(output, data);
 				output.close();
 			}
-				});
+		});
 		final UserAbort abort = new UserAbort();
 		final EvolutionMonitor<FeedforwardNetwork> monitor = new EvolutionMonitor<FeedforwardNetwork>(new FeedforwardNetworkRenderer(layout), false);
 
@@ -160,7 +160,7 @@ public class FeedforwardNetworkEvolve
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
 
-		final FeedforwardNetwork result = engine.evolve(250, 25, abort);
+		final FeedforwardNetwork result = engine.evolve(500, 25, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }

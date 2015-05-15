@@ -10,12 +10,7 @@ public class NeuronNode extends AbstractNode
 {
 	public static double sigmoid(final double x)
 	{
-		return 1 / (1 + FastMath.exp(-x));
-	}
-
-	public static double tanh(final double x)
-	{
-		return FastMath.tanh(x);
+		return 2 / (1 + FastMath.exp(-2 * x)) - 1;
 	}
 
 	private List<Double>	weights;
@@ -42,7 +37,7 @@ public class NeuronNode extends AbstractNode
 		double sum = 0;
 		for (int i = 0; i < this.parents.size(); i++)
 			sum += this.parents.get(i).getOutput() * this.weights.get(i);
-		return NeuronNode.tanh(sum);
+		return FastMath.tanh(sum);
 	}
 
 	public List<Double> getWeights()

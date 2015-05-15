@@ -33,8 +33,8 @@ public class Arena
 
 		public boolean						isShooting	= false;
 		public double						range;
-		public final Color					team		= new Color((int) FastMath.round(FastMath.random() * 255), (int) FastMath.round(FastMath.random() * 255),
-				(int) FastMath.round(FastMath.random() * 255));
+		public final Color					team		= new Color((int) FastMath.round(FastMath.random() * 255),
+																(int) FastMath.round(FastMath.random() * 255), (int) FastMath.round(FastMath.random() * 255));
 		private final Arena					arena;
 		@Nullable
 		private final FeedforwardNetwork	brain;
@@ -66,6 +66,12 @@ public class Arena
 			this.isControlled = true;
 		}
 
+		@Override
+		public String toString()
+		{
+			return this.brain.toString() + " " + this.team.toString();
+		}
+
 		public void decrementScore(final BigFraction i)
 		{
 			this.score = this.score.subtract(i);
@@ -74,8 +80,8 @@ public class Arena
 		@Override
 		public Rectangle getBoundingBox()
 		{
-			return new Rectangle((int) FastMath.round(this.x - Fighter.RADIUS), (int) FastMath.round(this.y - Fighter.RADIUS), (int) FastMath.round(2 * Fighter.RADIUS),
-					(int) FastMath.round(2 * Fighter.RADIUS));
+			return new Rectangle((int) FastMath.round(this.x - Fighter.RADIUS), (int) FastMath.round(this.y - Fighter.RADIUS),
+					(int) FastMath.round(2 * Fighter.RADIUS), (int) FastMath.round(2 * Fighter.RADIUS));
 		}
 
 		public double getNormalizedX()
@@ -130,8 +136,8 @@ public class Arena
 			}
 
 			g2d.setColor(this.team);
-			g2d.fillOval((int) FastMath.round(this.x - Fighter.RADIUS), (int) FastMath.round(this.y - Fighter.RADIUS), (int) FastMath.round(2 * Fighter.RADIUS),
-					(int) FastMath.round(2 * Fighter.RADIUS));
+			g2d.fillOval((int) FastMath.round(this.x - Fighter.RADIUS), (int) FastMath.round(this.y - Fighter.RADIUS),
+					(int) FastMath.round(2 * Fighter.RADIUS), (int) FastMath.round(2 * Fighter.RADIUS));
 
 			final PolarPoint p = new PolarPoint(this.range, this.angle);
 			g2d.setColor(Color.RED);
@@ -143,7 +149,8 @@ public class Arena
 			final PolarPoint p3 = new PolarPoint(this.range, this.angle + this.fov / 2);
 			g2d.drawLine((int) this.x, (int) this.y, (int) FastMath.round(this.x + p3.getX()), (int) FastMath.round(this.y + p3.getY()));
 			g2d.drawArc((int) FastMath.round(this.x - this.range), (int) FastMath.round(this.y - this.range), (int) FastMath.round(this.range * 2),
-					(int) FastMath.round(this.range * 2), -(int) FastMath.round(FastMath.toDegrees(this.angle - this.fov / 2)), -(int) FastMath.round(FastMath.toDegrees(this.fov)));
+					(int) FastMath.round(this.range * 2), -(int) FastMath.round(FastMath.toDegrees(this.angle - this.fov / 2)),
+					-(int) FastMath.round(FastMath.toDegrees(this.fov)));
 		}
 
 		public void react()
@@ -244,15 +251,16 @@ public class Arena
 		public void paint(final Graphics g)
 		{
 			g.setColor(Color.GRAY);
-			g.fillOval((int) FastMath.round(this.x - Projectile.RADIUS), (int) FastMath.round(this.y - Projectile.RADIUS), (int) FastMath.round(2 * Projectile.RADIUS),
-					(int) FastMath.round(2 * Projectile.RADIUS));
+			g.fillOval((int) FastMath.round(this.x - Projectile.RADIUS), (int) FastMath.round(this.y - Projectile.RADIUS),
+					(int) FastMath.round(2 * Projectile.RADIUS), (int) FastMath.round(2 * Projectile.RADIUS));
 
 			final PolarPoint[] points = new PolarPoint[] { new PolarPoint(Projectile.RADIUS, this.angle),
 					new PolarPoint(Projectile.RADIUS, this.angle + FastMath.PI / 2), new PolarPoint(Projectile.RADIUS, this.angle + FastMath.PI),
 					new PolarPoint(Projectile.RADIUS, this.angle + 3 * FastMath.PI / 2) };
 			g.setColor(Color.BLACK);
 			for (final PolarPoint p : points)
-				g.drawLine((int) FastMath.round(this.x), (int) FastMath.round(this.y), (int) FastMath.round(this.x + p.getX()), (int) FastMath.round(this.y + p.getY()));
+				g.drawLine((int) FastMath.round(this.x), (int) FastMath.round(this.y), (int) FastMath.round(this.x + p.getX()),
+						(int) FastMath.round(this.y + p.getY()));
 		}
 
 		public void setLocation(final double x, final double y)
@@ -291,7 +299,8 @@ public class Arena
 		for (int i = 0; i < 10; i++)
 		{
 			n.randomizeWeights(new MersenneTwisterRNG(), 2);
-			a.addFighter(a.new Fighter(n.getDeepCopy(), FastMath.random() * 400 + 200, FastMath.random() * 400 + 200, FastMath.random() * FastMath.PI * 2, true, a));
+			a.addFighter(a.new Fighter(n.getDeepCopy(), FastMath.random() * 400 + 200, FastMath.random() * 400 + 200, FastMath.random() * FastMath.PI * 2,
+					true, a));
 		}
 		// a.getFighters().get(0).isShooting = true;
 		// a.getFighters().get(0).xV = 1;

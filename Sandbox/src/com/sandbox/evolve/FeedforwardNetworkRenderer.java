@@ -80,6 +80,7 @@ class FeedforwardNetworkRendererComponent extends JComponent
 				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, this.arena);
 		this.fighter2 = this.arena.new Fighter(champ.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
 				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, this.arena);
+
 		this.arena.addFighter(this.fighter1);
 		this.arena.addFighter(this.fighter2);
 	}

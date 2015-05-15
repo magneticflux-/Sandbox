@@ -79,13 +79,11 @@ public class FeedforwardNetwork
 	public FeedforwardNetwork getDeepCopy()
 	{
 		final FeedforwardNetwork n = new FeedforwardNetwork(this.layout);
-
 		for (int layer = 0; layer < n.getLayers().size(); layer++)
 			for (int node = 0; node < n.getLayers().get(layer).getNodes().size(); node++)
 				if (n.getLayers().get(layer).getNode(node) instanceof NeuronNode)
 					((NeuronNode) n.getLayers().get(layer).getNode(node)).setWeights((List<Double>) ((ArrayList<Double>) ((NeuronNode) this.getLayers()
 							.get(layer).getNode(node)).getWeights()).clone());
-
 		return n;
 	}
 
