@@ -48,25 +48,18 @@ public class Mass
 		return FastMath.atan2(this.getyCenter() - mass.getyCenter(), this.getxCenter() - mass.getxCenter());
 	}
 
-	public void attract(final Mass mass)
+	public double distanceToSquared(Mass m)
 	{
-		// F = G * M1 * M2 / r^2
-		final double force = Mass.GRAVITATIONAL_CONSTANT * (this.getMass() * mass.getMass() / FastMath.pow(this.distanceTo(mass), 2));
+		return FastMath.pow(this.getxCenter() - m.getxCenter(), 2) + FastMath.pow(this.getyCenter() - m.getyCenter(), 2);
+	}
+
+	public synchronized void attract(final Mass mass)
+	{
+		final double force = Mass.GRAVITATIONAL_CONSTANT * (this.getMass() * mass.getMass() / this.distanceToSquared(mass));
 		final double angle = this.angleTo(mass);
 
-		final double xForce = force * FastMath.cos(angle);
-		final double yForce = force * FastMath.sin(angle);
-
-		// F = m * a
-
-		final double xAcceleration = xForce / mass.getMass();
-		final double yAcceleration = yForce / mass.getMass();
-
-		final double deltaXVelocity = xAcceleration * Mass.timeStep;
-		final double deltaYVelocity = yAcceleration * Mass.timeStep;
-
-		mass.setxV(mass.getxV() + deltaXVelocity);
-		mass.setyV(mass.getyV() + deltaYVelocity);
+		mass.setxV(mass.getxV() + ((force * FastMath.cos(angle)) / mass.getMass()) * Mass.timeStep);
+		mass.setyV(mass.getyV() + ((force * FastMath.sin(angle)) / mass.getMass()) * Mass.timeStep);
 
 		if (!(MathUtil.isFinite(mass.getyV()) || MathUtil.isFinite(mass.getxV()) || MathUtil.isFinite(mass.getxCenter()) || MathUtil
 				.isFinite(mass.getyCenter())))
@@ -98,8 +91,8 @@ public class Mass
 		while (i.hasNext())
 		{
 			final Mass mass = i.next();
-			if (!this.equals(mass) && this.collides(mass))
-				if (this.getMass() > mass.getMass())
+			if (this != mass && this.collides(mass))
+				if (this.getMass() >= mass.getMass())
 				{
 					this.setxV((this.getxV() * this.getMass() + mass.getxV() * mass.getMass()) / (this.getMass() + mass.getMass()));
 					this.setyV((this.getyV() * this.getMass() + mass.getyV() * mass.getMass()) / (this.getMass() + mass.getMass()));
@@ -114,8 +107,7 @@ public class Mass
 
 	public boolean collides(final Mass mass)
 	{
-		return FastMath.sqrt(FastMath.pow(this.getxCenter() - mass.getxCenter(), 2) + FastMath.pow(this.getyCenter() - mass.getyCenter(), 2)) < this.getRadius()
-				+ mass.getRadius();
+		return this.distanceToSquared(mass) < FastMath.pow(this.getRadius() + mass.getRadius(), 2);
 	}
 
 	public double distanceTo(final Mass mass)
@@ -130,7 +122,9 @@ public class Mass
 
 	public double getRadius()
 	{
-		return FastMath.sqrt(this.mass / (FastMath.PI * Mass.DENSITY_CONSTANT)) * (100 / (100 + FastMath.pow(FastMath.E, this.mass / 1000))) + this.mass / 250000 + 1;
+		// return FastMath.sqrt(this.mass / (FastMath.PI * Mass.DENSITY_CONSTANT)) * (100 / (100 + FastMath.pow(FastMath.E, this.mass / 1000))) + this.mass
+		// / 250000 + 1;
+		return Mass.DENSITY_CONSTANT * FastMath.log1p(this.mass) / 6;
 	}
 
 	public double getVelocity()
@@ -176,7 +170,8 @@ public class Mass
 				.getMass() / Mass.maxMass))));
 		g.fillOval((int) (this.xCenter - radius), (int) (this.yCenter - radius), (int) (2 * radius), (int) (2 * radius));
 
-		final PolarPoint p = new PolarPoint(100000 * FastMath.sqrt(FastMath.pow(this.getxV(), 2) + FastMath.pow(this.getyV(), 2)), FastMath.atan2(this.getyV(), this.getxV()));
+		final PolarPoint p = new PolarPoint(100000 * FastMath.sqrt(FastMath.pow(this.getxV(), 2) + FastMath.pow(this.getyV(), 2)), FastMath.atan2(this.getyV(),
+				this.getxV()));
 		g.setColor(Color.RED);
 		g.drawLine((int) this.getxCenter(), (int) this.getyCenter(), (int) (p.getX() + this.getxCenter()), (int) (p.getY() + this.getyCenter()));
 
