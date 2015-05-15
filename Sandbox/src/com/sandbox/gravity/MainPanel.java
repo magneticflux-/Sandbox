@@ -4,13 +4,20 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.apache.commons.math3.util.FastMath;
+
+import com.electronauts.mathutil.MathUtil;
+import com.electronauts.mathutil.PolarPoint;
 
 public class MainPanel extends JComponent
 {
@@ -35,7 +42,7 @@ public class MainPanel extends JComponent
 		frame.getContentPane().add(component);
 		frame.setVisible(true);
 
-		new Thread()
+		Thread t = new Thread()
 		{
 
 			@Override
@@ -47,13 +54,13 @@ public class MainPanel extends JComponent
 					{
 						final Mass mass = new Mass((int) (FastMath.random() * component.getWidth()), (int) (FastMath.random() * component.getHeight()),
 								(int) (FastMath.random() * 100));
-						mass.setxV((FastMath.random() - 0.5) * 0.0001);
-						mass.setyV((FastMath.random() - 0.5) * 0.0001);
+						mass.setxV((FastMath.random() - 0.5) * 0.000025);
+						mass.setyV((FastMath.random() - 0.5) * 0.000025);
 						component.masses.add(mass);
 					}
 					try
 					{
-						Thread.sleep(100);
+						Thread.sleep(1000);
 					}
 					catch (final Exception e)
 					{
@@ -62,6 +69,7 @@ public class MainPanel extends JComponent
 				}
 			}
 		};
+		t.start();
 	}
 
 	private final LinkedList<Long>	fpsLog	= new LinkedList<Long>();
@@ -77,22 +85,15 @@ public class MainPanel extends JComponent
 			this.masses.get(i).setyV((FastMath.random() - 0.5) * 0.0001);
 		}
 
-		for (int x = 0; x <= 720; x += 80)
-			for (int y = 0; y <= 720; y += 80)
+		for (int x = 0; x <= 720; x += 60)
+			for (int y = 0; y <= 720; y += 60)
 			{
-				final Mass m = new Mass(x, y, 10);
+				final Mass m = new Mass(x, y, 200);
+				MathUtil.angleTo(new Point2D.Double(), new Point2D.Double());
+				PolarPoint p = new PolarPoint(1,1);
+				m.setxV(0);
 				this.masses.add(m);
 			}
-
-		final boolean extra = false;
-		if (extra)
-		{
-			this.masses.add(new Mass(400, 400, 2000));
-			this.masses.add(new Mass(400, 200, 800));
-
-			this.masses.get(0).setxV(2.777777777);
-			this.masses.get(1).setxV(-7);
-		}
 	}
 
 	@Override
@@ -135,8 +136,28 @@ public class MainPanel extends JComponent
 				this.masses.get(i).collideAll(this.masses);
 			}
 
+			ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
 			for (final Mass m : this.masses)
-				m.attractAll(this.masses);
+			{
+				es.submit(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						m.attractAll(masses);
+					}
+				});
+			}
+			es.shutdown();
+			try
+			{
+				es.awaitTermination(1, TimeUnit.DAYS);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
 
 			for (final Mass m : this.masses)
 			{
@@ -173,7 +194,7 @@ public class MainPanel extends JComponent
 		}
 		MainPanel.lastTime = System.nanoTime() - startTime;
 		this.fpsLog.addFirst(MainPanel.lastTime);
-		Mass.setTimeStep(1000000 / MainPanel.getFPS());
+		Mass.setTimeStep(250000 / MainPanel.getFPS());
 
 		this.repaint();
 	}
