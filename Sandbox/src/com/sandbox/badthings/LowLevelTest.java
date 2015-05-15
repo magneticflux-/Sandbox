@@ -9,16 +9,16 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class LowLevelTest
 {
-	public static void main(String[] args) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-			IllegalAccessException, InvocationTargetException
+	public static void main(final String[] args) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
+	IllegalAccessException, InvocationTargetException
 	{
-		Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
+		final Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
 		unsafeConstructor.setAccessible(true);
-		Unsafe unsafe = unsafeConstructor.newInstance();
+		final Unsafe unsafe = unsafeConstructor.newInstance();
 
-		long start = unsafe.allocateMemory(1);
+		final long start = unsafe.allocateMemory(1);
 		System.out.println("Start = " + start);
-		Random r = new Random();
+		final Random r = new Random();
 		for (long i = start; i > 0; i += 1) // 27500000
 		{
 			System.out.println("Memory at location " + i + " contains " + unsafe.getBoolean(null, i));

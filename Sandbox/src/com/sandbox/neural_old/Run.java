@@ -8,6 +8,8 @@ import java.util.Random;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import org.apache.commons.math3.util.FastMath;
+
 public class Run
 {
 	public static void main(final String[] args)
@@ -39,7 +41,7 @@ public class Run
 
 						n.setEnvironment(input);
 						pixels[y][x] = n.getOutputs()[0];
-						if (Math.abs(pixels[y][x]) > max) max = Math.abs(pixels[y][x]);
+						if (FastMath.abs(pixels[y][x]) > max) max = FastMath.abs(pixels[y][x]);
 					}
 
 				for (int y = 0; y < height; y++)
@@ -92,7 +94,7 @@ public class Run
 						final double[] input = new double[] { x - width / 2, y - height / 2 };
 
 						pixels[y][x] = Config.operation(input[0], input[1]);
-						if (Math.abs(pixels[y][x]) > max) max = Math.abs(pixels[y][x]);
+						if (FastMath.abs(pixels[y][x]) > max) max = FastMath.abs(pixels[y][x]);
 					}
 
 				for (int y = 0; y < height; y++)
@@ -145,9 +147,9 @@ public class Run
 						final double[] input = new double[] { x - width / 2, y - height / 2 };
 
 						n.setEnvironment(input);
-						pixels[y][x] = Math.abs(Config.operation(input[0], input[1]) - n.getOutputs()[0]);
+						pixels[y][x] = FastMath.abs(Config.operation(input[0], input[1]) - n.getOutputs()[0]);
 
-						if (Math.abs(pixels[y][x]) > max) max = Math.abs(pixels[y][x]);
+						if (FastMath.abs(pixels[y][x]) > max) max = FastMath.abs(pixels[y][x]);
 					}
 
 				for (int y = 0; y < height; y++)

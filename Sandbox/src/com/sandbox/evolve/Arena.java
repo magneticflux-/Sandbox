@@ -8,12 +8,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.apache.commons.math3.fraction.BigFraction;
+import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.MathUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.uncommons.maths.random.MersenneTwisterRNG;
@@ -33,8 +33,8 @@ public class Arena
 
 		public boolean						isShooting	= false;
 		public double						range;
-		public final Color					team		= new Color((int) Math.round(Math.random() * 255), (int) Math.round(Math.random() * 255),
-																(int) Math.round(Math.random() * 255));
+		public final Color					team		= new Color((int) FastMath.round(FastMath.random() * 255), (int) FastMath.round(FastMath.random() * 255),
+				(int) FastMath.round(FastMath.random() * 255));
 		private final Arena					arena;
 		@Nullable
 		private final FeedforwardNetwork	brain;
@@ -61,7 +61,7 @@ public class Arena
 			this.arena = arena;
 			this.score = new BigFraction(0);
 			this.isRobot = isRobot;
-			this.fov = Math.PI / 3;
+			this.fov = FastMath.PI / 3;
 			this.range = 400;
 			this.isControlled = true;
 		}
@@ -74,8 +74,8 @@ public class Arena
 		@Override
 		public Rectangle getBoundingBox()
 		{
-			return new Rectangle((int) Math.round(this.x - Fighter.RADIUS), (int) Math.round(this.y - Fighter.RADIUS), (int) Math.round(2 * Fighter.RADIUS),
-					(int) Math.round(2 * Fighter.RADIUS));
+			return new Rectangle((int) FastMath.round(this.x - Fighter.RADIUS), (int) FastMath.round(this.y - Fighter.RADIUS), (int) FastMath.round(2 * Fighter.RADIUS),
+					(int) FastMath.round(2 * Fighter.RADIUS));
 		}
 
 		public double getNormalizedX()
@@ -125,42 +125,43 @@ public class Arena
 			if (this.isShooting)
 			{
 				g2d.setColor(Color.RED);
-				g2d.fillOval((int) Math.round(this.x - Fighter.RADIUS - 2), (int) Math.round(this.y - Fighter.RADIUS - 2),
-						(int) Math.round(2 * Fighter.RADIUS + 4), (int) Math.round(2 * Fighter.RADIUS + 4));
+				g2d.fillOval((int) FastMath.round(this.x - Fighter.RADIUS - 2), (int) FastMath.round(this.y - Fighter.RADIUS - 2),
+						(int) FastMath.round(2 * Fighter.RADIUS + 4), (int) FastMath.round(2 * Fighter.RADIUS + 4));
 			}
 
 			g2d.setColor(this.team);
-			g2d.fillOval((int) Math.round(this.x - Fighter.RADIUS), (int) Math.round(this.y - Fighter.RADIUS), (int) Math.round(2 * Fighter.RADIUS),
-					(int) Math.round(2 * Fighter.RADIUS));
+			g2d.fillOval((int) FastMath.round(this.x - Fighter.RADIUS), (int) FastMath.round(this.y - Fighter.RADIUS), (int) FastMath.round(2 * Fighter.RADIUS),
+					(int) FastMath.round(2 * Fighter.RADIUS));
 
 			final PolarPoint p = new PolarPoint(this.range, this.angle);
 			g2d.setColor(Color.RED);
-			g2d.drawLine((int) this.x, (int) this.y, (int) Math.round(this.x + p.getX()), (int) Math.round(this.y + p.getY()));
+			g2d.drawLine((int) this.x, (int) this.y, (int) FastMath.round(this.x + p.getX()), (int) FastMath.round(this.y + p.getY()));
 
 			g2d.setColor(Color.RED);
 			final PolarPoint p2 = new PolarPoint(this.range, this.angle - this.fov / 2);
-			g2d.drawLine((int) this.x, (int) this.y, (int) Math.round(this.x + p2.getX()), (int) Math.round(this.y + p2.getY()));
+			g2d.drawLine((int) this.x, (int) this.y, (int) FastMath.round(this.x + p2.getX()), (int) FastMath.round(this.y + p2.getY()));
 			final PolarPoint p3 = new PolarPoint(this.range, this.angle + this.fov / 2);
-			g2d.drawLine((int) this.x, (int) this.y, (int) Math.round(this.x + p3.getX()), (int) Math.round(this.y + p3.getY()));
-			g2d.drawArc((int) Math.round(this.x - this.range), (int) Math.round(this.y - this.range), (int) Math.round(this.range * 2),
-					(int) Math.round(this.range * 2), -(int) Math.round(Math.toDegrees(this.angle - this.fov / 2)), -(int) Math.round(Math.toDegrees(this.fov)));
+			g2d.drawLine((int) this.x, (int) this.y, (int) FastMath.round(this.x + p3.getX()), (int) FastMath.round(this.y + p3.getY()));
+			g2d.drawArc((int) FastMath.round(this.x - this.range), (int) FastMath.round(this.y - this.range), (int) FastMath.round(this.range * 2),
+					(int) FastMath.round(this.range * 2), -(int) FastMath.round(FastMath.toDegrees(this.angle - this.fov / 2)), -(int) FastMath.round(FastMath.toDegrees(this.fov)));
 		}
 
 		public void react()
 		{
-			if (this.isRobot && this.brain != null) this.reactTo(new double[] { this.angle, this.getNumVisibleProjectiles(), this.getNumVisibleFighters() });
+			if (this.isRobot && this.brain != null)
+				this.reactTo(new double[] { this.shootDelay / (double) Arena.RELOAD_TIME, this.getNumVisibleProjectiles(), this.getNumVisibleFighters() });
 		}
 
 		public void reactTo(final double[] enviroment)
 		{
 			final double[] reaction = this.brain.evaluate(enviroment);
 			final PolarPoint p1 = new PolarPoint(reaction[0] * 4, this.angle);
-			final PolarPoint p2 = new PolarPoint(reaction[1] * 4, this.angle + Math.PI / 2);
+			final PolarPoint p2 = new PolarPoint(reaction[1] * 4, this.angle + FastMath.PI / 2);
 			this.xV = p1.getX() + p2.getX();
 			this.yV = p1.getY() + p2.getY();
-			this.angleV = reaction[2] / (Math.PI * 2);
+			this.angleV = reaction[2] / (FastMath.PI * 2);
 			this.isShooting = reaction[3] > 0;
-			if (this.fov + reaction[4] / 5 >= 0 && this.fov + reaction[4] / 5 <= Math.PI) this.fov += reaction[4] / 5;
+			if (this.fov + reaction[4] / 5 >= 0 && this.fov + reaction[4] / 5 <= FastMath.PI) this.fov += reaction[4] / 5;
 			if (this.range + reaction[5] * 5 >= 50) this.range += reaction[5] * 5;
 		}
 
@@ -169,13 +170,13 @@ public class Arena
 		{
 			super.updatePosition();
 
-			if (Math.abs(this.angle) >= Math.PI * 2) this.angle = (Math.PI * 2 + this.angle) % (Math.PI * 2);
+			if (FastMath.abs(this.angle) >= FastMath.PI * 2) this.angle = (FastMath.PI * 2 + this.angle) % (FastMath.PI * 2);
 
 			if (this.shootDelay > 0)
 				this.shootDelay--;
 			else if (this.isShooting)
 			{
-				this.shootDelay = 25;
+				this.shootDelay = Arena.RELOAD_TIME;
 				final PolarPoint p1 = new PolarPoint(Fighter.RADIUS + 10, this.angle);
 				final PolarPoint p2 = new PolarPoint(25, this.angle);
 				this.arena.addProjectile(new Projectile(p1.getX() + this.getX(), p1.getY() + this.getY(), p2.getX() + this.xV, p2.getY() + this.yV,
@@ -215,8 +216,8 @@ public class Arena
 
 		public Rectangle getBoundingBox()
 		{
-			return new Rectangle((int) Math.round(this.x - Projectile.RADIUS), (int) Math.round(this.y - Projectile.RADIUS),
-					(int) Math.round(2 * Projectile.RADIUS), (int) Math.round(2 * Projectile.RADIUS));
+			return new Rectangle((int) FastMath.round(this.x - Projectile.RADIUS), (int) FastMath.round(this.y - Projectile.RADIUS),
+					(int) FastMath.round(2 * Projectile.RADIUS), (int) FastMath.round(2 * Projectile.RADIUS));
 		}
 
 		@Nullable
@@ -243,15 +244,15 @@ public class Arena
 		public void paint(final Graphics g)
 		{
 			g.setColor(Color.GRAY);
-			g.fillOval((int) Math.round(this.x - Projectile.RADIUS), (int) Math.round(this.y - Projectile.RADIUS), (int) Math.round(2 * Projectile.RADIUS),
-					(int) Math.round(2 * Projectile.RADIUS));
+			g.fillOval((int) FastMath.round(this.x - Projectile.RADIUS), (int) FastMath.round(this.y - Projectile.RADIUS), (int) FastMath.round(2 * Projectile.RADIUS),
+					(int) FastMath.round(2 * Projectile.RADIUS));
 
 			final PolarPoint[] points = new PolarPoint[] { new PolarPoint(Projectile.RADIUS, this.angle),
-					new PolarPoint(Projectile.RADIUS, this.angle + Math.PI / 2), new PolarPoint(Projectile.RADIUS, this.angle + Math.PI),
-					new PolarPoint(Projectile.RADIUS, this.angle + 3 * Math.PI / 2) };
+					new PolarPoint(Projectile.RADIUS, this.angle + FastMath.PI / 2), new PolarPoint(Projectile.RADIUS, this.angle + FastMath.PI),
+					new PolarPoint(Projectile.RADIUS, this.angle + 3 * FastMath.PI / 2) };
 			g.setColor(Color.BLACK);
 			for (final PolarPoint p : points)
-				g.drawLine((int) Math.round(this.x), (int) Math.round(this.y), (int) Math.round(this.x + p.getX()), (int) Math.round(this.y + p.getY()));
+				g.drawLine((int) FastMath.round(this.x), (int) FastMath.round(this.y), (int) FastMath.round(this.x + p.getX()), (int) FastMath.round(this.y + p.getY()));
 		}
 
 		public void setLocation(final double x, final double y)
@@ -264,10 +265,10 @@ public class Arena
 		{
 			if (!this.isControlled)
 			{
-				final PolarPoint p1 = new PolarPoint(Arena.AIR_DENSITY * Math.sqrt(Math.pow(this.xV, 2) + Math.pow(this.yV, 2)) * MathUtils.TWO_PI
-						* this.angleV * Math.pow(Projectile.RADIUS, 2), Math.atan2(this.yV, this.xV) + Math.PI / 2);
-				final PolarPoint p2 = new PolarPoint(-(Arena.SPHERE_CD * 0.5 * Arena.AIR_DENSITY * (Math.pow(this.xV, 2) + Math.pow(this.yV, 2))
-						* Math.pow(Projectile.RADIUS, 2) * Math.PI), Math.atan2(this.yV, this.xV));
+				final PolarPoint p1 = new PolarPoint(Arena.AIR_DENSITY * FastMath.sqrt(FastMath.pow(this.xV, 2) + FastMath.pow(this.yV, 2)) * MathUtils.TWO_PI
+						* this.angleV * FastMath.pow(Projectile.RADIUS, 2), FastMath.atan2(this.yV, this.xV) + FastMath.PI / 2);
+				final PolarPoint p2 = new PolarPoint(-(Arena.SPHERE_CD * 0.5 * Arena.AIR_DENSITY * (FastMath.pow(this.xV, 2) + FastMath.pow(this.yV, 2))
+						* FastMath.pow(Projectile.RADIUS, 2) * FastMath.PI), FastMath.atan2(this.yV, this.xV));
 				this.xV += p1.getX() + p2.getX();
 				this.yV += p1.getY() + p2.getY();
 			}
@@ -280,6 +281,7 @@ public class Arena
 
 	public static final double	AIR_DENSITY	= 0.00075;
 	public static final double	SPHERE_CD	= 0.1;
+	public static final int		RELOAD_TIME	= 20;
 
 	public static void main1(final String[] args)
 	{
@@ -289,7 +291,7 @@ public class Arena
 		for (int i = 0; i < 10; i++)
 		{
 			n.randomizeWeights(new MersenneTwisterRNG(), 2);
-			a.addFighter(a.new Fighter(n.getDeepCopy(), Math.random() * 400 + 200, Math.random() * 400 + 200, Math.random() * Math.PI * 2, true, a));
+			a.addFighter(a.new Fighter(n.getDeepCopy(), FastMath.random() * 400 + 200, FastMath.random() * 400 + 200, FastMath.random() * FastMath.PI * 2, true, a));
 		}
 		// a.getFighters().get(0).isShooting = true;
 		// a.getFighters().get(0).xV = 1;
@@ -332,8 +334,6 @@ public class Arena
 		frame.setVisible(true);
 	}
 
-	public final Random					r;
-
 	private int							age;
 	private final Rectangle				bounds;
 	private final ArrayList<Fighter>	fighters;
@@ -348,8 +348,7 @@ public class Arena
 		this.bounds = bounds;
 		this.age = 0;
 		this.maxAge = maxAge;
-		this.maxDistance = Math.sqrt(Math.pow(bounds.getWidth(), 2) + Math.pow(bounds.getHeight(), 2));
-		this.r = new Random(0);
+		this.maxDistance = FastMath.sqrt(FastMath.pow(bounds.getWidth(), 2) + FastMath.pow(bounds.getHeight(), 2));
 	}
 
 	public void addFighter(final Fighter f)
@@ -418,9 +417,9 @@ public class Arena
 		for (int i = 0; i < this.fighters.size(); i++)
 		{
 			g2d.setColor(Color.BLACK);
-			g2d.drawString("Fighter " + (i + 1) + ": " + this.fighters.get(i).getScore().bigDecimalValue() + "pts. " + fighters.get(i).getNumVisibleFighters()
-					+ " visible fighters. " + fighters.get(i).getNumVisibleProjectiles() + " visible projectiles.", 50, 20 + i
-					* g2d.getFontMetrics().getHeight());
+			g2d.drawString("Fighter " + (i + 1) + ": " + this.fighters.get(i).getScore().bigDecimalValue() + "pts. "
+					+ this.fighters.get(i).getNumVisibleFighters() + " visible fighters. " + this.fighters.get(i).getNumVisibleProjectiles()
+					+ " visible projectiles. " + this.fighters.get(i).shootDelay, 50, 20 + i * g2d.getFontMetrics().getHeight());
 
 			g2d.setColor(this.fighters.get(i).team);
 			g2d.fillRect(50 - g2d.getFontMetrics().getHeight(), 20 + (i - 1) * g2d.getFontMetrics().getHeight(), g2d.getFontMetrics().getHeight(), g2d
@@ -460,7 +459,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ONE_QUARTER);
+					if (p.getOwner() != null) p.getOwner().decrementScore(BigFraction.ZERO);
 				}
 				else
 					for (final Fighter f : this.fighters)

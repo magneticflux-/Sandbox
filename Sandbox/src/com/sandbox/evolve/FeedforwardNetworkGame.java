@@ -23,6 +23,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.math3.util.FastMath;
 import org.uncommons.watchmaker.framework.PopulationData;
 
 import com.electronauts.mathutil.MathUtil;
@@ -34,7 +35,7 @@ public class FeedforwardNetworkGame
 {
 	public static final String	SAVE_FILE	= "SAVE_FILE";
 
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		final Kryo kryo = new Kryo();
 		final Arena arena = new Arena(new Rectangle(10, 10, 560, 560), -1);
@@ -45,30 +46,30 @@ public class FeedforwardNetworkGame
 		final MouseListener mouse = new MouseListener()
 		{
 			@Override
-			public void mouseClicked(MouseEvent e)
+			public void mouseClicked(final MouseEvent e)
 			{
 			}
 
 			@Override
-			public void mousePressed(MouseEvent e)
+			public void mouseEntered(final MouseEvent e)
+			{
+			}
+
+			@Override
+			public void mouseExited(final MouseEvent e)
+			{
+			}
+
+			@Override
+			public void mousePressed(final MouseEvent e)
 			{
 				player.isShooting = true;
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent e)
+			public void mouseReleased(final MouseEvent e)
 			{
 				player.isShooting = false;
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e)
-			{
 			}
 		};
 		frame.addMouseListener(mouse);
@@ -77,79 +78,34 @@ public class FeedforwardNetworkGame
 			public static final double	SPEED	= 4;
 
 			@Override
-			public void keyTyped(KeyEvent e)
+			public void keyPressed(final KeyEvent e)
 			{
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_W && player.yV <= 0)
-				{
-					player.yV += SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_S && player.yV >= 0)
-				{
-					player.yV -= SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_A && player.xV >= 0)
-				{
-					player.xV -= SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_D && player.xV <= 0)
-				{
-					player.xV += SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_SPACE)
-				{
-					player.isShooting = true;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_F)
-				{
-					MouseInfo.getPointerInfo().getDevice().setFullScreenWindow(frame);
-				}
-				if (e.getKeyCode() == KeyEvent.VK_Z)
-				{
-					player.fov += Math.PI / 32;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_X)
-				{
-					player.fov -= Math.PI / 32;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_C)
-				{
-					player.range += 10;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_V)
-				{
-					player.range -= 10;
-				}
+				if (e.getKeyCode() == KeyEvent.VK_W && player.yV <= 0) player.yV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_S && player.yV >= 0) player.yV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_A && player.xV >= 0) player.xV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_D && player.xV <= 0) player.xV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_SPACE) player.isShooting = true;
+				if (e.getKeyCode() == KeyEvent.VK_F) MouseInfo.getPointerInfo().getDevice().setFullScreenWindow(frame);
+				if (e.getKeyCode() == KeyEvent.VK_Z) player.fov += FastMath.PI / 32;
+				if (e.getKeyCode() == KeyEvent.VK_X) player.fov -= FastMath.PI / 32;
+				if (e.getKeyCode() == KeyEvent.VK_C) player.range += 10;
+				if (e.getKeyCode() == KeyEvent.VK_V) player.range -= 10;
 
 			}
 
 			@Override
-			public void keyReleased(KeyEvent e)
+			public void keyReleased(final KeyEvent e)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_W)
-				{
-					player.yV -= SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_S)
-				{
-					player.yV += SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_A)
-				{
-					player.xV += SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_D)
-				{
-					player.xV -= SPEED;
-				}
-				if (e.getKeyCode() == KeyEvent.VK_SPACE)
-				{
-					player.isShooting = false;
-				}
+				if (e.getKeyCode() == KeyEvent.VK_W) player.yV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_S) player.yV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_A) player.xV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_D) player.xV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_SPACE) player.isShooting = false;
+			}
+
+			@Override
+			public void keyTyped(final KeyEvent e)
+			{
 			}
 		};
 		frame.addKeyListener(key);
@@ -157,19 +113,15 @@ public class FeedforwardNetworkGame
 		{
 			@SuppressWarnings("unchecked")
 			@Override
-			public void actionPerformed(ActionEvent e)
+			public void actionPerformed(final ActionEvent e)
 			{
-				if (e.getActionCommand() == SAVE_FILE)
+				if (e.getActionCommand() == FeedforwardNetworkGame.SAVE_FILE)
 				{
 					if (e.getSource() instanceof PopulationData<?>)
-					{
 						arena.addFighter(arena.new Fighter(((PopulationData<FeedforwardNetwork>) e.getSource()).getBestCandidate(), 100, 100, true, arena));
-					}
 				}
 				else
-				{
 					throw new IllegalArgumentException("Illegal parameter specified!");
-				}
 			}
 		};
 		frame.setJMenuBar(new JMenuBar()
@@ -189,23 +141,23 @@ public class FeedforwardNetworkGame
 									File	directory	= new File(System.getProperty("user.home"));
 
 									@Override
-									public void actionPerformed(ActionEvent e)
+									public void actionPerformed(final ActionEvent e)
 									{
-										final JFileChooser open = new JFileChooser(directory);
+										final JFileChooser open = new JFileChooser(this.directory);
 
 										final int returnVal = open.showOpenDialog(null);
 										if (returnVal == JFileChooser.APPROVE_OPTION)
 										{
-											directory = open.getSelectedFile();
+											this.directory = open.getSelectedFile();
 											try
 											{
 												Input i = null;
-												i = new Input(new FileInputStream(directory));
-												action.actionPerformed(new ActionEvent(kryo.readClassAndObject(i), 0, SAVE_FILE));
+												i = new Input(new FileInputStream(this.directory));
+												action.actionPerformed(new ActionEvent(kryo.readClassAndObject(i), 0, FeedforwardNetworkGame.SAVE_FILE));
 												i.close();
 
 											}
-											catch (FileNotFoundException e1)
+											catch (final FileNotFoundException e1)
 											{
 												e1.printStackTrace();
 											}
@@ -223,18 +175,19 @@ public class FeedforwardNetworkGame
 			private static final long	serialVersionUID	= 1L;
 			public static final double	updateSpeed			= 50 / 3d;
 
-			public void paintComponent(Graphics g)
+			@Override
+			public void paintComponent(final Graphics g)
 			{
 				super.paintComponent(g);
 				final long startTime = System.nanoTime();
 				arena.paint(g);
 				arena.updatePhysics();
 
-				Point p = MouseInfo.getPointerInfo().getLocation();
+				final Point p = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(p, this);
 
-				player.angleV = Math.atan2(Math.sin(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle),
-						Math.cos(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle)) / 2;
+				player.angleV = FastMath.atan2(FastMath.sin(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle),
+						FastMath.cos(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle)) / 2;
 
 				try
 				{

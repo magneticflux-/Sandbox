@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.util.FastMath;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.watchmaker.framework.PopulationData;
@@ -30,12 +31,12 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 			{
 				input = new Input(new FileInputStream("codex/AI Meta Level 0/generation_14321.pop"));
 			}
-			catch (FileNotFoundException e2)
+			catch (final FileNotFoundException e2)
 			{
 				e2.printStackTrace();
 			}
 			@SuppressWarnings("unchecked")
-			PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+			final PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
 			input.close();
 			this.previousBest = oldPop.getBestCandidate();
 		}
@@ -50,10 +51,10 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 
 		if (FeedforwardNetworkEvolve.FIGHT_SELF && !FeedforwardNetworkEvolve.USE_FILE_FOR_OPPONENT) this.previousBest = candidate;
 
-		a.addFighter(a.new Fighter(candidate, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble() * Math.PI
+		a.addFighter(a.new Fighter(candidate, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble() * FastMath.PI
 				* 2, true, a));
 		a.addFighter(a.new Fighter(this.previousBest, r.nextDouble() * a.getBounds().getWidth() + a.getBounds().getMinX(), r.nextDouble()
-				* a.getBounds().getHeight() + a.getBounds().getMinY(), r.nextDouble() * Math.PI * 2, true, a));
+				* a.getBounds().getHeight() + a.getBounds().getMinY(), r.nextDouble() * FastMath.PI * 2, true, a));
 
 		while (a.isYoung())
 			a.updatePhysics();

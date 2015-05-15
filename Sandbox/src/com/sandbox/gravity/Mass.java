@@ -6,14 +6,16 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.commons.math3.util.FastMath;
+
 import com.electronauts.mathutil.MathUtil;
 import com.electronauts.mathutil.PolarPoint;
 
 public class Mass
 {
 	public static final double	DENSITY_CONSTANT		= 5;
-	public static final double	EXPLOSION_CONSTANT		= Math.pow(10, -11);
-	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * Math.pow(10, -11);
+	public static final double	EXPLOSION_CONSTANT		= FastMath.pow(10, -11);
+	public static final double	GRAVITATIONAL_CONSTANT	= 6.673848 * FastMath.pow(10, -11);
 	public static double		maxMass					= 0;
 	public static final double	TIME_SHIFT				= 100;
 
@@ -43,17 +45,17 @@ public class Mass
 
 	public double angleTo(final Mass mass)
 	{
-		return Math.atan2(this.getyCenter() - mass.getyCenter(), this.getxCenter() - mass.getxCenter());
+		return FastMath.atan2(this.getyCenter() - mass.getyCenter(), this.getxCenter() - mass.getxCenter());
 	}
 
 	public void attract(final Mass mass)
 	{
 		// F = G * M1 * M2 / r^2
-		final double force = Mass.GRAVITATIONAL_CONSTANT * (this.getMass() * mass.getMass() / Math.pow(this.distanceTo(mass), 2));
+		final double force = Mass.GRAVITATIONAL_CONSTANT * (this.getMass() * mass.getMass() / FastMath.pow(this.distanceTo(mass), 2));
 		final double angle = this.angleTo(mass);
 
-		final double xForce = force * Math.cos(angle);
-		final double yForce = force * Math.sin(angle);
+		final double xForce = force * FastMath.cos(angle);
+		final double yForce = force * FastMath.sin(angle);
 
 		// F = m * a
 
@@ -101,9 +103,9 @@ public class Mass
 				{
 					this.setxV((this.getxV() * this.getMass() + mass.getxV() * mass.getMass()) / (this.getMass() + mass.getMass()));
 					this.setyV((this.getyV() * this.getMass() + mass.getyV() * mass.getMass()) / (this.getMass() + mass.getMass()));
-					final double strength = Math.sqrt(Math.pow(this.getMass(), 2) + Math.pow(mass.getMass(), 2))
-							* Math.sqrt(Math.pow(this.getVelocity(), 2) + Math.pow(mass.getVelocity(), 2));
-					this.setMass(this.getMass() + mass.getMass() - Math.random() * 3 * mass.getMass() / 10);
+					final double strength = FastMath.sqrt(FastMath.pow(this.getMass(), 2) + FastMath.pow(mass.getMass(), 2))
+							* FastMath.sqrt(FastMath.pow(this.getVelocity(), 2) + FastMath.pow(mass.getVelocity(), 2));
+					this.setMass(this.getMass() + mass.getMass() - FastMath.random() * 3 * mass.getMass() / 10);
 					i.remove();
 					this.repellAll(masses, strength);
 				}
@@ -112,13 +114,13 @@ public class Mass
 
 	public boolean collides(final Mass mass)
 	{
-		return Math.sqrt(Math.pow(this.getxCenter() - mass.getxCenter(), 2) + Math.pow(this.getyCenter() - mass.getyCenter(), 2)) < this.getRadius()
+		return FastMath.sqrt(FastMath.pow(this.getxCenter() - mass.getxCenter(), 2) + FastMath.pow(this.getyCenter() - mass.getyCenter(), 2)) < this.getRadius()
 				+ mass.getRadius();
 	}
 
 	public double distanceTo(final Mass mass)
 	{
-		return Math.sqrt(Math.pow(this.getxCenter() - mass.getxCenter(), 2) + Math.pow(this.getyCenter() - mass.getyCenter(), 2));
+		return FastMath.sqrt(FastMath.pow(this.getxCenter() - mass.getxCenter(), 2) + FastMath.pow(this.getyCenter() - mass.getyCenter(), 2));
 	}
 
 	public double getMass()
@@ -128,12 +130,12 @@ public class Mass
 
 	public double getRadius()
 	{
-		return Math.sqrt(this.mass / (Math.PI * Mass.DENSITY_CONSTANT)) * (100 / (100 + Math.pow(Math.E, this.mass / 1000))) + this.mass / 250000 + 1;
+		return FastMath.sqrt(this.mass / (FastMath.PI * Mass.DENSITY_CONSTANT)) * (100 / (100 + FastMath.pow(FastMath.E, this.mass / 1000))) + this.mass / 250000 + 1;
 	}
 
 	public double getVelocity()
 	{
-		return Math.sqrt(Math.pow(this.xV, 2) + Math.pow(this.yV, 2));
+		return FastMath.sqrt(FastMath.pow(this.xV, 2) + FastMath.pow(this.yV, 2));
 	}
 
 	public double getxCenter()
@@ -174,7 +176,7 @@ public class Mass
 				.getMass() / Mass.maxMass))));
 		g.fillOval((int) (this.xCenter - radius), (int) (this.yCenter - radius), (int) (2 * radius), (int) (2 * radius));
 
-		final PolarPoint p = new PolarPoint(100000 * Math.sqrt(Math.pow(this.getxV(), 2) + Math.pow(this.getyV(), 2)), Math.atan2(this.getyV(), this.getxV()));
+		final PolarPoint p = new PolarPoint(100000 * FastMath.sqrt(FastMath.pow(this.getxV(), 2) + FastMath.pow(this.getyV(), 2)), FastMath.atan2(this.getyV(), this.getxV()));
 		g.setColor(Color.RED);
 		g.drawLine((int) this.getxCenter(), (int) this.getyCenter(), (int) (p.getX() + this.getxCenter()), (int) (p.getY() + this.getyCenter()));
 
@@ -184,7 +186,7 @@ public class Mass
 	public void paintTarget(final String name, final Graphics2D g)
 	{
 		final double radius = 10;
-		final double scale = Math.sqrt(2) / 2;
+		final double scale = FastMath.sqrt(2) / 2;
 		g.drawOval((int) (this.getxCenter() - radius), (int) (this.getyCenter() - radius), (int) (radius * 2), (int) (radius * 2));
 		g.drawLine((int) this.getxCenter(), (int) (this.getyCenter() + radius / 2), (int) this.getxCenter(), (int) (this.getyCenter() + 3 * radius / 2));
 		g.drawLine((int) this.getxCenter(), (int) (this.getyCenter() - radius / 2), (int) this.getxCenter(), (int) (this.getyCenter() - 3 * radius / 2));
@@ -211,11 +213,11 @@ public class Mass
 	public void repell(final Mass mass, final double strength)
 	{
 		// F = G * M1 * M2 / r^2
-		final double force = -Mass.EXPLOSION_CONSTANT * strength * (this.getMass() * mass.getMass() / Math.pow(this.distanceTo(mass), 3 / 2d));
+		final double force = -Mass.EXPLOSION_CONSTANT * strength * (this.getMass() * mass.getMass() / FastMath.pow(this.distanceTo(mass), 3 / 2d));
 		final double angle = this.angleTo(mass);
 
-		final double xForce = force * Math.cos(angle);
-		final double yForce = force * Math.sin(angle);
+		final double xForce = force * FastMath.cos(angle);
+		final double yForce = force * FastMath.sin(angle);
 
 		// F = m * a
 

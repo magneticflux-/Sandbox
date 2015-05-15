@@ -48,7 +48,7 @@ public class FeedforwardNetworkCrossover extends AbstractCrossover<FeedforwardNe
 	@Override
 	protected List<FeedforwardNetwork> mate(final FeedforwardNetwork parent1, final FeedforwardNetwork parent2, final int numberOfCrossoverPoints,
 			final Random rng)
-	{
+			{
 		if (!parent1.getLayout().equals(parent2.getLayout())) throw new IllegalArgumentException("Cannot perform crossover with incompatible parents.");
 		final FeedforwardNetwork offspring1 = new FeedforwardNetwork(parent1.getLayout());
 		final FeedforwardNetwork offspring2 = new FeedforwardNetwork(parent1.getLayout());
@@ -73,5 +73,5 @@ public class FeedforwardNetworkCrossover extends AbstractCrossover<FeedforwardNe
 		offspring.add(offspring2);
 
 		return offspring;
-	}
+			}
 }

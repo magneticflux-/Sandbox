@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 public class FeedforwardNetwork
 {
+	public static final InputNode	BIAS_NODE	= new InputNode(0.01);
+
 	public static void main(final String[] args)
 	{
 		final FeedforwardNetwork n1 = new FeedforwardNetwork("2 3 1");
@@ -19,7 +21,6 @@ public class FeedforwardNetwork
 
 	private NodeLayer					inputs;
 	private final ArrayList<NodeLayer>	layers;
-	public static final InputNode		BIAS_NODE	= new InputNode(1);
 
 	private final String				layout;
 
@@ -49,8 +50,8 @@ public class FeedforwardNetwork
 				final NodeLayer nl = new NodeLayer();
 				for (int i = 0; i < layerSize; i++)
 				{
-					NeuronNode n = new NeuronNode(parentLayer.getNodes());
-					n.addParent(BIAS_NODE);
+					final NeuronNode n = new NeuronNode(parentLayer.getNodes());
+					n.addParent(FeedforwardNetwork.BIAS_NODE);
 					nl.addNode(n);
 				}
 				this.layers.add(nl);

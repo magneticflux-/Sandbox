@@ -12,34 +12,34 @@ import javax.swing.JPanel;
 
 public class Run
 {
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		JFrame frame = new JFrame("Fractal");
-		JPanel panel = new JPanel()
+		final JFrame frame = new JFrame("Fractal");
+		final JPanel panel = new JPanel()
 		{
 			private static final long	serialVersionUID	= 1L;
 
 			@Override
-			public void paintComponent(Graphics g)
+			public void paintComponent(final Graphics g)
 			{
 				super.paintComponent(g);
 
-				Point p1 = new Point(0, 0);
-				Point p2 = new Point(this.getWidth(), 0);
-				Point p3 = new Point(this.getWidth() / 2, this.getHeight());
-				Point p4 = new Point(this.getWidth(), this.getHeight());
+				new Point(0, 0);
+				new Point(this.getWidth(), 0);
+				new Point(this.getWidth() / 2, this.getHeight());
+				new Point(this.getWidth(), this.getHeight());
 
-				Point draw = new Point(this.getWidth()/2, this.getHeight()/2);
-				BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g2d = bi.createGraphics();
-				Random r = new Random();
+				final Point draw = new Point(this.getWidth() / 2, this.getHeight() / 2);
+				final BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				final Graphics2D g2d = bi.createGraphics();
+				final Random r = new Random();
 
 				g2d.setColor(Color.BLACK);
 				for (int i = 0; i < 1000; i++)
 				{
 					g2d.drawLine(draw.x, draw.y, draw.x, draw.y);
 
-					int decide = r.nextInt(4);
+					final int decide = r.nextInt(4);
 
 					switch (decide)
 					{
@@ -66,7 +66,7 @@ public class Run
 					}
 				}
 				g.drawImage(bi, 0, 0, this);
-				repaint();
+				this.repaint();
 			}
 		};
 		frame.add(panel);

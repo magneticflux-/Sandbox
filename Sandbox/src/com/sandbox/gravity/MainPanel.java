@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import org.apache.commons.math3.util.FastMath;
+
 public class MainPanel extends JComponent
 {
 	public static final int		logSize				= 100;
@@ -43,10 +45,10 @@ public class MainPanel extends JComponent
 				{
 					synchronized (component)
 					{
-						final Mass mass = new Mass((int) (Math.random() * component.getWidth()), (int) (Math.random() * component.getHeight()),
-								(int) (Math.random() * 100));
-						mass.setxV((Math.random() - 0.5) * 0.0001);
-						mass.setyV((Math.random() - 0.5) * 0.0001);
+						final Mass mass = new Mass((int) (FastMath.random() * component.getWidth()), (int) (FastMath.random() * component.getHeight()),
+								(int) (FastMath.random() * 100));
+						mass.setxV((FastMath.random() - 0.5) * 0.0001);
+						mass.setyV((FastMath.random() - 0.5) * 0.0001);
 						component.masses.add(mass);
 					}
 					try
@@ -70,9 +72,9 @@ public class MainPanel extends JComponent
 	{
 		for (int i = 0; i < 0; i++)
 		{
-			this.masses.add(new Mass((int) (Math.random() * 720), (int) (Math.random() * 720), (int) (Math.random() * 200)));
-			this.masses.get(i).setxV((Math.random() - 0.5) * 0.0001);
-			this.masses.get(i).setyV((Math.random() - 0.5) * 0.0001);
+			this.masses.add(new Mass((int) (FastMath.random() * 720), (int) (FastMath.random() * 720), (int) (FastMath.random() * 200)));
+			this.masses.get(i).setxV((FastMath.random() - 0.5) * 0.0001);
+			this.masses.get(i).setyV((FastMath.random() - 0.5) * 0.0001);
 		}
 
 		for (int x = 0; x <= 720; x += 80)

@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 import javax.swing.JComponent;
 
+import org.apache.commons.math3.util.FastMath;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
 import org.uncommons.watchmaker.framework.CandidateFactory;
@@ -91,13 +92,13 @@ public class StringEvolve
 		final EvolutionEngine<String> engine = new GenerationalEvolutionEngine<String>(factory, pipeline, fitnessEvaluator, selection, rng);
 
 		engine.addEvolutionObserver(new EvolutionObserver<String>()
-		{
+				{
 			@Override
 			public void populationUpdate(final PopulationData<? extends String> data)
 			{
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
 			}
-		});
+				});
 		final EvolutionMonitor<String> monitor = new EvolutionMonitor<String>(new StringRenderer(), false);
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
@@ -121,11 +122,11 @@ class StringRenderer implements Renderer<String, JComponent>
 			@Override
 			public void paintComponent(final Graphics g)
 			{
-				g.setColor(new Color((int) (128 + 127 * Math.sin(this.inc + 2 * Math.PI / 3)), (int) (128 + 127 * Math.sin(this.inc + 4 * Math.PI / 3)),
-						(int) (128 + 127 * Math.sin(this.inc + 0 * Math.PI / 3))));
+				g.setColor(new Color((int) (128 + 127 * FastMath.sin(this.inc + 2 * FastMath.PI / 3)), (int) (128 + 127 * FastMath.sin(this.inc + 4 * FastMath.PI / 3)),
+						(int) (128 + 127 * FastMath.sin(this.inc + 0 * FastMath.PI / 3))));
 				g.fillRect(0, 0, this.getWidth(), this.getHeight());
-				g.setColor(new Color((int) (128 + 127 * Math.sin(this.inc + 0)), (int) (128 + 127 * Math.sin(this.inc + 2 * Math.PI / 3)),
-						(int) (128 + 127 * Math.sin(this.inc + 4 * Math.PI / 3))));
+				g.setColor(new Color((int) (128 + 127 * FastMath.sin(this.inc + 0)), (int) (128 + 127 * FastMath.sin(this.inc + 2 * FastMath.PI / 3)),
+						(int) (128 + 127 * FastMath.sin(this.inc + 4 * FastMath.PI / 3))));
 				g.drawString(this.toRender, 50, 50);
 				this.inc += 0.001;
 				this.repaint();

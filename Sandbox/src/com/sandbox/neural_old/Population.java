@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.apache.commons.math3.util.FastMath;
+
 public class Population
 {
 	public static double compareOutput(final double[] output, final double[] actual)
@@ -13,7 +15,7 @@ public class Population
 		double difference = 0;
 
 		for (int i = 0; i < output.length; i++)
-			difference += Math.abs(output[i] - actual[i]);
+			difference += FastMath.abs(output[i] - actual[i]);
 
 		return 1 / (0.001 + difference);
 	}
@@ -66,13 +68,13 @@ public class Population
 
 		final ArrayList<Network> sorted = new ArrayList<Network>(this.networks);
 		Collections.sort(sorted, new Comparator<Network>()
-		{
+				{
 			@Override
 			public int compare(final Network o1, final Network o2)
 			{
 				return -new Double(o1.getFitness()).compareTo(new Double(o2.getFitness()));
 			}
-		});
+				});
 
 		for (int i = 0; i < victors.length; i++)
 			victors[i] = sorted.get(i);

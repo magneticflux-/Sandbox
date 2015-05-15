@@ -8,6 +8,7 @@ import java.util.Random;
 
 import javax.swing.JComponent;
 
+import org.apache.commons.math3.util.FastMath;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.PopulationData;
 import org.uncommons.watchmaker.framework.interactive.Renderer;
@@ -34,12 +35,12 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 			{
 				input = new Input(new FileInputStream("codex/AI Meta Level 0/generation_14321.pop"));
 			}
-			catch (FileNotFoundException e2)
+			catch (final FileNotFoundException e2)
 			{
 				e2.printStackTrace();
 			}
 			@SuppressWarnings("unchecked")
-			PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+			final PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
 			input.close();
 			this.bestNetwork = oldPop.getBestCandidate();
 		}
@@ -76,9 +77,9 @@ class FeedforwardNetworkRendererComponent extends JComponent
 		final Random r = new Random();
 		this.arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
 		this.fighter1 = this.arena.new Fighter(competitor.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
-				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, true, this.arena);
+				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, this.arena);
 		this.fighter2 = this.arena.new Fighter(champ.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
-				* this.arena.getBounds().getHeight(), r.nextDouble() * Math.PI * 2, true, this.arena);
+				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, this.arena);
 		this.arena.addFighter(this.fighter1);
 		this.arena.addFighter(this.fighter2);
 	}

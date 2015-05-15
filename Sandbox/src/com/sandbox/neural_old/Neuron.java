@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.util.FastMath;
+
 public class Neuron implements HasOutput
 {
 	private Double						bias;
@@ -43,9 +45,9 @@ public class Neuron implements HasOutput
 		while (i1.hasNext() && i2.hasNext())
 			sum += i1.next().getOutput() * i2.next();
 
-		// return 1 / (Math.pow(10, -1) + Math.exp(-sum - bias));
-		// return 2 / (1 + Math.exp(sum + this.bias)) - 1;
-		return Math.tanh(sum - this.bias);
+		// return 1 / (FastMath.pow(10, -1) + FastMath.exp(-sum - bias));
+		// return 2 / (1 + FastMath.exp(sum + this.bias)) - 1;
+		return FastMath.tanh(sum - this.bias);
 		// return sum + bias;
 	}
 

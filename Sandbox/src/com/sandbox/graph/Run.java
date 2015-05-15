@@ -10,12 +10,12 @@ import com.sun.j3d.utils.universe.SimpleUniverse;
 
 public class Run
 {
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		JFrame frame = new JFrame("3D");
+		final JFrame frame = new JFrame("3D");
 		final Canvas3D canvas = new Canvas3D(SimpleUniverse.getPreferredConfiguration());
-		SimpleUniverse su = new SimpleUniverse(canvas);
-		BranchGroup contents = new BranchGroup();
+		final SimpleUniverse su = new SimpleUniverse(canvas);
+		final BranchGroup contents = new BranchGroup();
 		contents.addChild(new ColorCube(0.3));
 		su.getViewingPlatform().setNominalViewingTransform();
 		su.addBranchGraph(contents);
@@ -24,9 +24,9 @@ public class Run
 
 		frame.add(new JPanel()
 		{
+			private static final long	serialVersionUID	= 1L;
 			{
 			}
-			private static final long	serialVersionUID	= 1L;
 		});
 
 		frame.setSize(400, 400);

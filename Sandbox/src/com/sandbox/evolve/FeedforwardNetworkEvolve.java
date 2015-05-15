@@ -42,7 +42,7 @@ import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkEvolve
 {
-	public static boolean	USE_FILE_FOR_OPPONENT	= true;
+	public static boolean	USE_FILE_FOR_OPPONENT	= false;
 	public static boolean	FIGHT_SELF				= false;
 
 	public static void main(final String[] args)
@@ -51,7 +51,7 @@ public class FeedforwardNetworkEvolve
 		{
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -69,22 +69,19 @@ public class FeedforwardNetworkEvolve
 			{
 				input = new Input(new FileInputStream("codex/generation_" + loadValue + ".pop"));
 			}
-			catch (FileNotFoundException e2)
+			catch (final FileNotFoundException e2)
 			{
 				e2.printStackTrace();
 			}
 			@SuppressWarnings("unchecked")
-			PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
+			final PopulationData<FeedforwardNetwork> oldPop = (PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(input);
 			input.close();
 			factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 		}
 
-		final String layout = "3 6 6 6";
+		final String layout = "3 12 6";
 
-		if (!loadPrevious)
-		{
-			factory = new NetworkCandidateFactory(layout, 4);
-		}
+		if (!loadPrevious) factory = new NetworkCandidateFactory(layout, 4);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
@@ -104,7 +101,7 @@ public class FeedforwardNetworkEvolve
 
 		engine.addEvolutionObserver(eval);
 		engine.addEvolutionObserver(new EvolutionObserver<FeedforwardNetwork>()
-		{
+				{
 			@Override
 			public void populationUpdate(final PopulationData<? extends FeedforwardNetwork> data)
 			{
@@ -115,14 +112,14 @@ public class FeedforwardNetworkEvolve
 				{
 					output = new Output(new FileOutputStream("codex/AI Meta Level 1/generation_" + (data.getGenerationNumber() + loadValue) + ".pop"));
 				}
-				catch (FileNotFoundException e1)
+				catch (final FileNotFoundException e1)
 				{
 					e1.printStackTrace();
 				}
 				kryo.writeClassAndObject(output, data);
 				output.close();
 			}
-		});
+				});
 		final UserAbort abort = new UserAbort();
 		final EvolutionMonitor<FeedforwardNetwork> monitor = new EvolutionMonitor<FeedforwardNetwork>(new FeedforwardNetworkRenderer(layout), false);
 

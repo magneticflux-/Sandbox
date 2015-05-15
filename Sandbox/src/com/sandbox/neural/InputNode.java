@@ -10,7 +10,7 @@ public class InputNode extends AbstractNode
 	{
 	}
 
-	public InputNode(double output)
+	public InputNode(final double output)
 	{
 		this.output = output;
 	}

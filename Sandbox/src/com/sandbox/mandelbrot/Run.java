@@ -20,6 +20,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.util.FastMath;
 
 public class Run
 {
@@ -34,9 +35,9 @@ public class Run
 
 	public static Color getRainbow(final double i)
 	{
-		final int r = 128 + (int) (127 * Math.sin(i));
-		final int g = 128 + (int) (127 * Math.sin(i + 2 * Math.PI / 3));
-		final int b = 128 + (int) (127 * Math.sin(i + 4 * Math.PI / 3));
+		final int r = 128 + (int) (127 * FastMath.sin(i));
+		final int g = 128 + (int) (127 * FastMath.sin(i + 2 * FastMath.PI / 3));
+		final int b = 128 + (int) (127 * FastMath.sin(i + 4 * FastMath.PI / 3));
 		if (i >= 0)
 			return new Color(r, g, b);
 		else
@@ -98,21 +99,21 @@ public class Run
 					e.printStackTrace();
 				}
 
-				BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-				Graphics2D g2d = bImg.createGraphics();
+				final BufferedImage bImg = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+				final Graphics2D g2d = bImg.createGraphics();
 
 				for (final Entry<Point, Integer> e : this.normalizedValues.entrySet())
 				{
-					g2d.setColor(Run.getRainbow(e.getValue() * Math.PI * 2 / maxIteration));
+					g2d.setColor(Run.getRainbow(e.getValue() * FastMath.PI * 2 / Run.maxIteration));
 					g2d.fillRect(e.getKey().x, e.getKey().y, this.renderResolution, this.renderResolution);
-					// bImg.setRGB(e.getKey().x, e.getKey().y, Run.getRainbow(e.getValue() * Math.PI * 2).getRGB());
+					// bImg.setRGB(e.getKey().x, e.getKey().y, Run.getRainbow(e.getValue() * FastMath.PI * 2).getRGB());
 				}
 
 				try
 				{
-					ImageIO.write(bImg, "png", new File(String.format("images/test_%04d.png", maxIteration)));
+					ImageIO.write(bImg, "png", new File(String.format("images/test_%04d.png", Run.maxIteration)));
 				}
-				catch (IOException e1)
+				catch (final IOException e1)
 				{
 					e1.printStackTrace();
 				}
@@ -127,8 +128,8 @@ public class Run
 				g.setColor(Color.WHITE);
 				g.drawString("Max iterations: " + Run.maxIteration, 20, 20);
 				System.out.println(String.format("Frame took %.4f seconds to render at %d iterations.", (System.nanoTime() - startTime) / 1000000000d,
-						maxIteration));
-				maxIteration++;
+						Run.maxIteration));
+				Run.maxIteration++;
 				// maxIteration = (int) (maxIteration * this.zoomMultiplier);
 				this.repaint();
 			}
