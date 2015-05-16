@@ -1,5 +1,7 @@
 package com.sandbox.evolve;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.io.FileInputStream;
@@ -7,14 +9,19 @@ import java.io.FileNotFoundException;
 import java.util.Random;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.apache.commons.math3.util.FastMath;
+import org.jgraph.JGraph;
+import org.jgrapht.ext.JGraphModelAdapter;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.uncommons.watchmaker.framework.EvolutionObserver;
 import org.uncommons.watchmaker.framework.PopulationData;
 import org.uncommons.watchmaker.framework.interactive.Renderer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
+import com.sandbox.neural.AbstractNode;
 import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, JComponent>, EvolutionObserver<FeedforwardNetwork>
@@ -53,17 +60,27 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 	}
 
 	@Override
-	public FeedforwardNetworkRendererComponent render(final FeedforwardNetwork entity)
+	public JPanel render(final FeedforwardNetwork entity)
 	{
 		final FeedforwardNetwork input = entity;
 		if (FeedforwardNetworkEvolve.FIGHT_SELF && !FeedforwardNetworkEvolve.USE_FILE_FOR_OPPONENT) this.bestNetwork = input;
 
-		return new FeedforwardNetworkRendererComponent(input, this.bestNetwork);
+		JPanel panel = new JPanel();
+		JComponent comp1 = new FeedforwardNetworkRendererComponent(input, this.bestNetwork);
+		JComponent comp2 = new JGraph(new JGraphModelAdapter<AbstractNode, DefaultWeightedEdge>(input.getGraphView()));
+
+		comp1.setPreferredSize(new Dimension(800, 600));
+		comp2.setPreferredSize(new Dimension(800, 800));
+
+		panel.add(comp1, BorderLayout.LINE_START);
+		panel.add(comp2, BorderLayout.LINE_END);
+
+		return panel;
 
 	}
 }
 
-class FeedforwardNetworkRendererComponent extends JComponent
+class FeedforwardNetworkRendererComponent extends JPanel
 {
 	private static final long	serialVersionUID	= 1L;
 	private static final double	updateSpeed			= 50 / 3d;
@@ -91,6 +108,7 @@ class FeedforwardNetworkRendererComponent extends JComponent
 		final long startTime = System.nanoTime();
 
 		super.paintComponent(g);
+
 		this.arena.updatePhysics();
 		this.arena.paint(g);
 

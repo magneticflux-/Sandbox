@@ -1,15 +1,23 @@
 package com.sandbox.neural;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import javax.swing.JFrame;
+
+import org.jgraph.JGraph;
+import org.jgrapht.ext.JGraphModelAdapter;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.DirectedWeightedPseudograph;
+
 public class FeedforwardNetwork
 {
 	public static final InputNode	BIAS_NODE	= new InputNode(0.01);
 
-	public static void main(final String[] args)
+	public static void main(final String[] args) throws IOException
 	{
 		final FeedforwardNetwork n1 = new FeedforwardNetwork("2 3 1");
 		final FeedforwardNetwork n2 = n1.getDeepCopy();
@@ -17,6 +25,13 @@ public class FeedforwardNetwork
 		((InputNode) n1.getLayers().get(0).getNode(0)).setOutput(4);
 		System.out.println(n1);
 		System.out.println(n2);
+
+		JFrame frame = new JFrame("Graph Visualization");
+		frame.add(new JGraph(new JGraphModelAdapter<AbstractNode, DefaultWeightedEdge>(n1.getGraphView())));
+
+		frame.setSize(300, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
 	}
 
 	private NodeLayer					inputs;
@@ -109,6 +124,11 @@ public class FeedforwardNetwork
 				n.randomizeWeights(rng, range);
 	}
 
+	public NodeLayer getLayer(int index)
+	{
+		return this.layers.get(index);
+	}
+
 	@Override
 	public String toString()
 	{
@@ -120,5 +140,54 @@ public class FeedforwardNetwork
 			sb.append('\n');
 		}
 		return sb.toString();
+	}
+
+	public DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge> getGraphView()
+	{
+		DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge> graph = new DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge>(
+				DefaultWeightedEdge.class);
+
+		for (int layer = 0; layer < this.getLayers().size(); layer++)
+		{
+			for (int node = 0; node < this.getLayers().get(layer).getNodes().size(); node++)
+			{
+				graph.addVertex(this.getLayer(layer).getNode(node));
+				if (this.getLayer(layer).getNode(node) instanceof NeuronNode)
+				{
+					NeuronNode tempNode = (NeuronNode) this.getLayer(layer).getNode(node);
+					for (int parent = 0; parent < tempNode.getParents().size(); parent++)
+					{
+						if (tempNode.getParents().get(parent) != FeedforwardNetwork.BIAS_NODE)
+							graph.addEdge(tempNode, tempNode.getParents().get(parent), new NetworkEdge(tempNode.getWeights().get(parent)));
+					}
+				}
+			}
+		}
+
+		return graph;
+	}
+
+	public class NetworkEdge extends DefaultWeightedEdge
+	{
+		private static final long	serialVersionUID	= 1L;
+
+		private double				weight;
+
+		public NetworkEdge(double weight)
+		{
+			this.weight = weight;
+		}
+
+		@Override
+		public double getWeight()
+		{
+			return this.weight;
+		}
+
+		@Override
+		public String toString()
+		{
+			return null;
+		}
 	}
 }

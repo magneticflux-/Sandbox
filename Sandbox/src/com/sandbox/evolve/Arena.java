@@ -412,8 +412,6 @@ public class Arena
 		g2d.translate(0, g2d.getClipBounds().getHeight() - 1);
 		g2d.scale(1, -1);
 
-		g.setColor(Color.BLACK);
-		g.drawRect(this.bounds.getLocation().x, this.bounds.getLocation().y, (int) this.bounds.getWidth(), (int) this.bounds.getHeight());
 		for (final Fighter f : this.fighters)
 			f.paint(g);
 		for (final Projectile p : this.projectiles)
@@ -434,6 +432,9 @@ public class Arena
 			g2d.fillRect(50 - g2d.getFontMetrics().getHeight(), 20 + (i - 1) * g2d.getFontMetrics().getHeight(), g2d.getFontMetrics().getHeight(), g2d
 					.getFontMetrics().getHeight());
 		}
+
+		g.setColor(Color.BLACK);
+		g.drawRect(this.bounds.getLocation().x, this.bounds.getLocation().y, (int) this.bounds.getWidth(), (int) this.bounds.getHeight() - 1);
 	}
 
 	public void updatePhysics()

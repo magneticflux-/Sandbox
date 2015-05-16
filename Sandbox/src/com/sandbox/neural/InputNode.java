@@ -34,7 +34,11 @@ public class InputNode extends AbstractNode
 	@Override
 	public String toString()
 	{
-		return "InputNode value: " + this.output;
+		return "InputNode";
 	}
 
+	public String detailedToString()
+	{
+		return "InputNode value: " + this.output;
+	}
 }

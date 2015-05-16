@@ -37,7 +37,7 @@ public class NeuronNode extends AbstractNode
 		double sum = 0;
 		for (int i = 0; i < this.parents.size(); i++)
 			sum += this.parents.get(i).getOutput() * this.weights.get(i);
-		return FastMath.tanh(sum);
+		return NeuronNode.sigmoid(sum);
 	}
 
 	public List<Double> getWeights()
@@ -59,6 +59,11 @@ public class NeuronNode extends AbstractNode
 
 	@Override
 	public String toString()
+	{
+		return "Neuron";
+	}
+
+	public String detailedToString()
 	{
 		return "Neuron has weights of " + this.weights;
 	}
