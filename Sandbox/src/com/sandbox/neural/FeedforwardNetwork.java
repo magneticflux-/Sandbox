@@ -1,40 +1,88 @@
 package com.sandbox.neural;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-import org.jgraph.JGraph;
-import org.jgrapht.ext.JGraphModelAdapter;
+import net.automatalib.commons.dotutil.DOT;
+
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.EdgeNameProvider;
+import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedPseudograph;
 
 public class FeedforwardNetwork
 {
-	public static final InputNode	BIAS_NODE	= new InputNode(0.01);
+	public class NetworkEdge extends DefaultWeightedEdge
+	{
+		private static final long	serialVersionUID	= 1L;
+
+		private final double		weight;
+
+		public NetworkEdge(final double weight)
+		{
+			this.weight = weight;
+		}
+
+		@Override
+		public double getWeight()
+		{
+			return this.weight;
+		}
+
+		@Override
+		public String toString()
+		{
+			return String.format("%.3f", this.getWeight());
+		}
+	}
+
+	public static final InputNode	BIAS_NODE	= new InputNode(0.01, 0);
 
 	public static void main(final String[] args) throws IOException
 	{
-		final FeedforwardNetwork n1 = new FeedforwardNetwork("2 3 1");
+		final FeedforwardNetwork n1 = new FeedforwardNetwork("3 3 1");
 		final FeedforwardNetwork n2 = n1.getDeepCopy();
 		((NeuronNode) n1.getLayers().get(1).getNode(0)).getWeights().set(0, 13d);
 		((InputNode) n1.getLayers().get(0).getNode(0)).setOutput(4);
 		System.out.println(n1);
 		System.out.println(n2);
 
-		JFrame frame = new JFrame("Graph Visualization");
-		frame.add(new JGraph(new JGraphModelAdapter<AbstractNode, DefaultWeightedEdge>(n1.getGraphView())));
+		final JFrame frame = new JFrame("Graph Visualization");
+		// frame.add(new JGraph(new JGraphModelAdapter<AbstractNode, DefaultWeightedEdge>(n1.getGraphView())));
+		frame.add(new JPanel()
+		{
+			private static final long	serialVersionUID	= 1L;
 
-		frame.setSize(300, 300);
+			@Override
+			public void paintComponent(final Graphics g)
+			{
+				super.paintComponent(g);
+				g.drawImage(n1.getGraphImage(), 0, 0, this);
+			}
+		});
+
+		frame.setSize(600, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
 
 	private NodeLayer					inputs;
+
 	private final ArrayList<NodeLayer>	layers;
 
 	private final String				layout;
@@ -56,7 +104,7 @@ public class FeedforwardNetwork
 				final NodeLayer nl = new NodeLayer();
 				this.inputs = nl;
 				for (int i = 0; i < layerSize; i++)
-					nl.addNode(new InputNode());
+					nl.addNode(new InputNode(0, this.layers.size()));
 				this.layers.add(nl);
 			}
 			else
@@ -65,7 +113,7 @@ public class FeedforwardNetwork
 				final NodeLayer nl = new NodeLayer();
 				for (int i = 0; i < layerSize; i++)
 				{
-					final NeuronNode n = new NeuronNode(parentLayer.getNodes());
+					final NeuronNode n = new NeuronNode(parentLayer.getNodes(), this.layers.size());
 					n.addParent(FeedforwardNetwork.BIAS_NODE);
 					nl.addNode(n);
 				}
@@ -102,9 +150,93 @@ public class FeedforwardNetwork
 		return n;
 	}
 
+	public BufferedImage getGraphImage()
+	{
+		final StringWriter dot = new StringWriter();
+
+		final DOTExporter<AbstractNode, DefaultWeightedEdge> exporter = new DOTExporter<AbstractNode, DefaultWeightedEdge>(
+				new VertexNameProvider<AbstractNode>()
+				{
+					private int							iter	= 0;
+					private Map<AbstractNode, Integer>	map		= new HashMap<AbstractNode, Integer>();
+
+					@Override
+					public String getVertexName(final AbstractNode vertex)
+					{
+						if (map.get(vertex) == null)
+						{
+							map.put(vertex, iter++);
+						}
+						return map.get(vertex).toString();
+					}
+				}, new VertexNameProvider<AbstractNode>()
+				{
+					@Override
+					public String getVertexName(final AbstractNode vertex)
+					{
+						return vertex.toString();
+					}
+				}, new EdgeNameProvider<DefaultWeightedEdge>()
+				{
+					@Override
+					public String getEdgeName(final DefaultWeightedEdge edge)
+					{
+						return edge.toString();
+					}
+				});
+
+		exporter.export(dot, this.getGraphView());
+
+		DOT.setDotExe("bin/dot.exe");
+
+		BufferedImage image;
+		try
+		{
+			final InputStream pngIs = DOT.runDOT(new StringReader(dot.toString()), "png", "-Kdot");
+
+			image = ImageIO.read(pngIs);
+
+			pngIs.close();
+		}
+		catch (final IOException e)
+		{
+			image = new BufferedImage(320, 50, BufferedImage.TYPE_INT_RGB);
+			image.getGraphics().drawString("IOException while creating the graph. Fix it in the code!", 10, 10);
+			e.printStackTrace();
+		}
+
+		return image;
+	}
+
+	public DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge> getGraphView()
+	{
+		final DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge> graph = new DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge>(
+				DefaultWeightedEdge.class);
+
+		for (int layer = 0; layer < this.getLayers().size(); layer++)
+			for (int node = 0; node < this.getLayers().get(layer).getNodes().size(); node++)
+			{
+				graph.addVertex(this.getLayer(layer).getNode(node));
+				if (this.getLayer(layer).getNode(node) instanceof NeuronNode)
+				{
+					final NeuronNode tempNode = (NeuronNode) this.getLayer(layer).getNode(node);
+					for (int parent = 0; parent < tempNode.getParents().size(); parent++)
+						if (tempNode.getParents().get(parent) != FeedforwardNetwork.BIAS_NODE)
+							graph.addEdge(tempNode, tempNode.getParents().get(parent), new NetworkEdge(tempNode.getWeights().get(parent)));
+				}
+			}
+
+		return graph;
+	}
+
 	public NodeLayer getInputs()
 	{
 		return this.inputs;
+	}
+
+	public NodeLayer getLayer(final int index)
+	{
+		return this.layers.get(index);
 	}
 
 	public ArrayList<NodeLayer> getLayers()
@@ -124,11 +256,6 @@ public class FeedforwardNetwork
 				n.randomizeWeights(rng, range);
 	}
 
-	public NodeLayer getLayer(int index)
-	{
-		return this.layers.get(index);
-	}
-
 	@Override
 	public String toString()
 	{
@@ -140,54 +267,5 @@ public class FeedforwardNetwork
 			sb.append('\n');
 		}
 		return sb.toString();
-	}
-
-	public DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge> getGraphView()
-	{
-		DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge> graph = new DirectedWeightedPseudograph<AbstractNode, DefaultWeightedEdge>(
-				DefaultWeightedEdge.class);
-
-		for (int layer = 0; layer < this.getLayers().size(); layer++)
-		{
-			for (int node = 0; node < this.getLayers().get(layer).getNodes().size(); node++)
-			{
-				graph.addVertex(this.getLayer(layer).getNode(node));
-				if (this.getLayer(layer).getNode(node) instanceof NeuronNode)
-				{
-					NeuronNode tempNode = (NeuronNode) this.getLayer(layer).getNode(node);
-					for (int parent = 0; parent < tempNode.getParents().size(); parent++)
-					{
-						if (tempNode.getParents().get(parent) != FeedforwardNetwork.BIAS_NODE)
-							graph.addEdge(tempNode, tempNode.getParents().get(parent), new NetworkEdge(tempNode.getWeights().get(parent)));
-					}
-				}
-			}
-		}
-
-		return graph;
-	}
-
-	public class NetworkEdge extends DefaultWeightedEdge
-	{
-		private static final long	serialVersionUID	= 1L;
-
-		private double				weight;
-
-		public NetworkEdge(double weight)
-		{
-			this.weight = weight;
-		}
-
-		@Override
-		public double getWeight()
-		{
-			return this.weight;
-		}
-
-		@Override
-		public String toString()
-		{
-			return null;
-		}
 	}
 }

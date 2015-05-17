@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,10 +43,13 @@ import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkEvolve
 {
-	public static boolean	USE_FILE_FOR_OPPONENT	= false;
-	public static boolean	FIGHT_SELF				= true;
-	public static boolean	LOAD_PREVIOUS			= false;
-	public static int		LOAD_NUMBER				= 0;
+	public static boolean		USE_FILE_FOR_OPPONENT	= false;
+	public static boolean		FIGHT_SELF				= true;
+	public static boolean		LOAD_PREVIOUS			= false;
+	public static final int		INPUT_NUMBER			= 0;
+	public static final String	OUTPUT_FOLDER			= "codex/AI Meta Level 1/";
+	public static final String	INPUT_FOLDER			= "codex/AI Meta Level 0/";
+	public static final double	MUTATION_RANGE			= 0.00001;
 
 	public static void main(final String[] args)
 	{
@@ -67,7 +71,7 @@ public class FeedforwardNetworkEvolve
 			Input input = null;
 			try
 			{
-				input = new Input(new FileInputStream("codex/generation_" + LOAD_NUMBER + ".pop"));
+				input = new Input(new FileInputStream(INPUT_FOLDER + "generation_" + INPUT_NUMBER + ".pop"));
 			}
 			catch (final FileNotFoundException e2)
 			{
@@ -79,9 +83,9 @@ public class FeedforwardNetworkEvolve
 			factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 		}
 
-		final String layout = "3 12 6";
+		final String layout = "3 6 6";
 
-		if (!LOAD_PREVIOUS) factory = new NetworkCandidateFactory(layout, 4);
+		if (!LOAD_PREVIOUS) factory = new NetworkCandidateFactory(layout, 2);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(2));
@@ -110,7 +114,7 @@ public class FeedforwardNetworkEvolve
 				Output output = null;
 				try
 				{
-					output = new Output(new FileOutputStream("codex/AI Meta Level 1/generation_" + (data.getGenerationNumber() + LOAD_NUMBER) + ".pop"));
+					output = new Output(new FileOutputStream(OUTPUT_FOLDER + "generation_" + (data.getGenerationNumber() + INPUT_NUMBER) + ".pop"));
 				}
 				catch (final FileNotFoundException e1)
 				{
@@ -147,7 +151,7 @@ public class FeedforwardNetworkEvolve
 								public void actionPerformed(final ActionEvent e)
 								{
 									abort.abort();
-									System.out.println("*** ABORT SEQUENCE ACTIVATED ***\n");
+									System.out.println("*** ABORT SEQUENCE ACTIVATED ***");
 								}
 							});
 						}
@@ -160,7 +164,10 @@ public class FeedforwardNetworkEvolve
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
 
-		final FeedforwardNetwork result = engine.evolve(500, 25, abort);
+		new File(OUTPUT_FOLDER).mkdirs();
+		new File(INPUT_FOLDER).mkdirs();
+
+		final FeedforwardNetwork result = engine.evolve(200, 10, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }

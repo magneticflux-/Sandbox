@@ -1,17 +1,15 @@
 package com.sandbox.neural;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class InputNode extends AbstractNode
 {
 	private double	output;
 
-	public InputNode()
+	public InputNode(final double output, int layerNumber)
 	{
-	}
-
-	public InputNode(final double output)
-	{
+		super(new ArrayList<AbstractNode>(), layerNumber);
 		this.output = output;
 	}
 
@@ -34,11 +32,11 @@ public class InputNode extends AbstractNode
 	@Override
 	public String toString()
 	{
-		return "InputNode";
+		return "InputNode @ " + this.layerNumber;
 	}
 
 	public String detailedToString()
 	{
-		return "InputNode value: " + this.output;
+		return this.toString() + ", value: " + this.output;
 	}
 }

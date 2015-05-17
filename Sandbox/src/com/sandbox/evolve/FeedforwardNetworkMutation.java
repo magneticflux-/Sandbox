@@ -48,6 +48,6 @@ public class FeedforwardNetworkMutation implements EvolutionaryOperator<Feedforw
 
 	private double mutate(final double value, final Random rng)
 	{
-		return value + (rng.nextDouble() - 0.5) * 2;
+		return value + (rng.nextDouble() - 0.5) * 2 * FeedforwardNetworkEvolve.MUTATION_RANGE;
 	}
 }

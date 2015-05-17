@@ -17,7 +17,6 @@ import javax.swing.JFrame;
 import org.apache.commons.math3.util.FastMath;
 
 import com.electronauts.mathutil.MathUtil;
-import com.electronauts.mathutil.PolarPoint;
 
 public class MainPanel extends JComponent
 {
@@ -90,7 +89,7 @@ public class MainPanel extends JComponent
 			{
 				final Mass m = new Mass(x, y, 200);
 				MathUtil.angleTo(new Point2D.Double(), new Point2D.Double());
-				PolarPoint p = new PolarPoint(1,1);
+				// PolarPoint p = new PolarPoint(1,1);
 				m.setxV(0);
 				this.masses.add(m);
 			}

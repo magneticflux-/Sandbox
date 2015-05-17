@@ -10,14 +10,15 @@ public class NeuronNode extends AbstractNode
 {
 	public static double sigmoid(final double x)
 	{
-		return 2 / (1 + FastMath.exp(-2 * x)) - 1;
+		return x / (1 + FastMath.abs(x));
+		// return 2 / (1 + FastMath.exp(-2 * x)) - 1;
 	}
 
 	private List<Double>	weights;
 
-	public NeuronNode(final ArrayList<AbstractNode> parents)
+	public NeuronNode(final ArrayList<AbstractNode> parents, int layerNumber)
 	{
-		this.parents = new ArrayList<AbstractNode>(parents);
+		super(new ArrayList<AbstractNode>(parents), layerNumber);
 		this.weights = new ArrayList<Double>(parents.size());
 
 		for (int i = 0; i < parents.size(); i++)
@@ -60,11 +61,11 @@ public class NeuronNode extends AbstractNode
 	@Override
 	public String toString()
 	{
-		return "Neuron";
+		return "Neuron @ " + this.layerNumber;
 	}
 
 	public String detailedToString()
 	{
-		return "Neuron has weights of " + this.weights;
+		return this.toString() + " has weights of " + this.weights;
 	}
 }

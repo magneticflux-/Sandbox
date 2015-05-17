@@ -20,6 +20,11 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>net.automatalib</groupId>
+			<artifactId>automata-commons-dotutil</artifactId>
+			<version>0.5.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 			<version>3.5</version>
