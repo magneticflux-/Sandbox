@@ -38,7 +38,7 @@ public class FeedforwardNetworkGame
 	public static void main(final String[] args)
 	{
 		final Kryo kryo = new Kryo();
-		final Arena arena = new Arena(new Rectangle(10, 10, 560, 560), -1);
+		final Arena arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
 		final Arena.Fighter player = arena.new Fighter(null, 200, 200, false, arena);
 		arena.addFighter(player);
 
@@ -178,15 +178,16 @@ public class FeedforwardNetworkGame
 			@Override
 			public void paintComponent(final Graphics g)
 			{
-				super.paintComponent(g);
 				final long startTime = System.nanoTime();
+				super.paintComponent(g);
 				arena.paint(g);
 				arena.updatePhysics();
 
 				final Point p = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(p, this);
 
-				player.angleV = FastMath.atan2(FastMath.sin(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle),
+				player.angleV = FastMath.atan2(
+						FastMath.sin(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle),
 						FastMath.cos(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle)) / 2;
 
 				try

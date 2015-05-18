@@ -187,6 +187,15 @@ public class FeedforwardNetwork
 
 		exporter.export(dot, this.getGraphView());
 
+		System.out.println(System.getProperty("java.specification.version"));
+		if (Double.parseDouble(System.getProperty("java.specification.version")) < 1.8)
+		{
+			System.out.println("_" + Double.parseDouble(System.getProperty("java.specification.version")));
+			BufferedImage image = new BufferedImage(320, 50, BufferedImage.TYPE_INT_RGB);
+			image.getGraphics().drawString("Something went wrong rendering the network!", 10, 10);
+			return image;
+		}
+
 		DOT.setDotExe("bin/dot.exe");
 
 		BufferedImage image;
@@ -201,7 +210,7 @@ public class FeedforwardNetwork
 		catch (final IOException e)
 		{
 			image = new BufferedImage(320, 50, BufferedImage.TYPE_INT_RGB);
-			image.getGraphics().drawString("IOException while creating the graph. Fix it in the code!", 10, 10);
+			image.getGraphics().drawString("Something went wrong rendering the network!", 10, 10);
 			e.printStackTrace();
 		}
 

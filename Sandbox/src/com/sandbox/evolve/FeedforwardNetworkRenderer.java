@@ -90,7 +90,7 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 				g2d.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), Color.PINK, this);
 			}
 		};
-		comp1.setPreferredSize(new Dimension(600, 600));
+		comp1.setPreferredSize(new Dimension(1000, 400));
 
 		JButton button = new JButton("Recalculate Visualization of Neural Network");
 		button.addActionListener(new ActionListener()
@@ -130,7 +130,7 @@ class FeedforwardNetworkRendererComponent extends JPanel
 	{
 		super();
 		final Random r = new Random();
-		this.arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
+		this.arena = new Arena(new Rectangle(0, 0, 1000, 400), -1);
 		this.fighter1 = this.arena.new Fighter(competitor.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
 				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, this.arena);
 		this.fighter2 = this.arena.new Fighter(champ.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
@@ -146,7 +146,6 @@ class FeedforwardNetworkRendererComponent extends JPanel
 		final long startTime = System.nanoTime();
 
 		super.paintComponent(g);
-
 		this.arena.updatePhysics();
 		this.arena.paint(g);
 

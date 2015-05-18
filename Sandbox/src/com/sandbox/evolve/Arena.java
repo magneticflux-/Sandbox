@@ -469,7 +469,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(new BigFraction(1, 10));
+					if (p.getOwner() != null) p.getOwner().decrementScore(new BigFraction(2, 10));
 				}
 				else
 					for (final Fighter f : this.fighters)
@@ -477,7 +477,7 @@ public class Arena
 						{
 							i.remove();
 							if (p.getOwner() != null) p.getOwner().incrementScore(BigFraction.ONE);
-							f.decrementScore(new BigFraction(5, 10));
+							f.decrementScore(new BigFraction(0, 10));
 							break;
 						}
 			}
