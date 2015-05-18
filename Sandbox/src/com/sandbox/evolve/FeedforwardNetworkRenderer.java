@@ -45,7 +45,7 @@ public class FeedforwardNetworkRenderer implements Renderer<FeedforwardNetwork, 
 			Input input = null;
 			try
 			{
-				input = new Input(new FileInputStream("codex/AI Meta Level 0/generation_14321.pop"));
+				input = new Input(new FileInputStream("codex/AI Meta Level 0/generation_20332.pop"));
 			}
 			catch (final FileNotFoundException e2)
 			{

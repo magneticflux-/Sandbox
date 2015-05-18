@@ -43,8 +43,8 @@ import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkEvolve
 {
-	public static boolean		USE_FILE_FOR_OPPONENT	= false;
-	public static boolean		FIGHT_SELF				= true;
+	public static boolean		USE_FILE_FOR_OPPONENT	= true;
+	public static boolean		FIGHT_SELF				= false;
 	public static boolean		LOAD_PREVIOUS			= false;
 	public static final int		INPUT_NUMBER			= 0;
 	public static final String	OUTPUT_FOLDER			= "codex/AI Meta Level 1/";
@@ -83,7 +83,7 @@ public class FeedforwardNetworkEvolve
 			factory = new NetworkCandidateFactory(Arrays.asList(oldPop.getBestCandidate()));
 		}
 
-		final String layout = "3 6 6";
+		final String layout = "3 12 6";
 
 		if (!LOAD_PREVIOUS) factory = new NetworkCandidateFactory(layout, 2);
 
@@ -167,7 +167,7 @@ public class FeedforwardNetworkEvolve
 		new File(OUTPUT_FOLDER).mkdirs();
 		new File(INPUT_FOLDER).mkdirs();
 
-		final FeedforwardNetwork result = engine.evolve(200, 10, abort);
+		final FeedforwardNetwork result = engine.evolve(500, 25, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }
