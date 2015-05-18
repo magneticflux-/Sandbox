@@ -13,11 +13,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="org.eclipse.jdt.annotation_1.1.0.v20140129-1625.jar"/>
-	<classpathentry kind="lib" path="/Users/skaggsm/git/Sandbox/Sandbox/External Libs/grappa/archives/grappa1_2.jar" sourcepath="/Users/skaggsm/git/Sandbox/Sandbox/External Libs/grappa/src/jdk1.2">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/Users/skaggsm/git/Sandbox/Sandbox/External%20Libs/grappa/docs1.2/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
