@@ -15,8 +15,8 @@ public class Randomness
 {
 	public static void main(String[] args)
 	{
-		int numColumns = 10000;
-		int numIterations = 10000000;
+		int numColumns = 1000;
+		int numIterations = 1000000;
 
 		List<Random> rand = Arrays.asList(new Random(), new SecureRandom(), new MersenneTwisterRNG());
 
