@@ -177,7 +177,7 @@ public class Arena
 			final PolarPoint p2 = new PolarPoint(reaction[1] * 3, this.angle + FastMath.PI / 2);
 			this.xV = p1.getX() + p2.getX();
 			this.yV = p1.getY() + p2.getY();
-			this.angleV = reaction[2] * FastMath.PI * (1 / 3d);
+			this.angleV = reaction[2] * FastMath.PI * (1 / 10d);
 			this.isShooting = reaction[3] > 0;
 			if (this.fov + reaction[4] / 10 >= 0 && this.fov + reaction[4] / 10 <= FastMath.PI) this.fov += reaction[4] / 10;
 			if (this.range + reaction[5] * 10 >= 50) this.range += reaction[5] * 10;

@@ -1,5 +1,6 @@
 package com.sandbox.evolve;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -137,7 +138,7 @@ public class FeedforwardNetworkEvolve
 
 				{
 					this.setName("Abort Button");
-					this.setLayout(new GridBagLayout());
+					this.setLayout(new BorderLayout());
 					this.add(new JButton("ABORT")
 					{
 						private static final long	serialVersionUID	= 1L;
@@ -157,7 +158,7 @@ public class FeedforwardNetworkEvolve
 								}
 							});
 						}
-					}, new GridBagConstraints(0, 0, 1, 1, .5, .5, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+					}, BorderLayout.PAGE_START);
 				}
 			});
 			monitor.getGUIComponent().validate();
@@ -172,7 +173,7 @@ public class FeedforwardNetworkEvolve
 		new File(OUTPUT_FOLDER).mkdirs();
 		new File(INPUT_FOLDER).mkdirs();
 
-		final FeedforwardNetwork result = engine.evolve(250, 25, abort);
+		final FeedforwardNetwork result = engine.evolve(2500, 250, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }
