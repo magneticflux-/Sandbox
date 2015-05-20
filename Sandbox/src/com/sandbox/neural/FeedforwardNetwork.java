@@ -187,7 +187,6 @@ public class FeedforwardNetwork
 
 		exporter.export(dot, this.getGraphView());
 
-		System.out.println(System.getProperty("java.specification.version"));
 		if (Double.parseDouble(System.getProperty("java.specification.version")) < 1.8)
 		{
 			System.out.println("_" + Double.parseDouble(System.getProperty("java.specification.version")));

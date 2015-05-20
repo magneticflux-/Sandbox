@@ -85,7 +85,6 @@ public class FeedforwardNetworkGame
 				if (e.getKeyCode() == KeyEvent.VK_A && player.xV >= 0) player.xV -= SPEED;
 				if (e.getKeyCode() == KeyEvent.VK_D && player.xV <= 0) player.xV += SPEED;
 				if (e.getKeyCode() == KeyEvent.VK_SPACE) player.isShooting = true;
-				if (e.getKeyCode() == KeyEvent.VK_F) MouseInfo.getPointerInfo().getDevice().setFullScreenWindow(frame);
 				if (e.getKeyCode() == KeyEvent.VK_Z) player.fov += FastMath.PI / 32;
 				if (e.getKeyCode() == KeyEvent.VK_X) player.fov -= FastMath.PI / 32;
 				if (e.getKeyCode() == KeyEvent.VK_C) player.range += 10;

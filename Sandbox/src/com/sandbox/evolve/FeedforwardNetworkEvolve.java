@@ -47,9 +47,11 @@ public class FeedforwardNetworkEvolve
 	public static boolean		FIGHT_SELF				= true;
 	public static boolean		LOAD_PREVIOUS			= false;
 	public static final int		INPUT_NUMBER			= 0;
-	public static final String	OUTPUT_FOLDER			= "codex/AI Meta Level 1/";
+	public static final String	OUTPUT_FOLDER			= "codex/AI Meta Level 0/";
 	public static final String	INPUT_FOLDER			= "codex/AI Meta Level 0/";
-	public static final double	MUTATION_RANGE			= 0.00001;
+	public static final double	MUTATION_RANGE			= 1;
+	public static final double	MUTATION_PROBABILITY	= 0.05;
+	public static final int		CROSSOVER_POINTS		= 2;
 
 	public static void main(final String[] args)
 	{
@@ -85,11 +87,11 @@ public class FeedforwardNetworkEvolve
 
 		final String layout = "3 6 6";
 
-		if (!LOAD_PREVIOUS) factory = new NetworkCandidateFactory(layout, 2);
+		if (!LOAD_PREVIOUS) factory = new NetworkCandidateFactory(layout, 8);
 
 		final List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
-		operators.add(new FeedforwardNetworkCrossover(2));
-		operators.add(new FeedforwardNetworkMutation(new Probability(0.01)));
+		operators.add(new FeedforwardNetworkCrossover(CROSSOVER_POINTS));
+		operators.add(new FeedforwardNetworkMutation(new Probability(MUTATION_PROBABILITY)));
 
 		final EvolutionaryOperator<FeedforwardNetwork> pipeline = new EvolutionPipeline<FeedforwardNetwork>(operators);
 
@@ -159,6 +161,9 @@ public class FeedforwardNetworkEvolve
 				}
 			});
 			monitor.getGUIComponent().validate();
+
+			for (int i = 0; i < ((JTabbedPane) monitor.getGUIComponent().getComponents()[0]).getComponentCount(); i++)
+				((JTabbedPane) monitor.getGUIComponent().getComponents()[0]).getComponentAt(0);
 		}
 
 		monitor.showInFrame("Evolution", true);

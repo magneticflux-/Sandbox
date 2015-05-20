@@ -94,22 +94,28 @@ public class Arena
 			return (this.y - (this.arena.bounds.y - this.arena.bounds.height)) / this.arena.bounds.height;
 		}
 
-		public int getNumVisibleFighters()
+		public int getNumVisibleEnemyFighters()
 		{
 			int sum = 0;
-			final Point2D ownPoint = this.getPoint();
 			for (final Fighter f : this.arena.getFighters())
-				if (MathUtil.angleTo(ownPoint, f.getPoint()) - this.angle < this.fov / 2 && MathUtil.distance(ownPoint, f.getPoint()) < this.range && f != this)
-					sum++;
+			{
+				if (!this.isRobot && f != this)
+					System.out.printf("AngleTo: %.4f Angle: %.4f Diff: %.4f\n", MathUtil.angleTo(this.getPoint(), f.getPoint()), this.angle,
+							FastMath.abs(MathUtil.angleTo(this.getPoint(), f.getPoint()) - this.angle));
+
+				if (FastMath.abs(MathUtil.angleTo(this.getPoint(), f.getPoint()) - this.angle) < this.fov / 2
+						&& MathUtil.distance(this.getPoint(), f.getPoint()) < this.range && f != this) sum++;
+			}
+
 			return sum;
 		}
 
-		public int getNumVisibleProjectiles()
+		public int getNumVisibleEnemyProjectiles()
 		{
 			int sum = 0;
-			final Point2D ownPoint = this.getPoint();
 			for (final Projectile p : this.arena.getProjectiles())
-				if (MathUtil.angleTo(ownPoint, p.getPoint()) - this.angle < this.fov / 2 && MathUtil.distance(ownPoint, p.getPoint()) < this.range) sum++;
+				if (MathUtil.angleTo(this.getPoint(), p.getPoint()) - this.angle < this.fov / 2
+						&& MathUtil.distance(this.getPoint(), p.getPoint()) < this.range && this != p.getOwner()) sum++;
 			return sum;
 		}
 
@@ -156,20 +162,25 @@ public class Arena
 		public void react()
 		{
 			if (this.isRobot && this.brain != null)
-				this.reactTo(new double[] { this.shootDelay / (double) Arena.RELOAD_TIME, this.getNumVisibleProjectiles(), this.getNumVisibleFighters() });
+				this.reactTo(new double[] { this.shootDelay / (double) Arena.RELOAD_TIME, this.getNumVisibleEnemyProjectiles(),
+						this.getNumVisibleEnemyFighters() });
+			if (!this.isRobot)
+			{
+				System.out.println("X:" + this.x + " Y:" + this.y);
+			}
 		}
 
 		public void reactTo(final double[] enviroment)
 		{
 			final double[] reaction = this.brain.evaluate(enviroment);
-			final PolarPoint p1 = new PolarPoint(reaction[0] * 4, this.angle);
-			final PolarPoint p2 = new PolarPoint(reaction[1] * 4, this.angle + FastMath.PI / 2);
+			final PolarPoint p1 = new PolarPoint(reaction[0] * 3, this.angle);
+			final PolarPoint p2 = new PolarPoint(reaction[1] * 3, this.angle + FastMath.PI / 2);
 			this.xV = p1.getX() + p2.getX();
 			this.yV = p1.getY() + p2.getY();
-			this.angleV = reaction[2] / (FastMath.PI * 2);
+			this.angleV = reaction[2] * FastMath.PI * (1 / 3d);
 			this.isShooting = reaction[3] > 0;
-			if (this.fov + reaction[4] / 5 >= 0 && this.fov + reaction[4] / 5 <= FastMath.PI) this.fov += reaction[4] / 5;
-			if (this.range + reaction[5] * 5 >= 50) this.range += reaction[5] * 5;
+			if (this.fov + reaction[4] / 10 >= 0 && this.fov + reaction[4] / 10 <= FastMath.PI) this.fov += reaction[4] / 10;
+			if (this.range + reaction[5] * 10 >= 50) this.range += reaction[5] * 10;
 		}
 
 		@Override
@@ -417,6 +428,9 @@ public class Arena
 		for (final Projectile p : this.projectiles)
 			p.paint(g);
 
+		g2d.setColor(Color.BLACK);
+		g2d.drawRect(this.bounds.getLocation().x, this.bounds.getLocation().y, (int) this.bounds.getWidth(), (int) this.bounds.getHeight() - 1);
+
 		g2d.setTransform(old);
 
 		g2d.setColor(Color.BLACK);
@@ -425,16 +439,13 @@ public class Arena
 		{
 			g2d.setColor(Color.BLACK);
 			g2d.drawString("Fighter " + (i + 1) + ": " + this.fighters.get(i).getScore().bigDecimalValue() + "pts. "
-					+ this.fighters.get(i).getNumVisibleFighters() + " visible fighters. " + this.fighters.get(i).getNumVisibleProjectiles()
+					+ this.fighters.get(i).getNumVisibleEnemyFighters() + " visible fighters. " + this.fighters.get(i).getNumVisibleEnemyProjectiles()
 					+ " visible projectiles. " + this.fighters.get(i).shootDelay, 50, 20 + i * g2d.getFontMetrics().getHeight());
 
 			g2d.setColor(this.fighters.get(i).team);
 			g2d.fillRect(50 - g2d.getFontMetrics().getHeight(), 20 + (i - 1) * g2d.getFontMetrics().getHeight(), g2d.getFontMetrics().getHeight(), g2d
 					.getFontMetrics().getHeight());
 		}
-
-		g.setColor(Color.BLACK);
-		g.drawRect(this.bounds.getLocation().x, this.bounds.getLocation().y, (int) this.bounds.getWidth(), (int) this.bounds.getHeight() - 1);
 	}
 
 	public void updatePhysics()
@@ -469,7 +480,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(new BigFraction(2, 10));
+					if (p.getOwner() != null) p.getOwner().decrementScore(new BigFraction(1, 4));
 				}
 				else
 					for (final Fighter f : this.fighters)
