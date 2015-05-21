@@ -37,7 +37,7 @@ public class InitialNetTest
 		JButton sendButton = new JButton("Send String");
 		final JTextField ip = new JTextField();
 		final JTextField data = new JTextField();
-		final JTextArea log = new JTextArea("Textmessage v1.41421 now online.\n\n\n\n");
+		final JTextArea log = new JTextArea("Textmessage v1.41421 now online.\n\n");
 		JScrollPane logScroll = new JScrollPane(log);
 
 		log.setEditable(false);
@@ -73,7 +73,7 @@ public class InitialNetTest
 					toSend[0].println(data.getText());
 					try
 					{
-						log.setText(log.getText() + '\n' + Inet4Address.getLocalHost().getCanonicalHostName() + ": " + data.getText());
+						log.setText(log.getText() + '\n' + Inet4Address.getLocalHost().getHostName() + ": " + data.getText());
 					}
 					catch (UnknownHostException e1)
 					{
@@ -108,7 +108,7 @@ public class InitialNetTest
 				{
 					System.out.println("Began accepting socket");
 					client[0] = server.accept();
-					System.out.println("Socket accepted from " + client[0].getInetAddress().getCanonicalHostName());
+					System.out.println("Socket accepted from " + client[0].getInetAddress().getHostName());
 					out[0] = new PrintWriter(client[0].getOutputStream(), true);
 					in[0] = new BufferedReader(new InputStreamReader(client[0].getInputStream()));
 				}
@@ -141,7 +141,7 @@ public class InitialNetTest
 								e1.printStackTrace();
 							}
 						}
-						log.setText(log.getText() + '\n' + client[0].getInetAddress().getCanonicalHostName() + ": " + in[0].readLine());
+						log.setText(log.getText() + '\n' + client[0].getInetAddress().getHostName() + ": " + in[0].readLine());
 						log.setCaretPosition(log.getText().length());
 					}
 					catch (IOException e)
