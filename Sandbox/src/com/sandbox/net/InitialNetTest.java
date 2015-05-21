@@ -37,7 +37,7 @@ public class InitialNetTest
 		JButton sendButton = new JButton("Send String");
 		final JTextField ip = new JTextField();
 		final JTextField data = new JTextField();
-		final JTextArea log = new JTextArea("Textmessage v1.41421 now online.\n\n\n\n");
+		final JTextArea log = new JTextArea("Textmessage v1.41421 now online.\n\n");
 		JScrollPane logScroll = new JScrollPane(log);
 
 		log.setEditable(false);
