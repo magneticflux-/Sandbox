@@ -1,6 +1,5 @@
 package com.sandbox.net;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -72,7 +71,15 @@ public class InitialNetTest
 				if (toSend[0] != null)
 				{
 					toSend[0].println(data.getText());
-					System.out.println("DEBUG" + data.getText());
+					try
+					{
+						log.setText(log.getText() + '\n' + Inet4Address.getLocalHost().getCanonicalHostName() + ": " + data.getText());
+					}
+					catch (UnknownHostException e1)
+					{
+						e1.printStackTrace();
+					}
+					log.setCaretPosition(log.getText().length());
 				}
 			}
 		});
@@ -88,38 +95,7 @@ public class InitialNetTest
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(300, 300);
 		frame.setVisible(true);
-		Thread t = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				try
-				{
-					System.out.println("Began request");
-					Socket s = new Socket(Inet4Address.getLocalHost(), DEFAULT_PORT);
-					System.out.println("Request accepted");
-					PrintWriter out = new PrintWriter(s.getOutputStream(), true);
-					out.println("MESSAGE");
-					System.out.println("Sent message.");
-					try
-					{
-						Thread.sleep(1000);
-					}
-					catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
-				}
-				catch (UnknownHostException e)
-				{
-					e.printStackTrace();
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		});
+
 		final PrintWriter[] out = new PrintWriter[1];
 		final BufferedReader[] in = new BufferedReader[1];
 
@@ -132,7 +108,7 @@ public class InitialNetTest
 				{
 					System.out.println("Began accepting socket");
 					client[0] = server.accept();
-					System.out.println("Socket accepted");
+					System.out.println("Socket accepted from " + client[0].getInetAddress().getCanonicalHostName());
 					out[0] = new PrintWriter(client[0].getOutputStream(), true);
 					in[0] = new BufferedReader(new InputStreamReader(client[0].getInputStream()));
 				}
@@ -165,7 +141,7 @@ public class InitialNetTest
 								e1.printStackTrace();
 							}
 						}
-						log.setText(log.getText() + '\n' + "Message Received: " + in[0].readLine());
+						log.setText(log.getText() + '\n' + client[0].getInetAddress().getCanonicalHostName() + ": " + in[0].readLine());
 						log.setCaretPosition(log.getText().length());
 					}
 					catch (IOException e)
