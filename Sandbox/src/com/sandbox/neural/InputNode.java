@@ -9,7 +9,7 @@ public class InputNode extends AbstractNode
 
 	public InputNode(final double output, int layerNumber)
 	{
-		super(new ArrayList<AbstractNode>(), layerNumber);
+		super(new ArrayList<AbstractNode>(), layerNumber, null);
 		this.output = output;
 	}
 

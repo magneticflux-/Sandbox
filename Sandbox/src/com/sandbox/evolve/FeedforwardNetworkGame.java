@@ -39,7 +39,7 @@ public class FeedforwardNetworkGame
 	{
 		final Kryo kryo = new Kryo();
 		final Arena arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
-		final Arena.Fighter player = arena.new Fighter(null, 200, 200, false, arena);
+		final Arena.Fighter player = arena.new Fighter(null, 200, 200, 0, false, false, arena);
 		arena.addFighter(player);
 
 		final JFrame frame = new JFrame("Game");
@@ -117,7 +117,8 @@ public class FeedforwardNetworkGame
 				if (e.getActionCommand() == FeedforwardNetworkGame.SAVE_FILE)
 				{
 					if (e.getSource() instanceof PopulationData<?>)
-						arena.addFighter(arena.new Fighter(((PopulationData<FeedforwardNetwork>) e.getSource()).getBestCandidate(), 100, 100, true, arena));
+						arena.addFighter(arena.new Fighter(((PopulationData<FeedforwardNetwork>) e.getSource()).getBestCandidate(), 100, 100, 0, true, false,
+								arena));
 				}
 				else
 					throw new IllegalArgumentException("Illegal parameter specified!");

@@ -40,13 +40,10 @@ public class Arena
 		private final FeedforwardNetwork	brain;
 		private BigFraction					score;
 		private int							shootDelay	= 0;
+		private boolean						isCheating;
 
-		public Fighter(final FeedforwardNetwork brain, final double x, final double y, final boolean isRobot, final Arena arena)
-		{
-			this(brain, x, y, 0, isRobot, arena);
-		}
-
-		public Fighter(final FeedforwardNetwork brain, final double x, final double y, final double angle, final boolean isRobot, final Arena arena)
+		public Fighter(final FeedforwardNetwork brain, final double x, final double y, final double angle, final boolean isRobot, final boolean isCheating,
+				final Arena arena)
 		{
 			super(x, y, null);
 
@@ -64,6 +61,7 @@ public class Arena
 			this.fov = FastMath.PI / 3;
 			this.range = 400;
 			this.isControlled = true;
+			this.isCheating = isCheating;
 		}
 
 		@Override
@@ -162,8 +160,18 @@ public class Arena
 		public void react()
 		{
 			if (this.isRobot && this.brain != null)
-				this.reactTo(new double[] { this.shootDelay / (double) Arena.RELOAD_TIME, this.getNumVisibleEnemyProjectiles(),
-						this.getNumVisibleEnemyFighters() });
+			{
+				if (this.isCheating)
+				{
+					this.reactTo(new double[] { this.angle - MathUtil.angleTo(this.getPoint(), arena.getOtherFighter(this).getPoint()),
+							this.getNumVisibleEnemyProjectiles(), this.getNumVisibleEnemyFighters() });
+				}
+				else
+				{
+					this.reactTo(new double[] { (double) this.shootDelay / Arena.RELOAD_TIME, this.getNumVisibleEnemyProjectiles(),
+							this.getNumVisibleEnemyFighters() });
+				}
+			}
 			if (!this.isRobot)
 			{
 				System.out.println("X:" + this.x + " Y:" + this.y);
@@ -311,7 +319,7 @@ public class Arena
 		{
 			n.randomizeWeights(new MersenneTwisterRNG(), 2);
 			a.addFighter(a.new Fighter(n.getDeepCopy(), FastMath.random() * 400 + 200, FastMath.random() * 400 + 200, FastMath.random() * FastMath.PI * 2,
-					true, a));
+					true, false, a));
 		}
 		// a.getFighters().get(0).isShooting = true;
 		// a.getFighters().get(0).xV = 1;

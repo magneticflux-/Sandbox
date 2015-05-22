@@ -25,7 +25,7 @@ import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedPseudograph;
 
-public class FeedforwardNetwork
+public class FeedforwardNetwork extends NeuralNet
 {
 	public class NetworkEdge extends DefaultWeightedEdge
 	{
@@ -82,9 +82,7 @@ public class FeedforwardNetwork
 	}
 
 	private NodeLayer					inputs;
-
 	private final ArrayList<NodeLayer>	layers;
-
 	private final String				layout;
 
 	public FeedforwardNetwork(final String layout)
@@ -113,7 +111,7 @@ public class FeedforwardNetwork
 				final NodeLayer nl = new NodeLayer();
 				for (int i = 0; i < layerSize; i++)
 				{
-					final NeuronNode n = new NeuronNode(parentLayer.getNodes(), this.layers.size());
+					final NeuronNode n = new NeuronNode(parentLayer.getNodes(), this.layers.size(), this);
 					n.addParent(FeedforwardNetwork.BIAS_NODE);
 					nl.addNode(n);
 				}
@@ -131,6 +129,7 @@ public class FeedforwardNetwork
 
 		for (int i = 0; i < inputs.length; i++)
 			((InputNode) this.inputs.getNode(i)).setOutput(inputs[i]);
+		this.invertGlobalValidate();
 
 		final double[] outputs = new double[this.layers.get(this.layers.size() - 1).getNodes().size()];
 		for (int i = 0; i < outputs.length; i++)

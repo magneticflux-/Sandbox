@@ -7,11 +7,13 @@ public abstract class AbstractNode
 {
 	protected ArrayList<AbstractNode>	parents;
 	protected int						layerNumber;
+	protected NeuralNet					network;
 
-	public AbstractNode(ArrayList<AbstractNode> parents, int layerNumber)
+	public AbstractNode(ArrayList<AbstractNode> parents, int layerNumber, NeuralNet network)
 	{
 		this.parents = parents;
 		this.layerNumber = layerNumber;
+		this.network = network;
 	}
 
 	public void addParent(final AbstractNode n)

@@ -29,7 +29,7 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 			Input input = null;
 			try
 			{
-				input = new Input(new FileInputStream("codex/AI Meta Level 3/generation_3345.pop"));
+				input = new Input(new FileInputStream("codex/AI Meta Level -1/generation_10571.pop"));
 			}
 			catch (final FileNotFoundException e2)
 			{
@@ -52,9 +52,9 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 		if (FeedforwardNetworkEvolve.FIGHT_SELF && !FeedforwardNetworkEvolve.USE_FILE_FOR_OPPONENT) this.previousBest = candidate;
 
 		a.addFighter(a.new Fighter(candidate, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble()
-				* FastMath.PI * 2, true, a));
+				* FastMath.PI * 2, true, false, a));
 		a.addFighter(a.new Fighter(this.previousBest, r.nextDouble() * a.getBounds().getWidth() + a.getBounds().getMinX(), r.nextDouble()
-				* a.getBounds().getHeight() + a.getBounds().getMinY(), r.nextDouble() * FastMath.PI * 2, true, a));
+				* a.getBounds().getHeight() + a.getBounds().getMinY(), r.nextDouble() * FastMath.PI * 2, true, true, a));
 
 		while (a.isYoung())
 			a.updatePhysics();

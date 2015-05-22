@@ -15,10 +15,12 @@ public class NeuronNode extends AbstractNode
 	}
 
 	private List<Double>	weights;
+	private boolean			localValidate	= false;
+	private double			cache;
 
-	public NeuronNode(final ArrayList<AbstractNode> parents, int layerNumber)
+	public NeuronNode(final ArrayList<AbstractNode> parents, int layerNumber, NeuralNet network)
 	{
-		super(new ArrayList<AbstractNode>(parents), layerNumber);
+		super(new ArrayList<AbstractNode>(parents), layerNumber, network);
 		this.weights = new ArrayList<Double>(parents.size());
 
 		for (int i = 0; i < parents.size(); i++)
@@ -35,10 +37,15 @@ public class NeuronNode extends AbstractNode
 	@Override
 	public double getOutput()
 	{
-		double sum = 0;
-		for (int i = 0; i < this.parents.size(); i++)
-			sum += this.parents.get(i).getOutput() * this.weights.get(i);
-		return NeuronNode.sigmoid(sum);
+		if (network.getGlobalValidate() == this.localValidate)
+		{
+			double sum = 0;
+			for (int i = 0; i < this.parents.size(); i++)
+				sum += this.parents.get(i).getOutput() * this.weights.get(i);
+			this.cache = NeuronNode.sigmoid(sum);
+			this.localValidate = !this.localValidate;
+		}
+		return this.cache;
 	}
 
 	public List<Double> getWeights()

@@ -24,6 +24,12 @@ public class InitialNetTest
 {
 	public static final int	DEFAULT_PORT	= 2245;
 
+	public static void logMessage(JTextArea log, String message, String sender)
+	{
+		log.setText(log.getText() + '\n' + sender + " says: " + message);
+		log.setCaretPosition(log.getText().length());
+	}
+
 	public static void main(String[] args) throws IOException
 	{
 		final ServerSocket server = new ServerSocket(DEFAULT_PORT);
@@ -71,15 +77,7 @@ public class InitialNetTest
 				if (toSend[0] != null)
 				{
 					toSend[0].println(data.getText());
-					try
-					{
-						log.setText(log.getText() + '\n' + Inet4Address.getLocalHost().getHostName() + ": " + data.getText());
-					}
-					catch (UnknownHostException e1)
-					{
-						e1.printStackTrace();
-					}
-					log.setCaretPosition(log.getText().length());
+					logMessage(log, data.getText(), "User");
 				}
 			}
 		});
@@ -106,9 +104,9 @@ public class InitialNetTest
 			{
 				try
 				{
-					System.out.println("Began accepting socket");
+					logMessage(log, "Began accepting sockets...", "System");
 					client[0] = server.accept();
-					System.out.println("Socket accepted from " + client[0].getInetAddress().getHostName());
+					logMessage(log, "Socket accepted from " + client[0].getInetAddress().getCanonicalHostName(), "System");
 					out[0] = new PrintWriter(client[0].getOutputStream(), true);
 					in[0] = new BufferedReader(new InputStreamReader(client[0].getInputStream()));
 				}
@@ -141,8 +139,7 @@ public class InitialNetTest
 								e1.printStackTrace();
 							}
 						}
-						log.setText(log.getText() + '\n' + client[0].getInetAddress().getHostName() + ": " + in[0].readLine());
-						log.setCaretPosition(log.getText().length());
+						logMessage(log, in[0].readLine(), client[0].getInetAddress().getCanonicalHostName());
 					}
 					catch (IOException e)
 					{
