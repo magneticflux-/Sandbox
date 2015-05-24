@@ -496,7 +496,7 @@ public class Arena
 						{
 							i.remove();
 							if (p.getOwner() != null) p.getOwner().incrementScore(BigFraction.ONE);
-							f.decrementScore(new BigFraction(0, 10));
+							f.decrementScore(new BigFraction(1, 8));
 							break;
 						}
 			}

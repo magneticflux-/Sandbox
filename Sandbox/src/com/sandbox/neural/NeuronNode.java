@@ -71,6 +71,7 @@ public class NeuronNode extends AbstractNode
 		return "Neuron @ " + this.layerNumber;
 	}
 
+	@Override
 	public String detailedToString()
 	{
 		return this.toString() + " has weights of " + this.weights;

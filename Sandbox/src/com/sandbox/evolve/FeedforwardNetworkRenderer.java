@@ -132,7 +132,7 @@ class FeedforwardNetworkRendererComponent extends JPanel
 		final Random r = new Random();
 		this.arena = new Arena(new Rectangle(0, 0, 1000, 400), -1);
 		this.fighter1 = this.arena.new Fighter(competitor.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
-				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, false, this.arena);
+				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, true, this.arena);
 		this.fighter2 = this.arena.new Fighter(champ.getDeepCopy(), r.nextDouble() * this.arena.getBounds().getWidth(), r.nextDouble()
 				* this.arena.getBounds().getHeight(), r.nextDouble() * FastMath.PI * 2, true, true, this.arena);
 

@@ -270,7 +270,7 @@ public class FeedforwardNetwork extends NeuralNet
 		for (final NodeLayer nl : this.layers)
 		{
 			for (final AbstractNode absn : nl.getNodes())
-				sb.append(absn + "; ");
+				sb.append(absn.detailedToString() + "; ");
 			sb.append('\n');
 		}
 		return sb.toString();

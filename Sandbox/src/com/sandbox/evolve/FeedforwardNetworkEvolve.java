@@ -41,13 +41,13 @@ import com.sandbox.neural.FeedforwardNetwork;
 
 public class FeedforwardNetworkEvolve
 {
-	public static boolean		USE_FILE_FOR_OPPONENT	= true;
-	public static boolean		FIGHT_SELF				= false;
-	public static boolean		LOAD_PREVIOUS			= false;
+	public static final boolean	USE_FILE_FOR_OPPONENT	= false;
+	public static final boolean	FIGHT_SELF				= true;
+	public static final boolean	LOAD_PREVIOUS			= false;
 	public static final int		INPUT_NUMBER			= 0;
 	public static final String	OUTPUT_FOLDER			= "codex/AI Meta Level 0/";
 	public static final String	INPUT_FOLDER			= "codex/AI Meta Level 0/";
-	public static final double	MUTATION_RANGE			= 1;
+	public static final double	MUTATION_RANGE			= 0.1;
 	public static final double	MUTATION_PROBABILITY	= 0.05;
 	public static final int		CROSSOVER_POINTS		= 2;
 
@@ -158,10 +158,6 @@ public class FeedforwardNetworkEvolve
 					}, BorderLayout.PAGE_START);
 				}
 			});
-			monitor.getGUIComponent().validate();
-
-			for (int i = 0; i < ((JTabbedPane) monitor.getGUIComponent().getComponents()[0]).getComponentCount(); i++)
-				((JTabbedPane) monitor.getGUIComponent().getComponents()[0]).getComponentAt(0);
 		}
 
 		monitor.showInFrame("Evolution", true);
@@ -170,7 +166,7 @@ public class FeedforwardNetworkEvolve
 		new File(OUTPUT_FOLDER).mkdirs();
 		new File(INPUT_FOLDER).mkdirs();
 
-		final FeedforwardNetwork result = engine.evolve(2000, 100, abort);
+		final FeedforwardNetwork result = engine.evolve(250, 25, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 }

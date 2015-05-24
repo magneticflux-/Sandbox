@@ -14,6 +14,7 @@ public class ExecTest
 		System.out.print("Command: ");
 		while (true)
 		{
+			@SuppressWarnings("resource")
 			Process proc = rt.exec(new Scanner(System.in).nextLine());
 			InputStream stderr = proc.getErrorStream();
 			InputStream stdin = proc.getInputStream();

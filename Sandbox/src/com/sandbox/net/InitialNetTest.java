@@ -30,6 +30,7 @@ public class InitialNetTest
 		log.setCaretPosition(log.getText().length());
 	}
 
+	@SuppressWarnings("resource")
 	public static void main(String[] args) throws IOException
 	{
 		final ServerSocket server = new ServerSocket(DEFAULT_PORT);

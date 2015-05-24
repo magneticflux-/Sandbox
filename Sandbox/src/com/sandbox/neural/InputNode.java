@@ -35,6 +35,7 @@ public class InputNode extends AbstractNode
 		return "InputNode @ " + this.layerNumber;
 	}
 
+	@Override
 	public String detailedToString()
 	{
 		return this.toString() + ", value: " + this.output;

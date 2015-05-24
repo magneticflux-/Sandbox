@@ -52,7 +52,7 @@ public class FeedforwardNetworkEvaluator implements FitnessEvaluator<Feedforward
 		if (FeedforwardNetworkEvolve.FIGHT_SELF && !FeedforwardNetworkEvolve.USE_FILE_FOR_OPPONENT) this.previousBest = candidate;
 
 		a.addFighter(a.new Fighter(candidate, r.nextDouble() * a.getBounds().getWidth(), r.nextDouble() * a.getBounds().getHeight(), r.nextDouble()
-				* FastMath.PI * 2, true, false, a));
+				* FastMath.PI * 2, true, true, a));
 		a.addFighter(a.new Fighter(this.previousBest, r.nextDouble() * a.getBounds().getWidth() + a.getBounds().getMinX(), r.nextDouble()
 				* a.getBounds().getHeight() + a.getBounds().getMinY(), r.nextDouble() * FastMath.PI * 2, true, true, a));
 
