@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.commons.math3.fraction.BigFraction;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.util.FastMath;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 
@@ -16,7 +17,7 @@ public class Randomness
 	public static void main(String[] args)
 	{
 		int numColumns = 1000;
-		int numIterations = 1000000;
+		int numIterations = 10000000;
 
 		List<Random> rand = Arrays.asList(new Random(), new SecureRandom(), new MersenneTwisterRNG());
 
