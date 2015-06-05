@@ -168,8 +168,7 @@ public class Arena
 				}
 				else
 				{
-					this.reactTo(new double[] { (double) this.shootDelay / Arena.RELOAD_TIME, this.getNumVisibleEnemyProjectiles(),
-							this.getNumVisibleEnemyFighters() });
+					this.reactTo(new double[] { this.angle, this.range, this.getNumVisibleEnemyProjectiles(), this.getNumVisibleEnemyFighters() });
 				}
 			}
 			if (!this.isRobot)
@@ -488,7 +487,7 @@ public class Arena
 				if (!this.bounds.contains(p.getX(), p.getY()))
 				{
 					i.remove();
-					if (p.getOwner() != null) p.getOwner().decrementScore(new BigFraction(1, 4));
+					if (p.getOwner() != null) p.getOwner().decrementScore(new BigFraction(1, 2));
 				}
 				else
 					for (final Fighter f : this.fighters)
@@ -496,7 +495,7 @@ public class Arena
 						{
 							i.remove();
 							if (p.getOwner() != null) p.getOwner().incrementScore(BigFraction.ONE);
-							f.decrementScore(new BigFraction(1, 8));
+							f.decrementScore(new BigFraction(0, 1));
 							break;
 						}
 			}

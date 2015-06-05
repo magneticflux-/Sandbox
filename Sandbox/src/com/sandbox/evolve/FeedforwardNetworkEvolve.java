@@ -47,7 +47,7 @@ public class FeedforwardNetworkEvolve
 	public static final int		INPUT_NUMBER			= 0;
 	public static final String	OUTPUT_FOLDER			= "codex/AI Meta Level 0/";
 	public static final String	INPUT_FOLDER			= "codex/AI Meta Level 0/";
-	public static final double	MUTATION_RANGE			= 0.1;
+	public static final double	MUTATION_RANGE			= 1;
 	public static final double	MUTATION_PROBABILITY	= 0.05;
 	public static final int		CROSSOVER_POINTS		= 2;
 

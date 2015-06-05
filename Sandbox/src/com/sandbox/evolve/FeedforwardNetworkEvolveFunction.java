@@ -40,15 +40,14 @@ public class FeedforwardNetworkEvolveFunction
 {
 	public static void main(String[] args)
 	{
-		final String layout = "2 3 1";
-		CandidateFactory<FeedforwardNetwork> candidateFactory = new NetworkCandidateFactory(layout, 0.01);
+		final String layout = "2 4 1";
+		CandidateFactory<FeedforwardNetwork> candidateFactory = new NetworkCandidateFactory(layout, 4);
 		List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(1));
 		operators.add(new FeedforwardNetworkMutation(new Probability(0.03)));
 		EvolutionaryOperator<FeedforwardNetwork> evolutionScheme = new EvolutionPipeline<FeedforwardNetwork>(operators);
 		FitnessEvaluator<FeedforwardNetwork> fitnessEvaluator = new FitnessEvaluator<FeedforwardNetwork>()
 		{
-
 			@Override
 			public double getFitness(FeedforwardNetwork candidate, List<? extends FeedforwardNetwork> population)
 			{
@@ -57,7 +56,7 @@ public class FeedforwardNetworkEvolveFunction
 				{
 					for (boolean q = false;; q = !q)
 					{
-						error += Math.abs(((candidate.evaluate(new double[] { p ? 1 : 0, q ? 1 : 0 })[0] > 0) ? 1 : 0)
+						error += Math.abs((candidate.evaluate(new double[] { p ? 1 : 0, q ? 1 : 0 })[0])
 								- FeedforwardNetworkEvolveFunction.function(p ? 1 : 0, q ? 1 : 0));
 						if (q == true) break;
 					}
@@ -93,7 +92,56 @@ public class FeedforwardNetworkEvolveFunction
 			public JComponent render(final FeedforwardNetwork entity)
 			{
 				JPanel panel = new JPanel();
-				 JComponent comp1 = new JPanel();
+				JComponent comp1 = new JPanel();
+				comp1.add(new JPanel()
+				{
+					private static final long	serialVersionUID	= 1L;
+
+					@Override
+					public void paintComponent(Graphics g)
+					{
+						super.paintComponent(g);
+						BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+						for (int x = 0; x < this.getWidth(); x++)
+						{
+							for (int y = 0; y < this.getHeight(); y++)
+							{
+								double value = function((x - this.getWidth() / 2d) / 8, (y - this.getHeight() / 2d) / 8);
+								bi.setRGB(x, y, (new Color((int) ((value + 1) * 127), (int) ((value + 1) * 127), (int) ((value + 1) * 127)).getRGB()));
+							}
+						}
+						g.drawImage(bi, 0, 0, this);
+						System.out.println("drawn");
+					}
+
+					{
+						this.setPreferredSize(new Dimension(400, 400));
+					}
+				}, BorderLayout.LINE_START);
+				comp1.add(new JPanel()
+				{
+					private static final long	serialVersionUID	= 1L;
+
+					@Override
+					public void paintComponent(Graphics g)
+					{
+						super.paintComponent(g);
+						BufferedImage bi = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+						for (int x = 0; x < this.getWidth(); x++)
+						{
+							for (int y = 0; y < this.getHeight(); y++)
+							{
+								double value = entity.evaluate(new double[] { (x - this.getWidth() / 2d) / 8, (y - this.getHeight() / 2d) / 8 })[0];
+								bi.setRGB(x, y, (new Color((int) ((value + 1) * 127), (int) ((value + 1) * 127), (int) ((value + 1) * 127))).getRGB());
+							}
+						}
+						g.drawImage(bi, 0, 0, this);
+					}
+
+					{
+						this.setPreferredSize(new Dimension(400, 400));
+					}
+				}, BorderLayout.LINE_END);
 				// JComponent comp2 = new JGraph(new JGraphModelAdapter<AbstractNode, DefaultWeightedEdge>(entity.getGraphView()));
 				if (image == null)
 				{
@@ -112,7 +160,7 @@ public class FeedforwardNetworkEvolveFunction
 						g2d.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), Color.PINK, this);
 					}
 				};
-				// comp1.setPreferredSize(new Dimension(1000, 400));
+				comp1.setPreferredSize(new Dimension(800, 400));
 
 				JButton button = new JButton("Recalculate Visualization of Neural Network");
 				button.addActionListener(new ActionListener()
@@ -130,7 +178,7 @@ public class FeedforwardNetworkEvolveFunction
 				button.setMinimumSize(d);
 
 				panel.setLayout(new BorderLayout());
-				// panel.add(comp1, BorderLayout.PAGE_START);
+				panel.add(comp1, BorderLayout.PAGE_START);
 				panel.add(comp2, BorderLayout.CENTER);
 				panel.add(button, BorderLayout.PAGE_END);
 				panel.setBackground(Color.WHITE);
@@ -171,7 +219,7 @@ public class FeedforwardNetworkEvolveFunction
 		}
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
-		final FeedforwardNetwork result = engine.evolve(5000, 500, abort);
+		final FeedforwardNetwork result = engine.evolve(250000, 2500, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 
