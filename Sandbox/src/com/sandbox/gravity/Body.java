@@ -62,7 +62,7 @@ public class Body
 	{
 		this.x += this.xV * this.universe.getDeltaTime();
 		this.y += this.yV * this.universe.getDeltaTime();
-		if (this.universe.getTick() % 50 == 0)
+		if (this.universe.getTick() % 100 == 0)
 		{
 			this.speedLog.add(this.universe.getTick(), FastMath.sqrt(FastMath.pow(this.xV, 2) + FastMath.pow(this.yV, 2)));
 			// this.positionLog.add(this.x, this.y);

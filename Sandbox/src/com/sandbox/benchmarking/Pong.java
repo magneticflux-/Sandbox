@@ -14,7 +14,7 @@ public class Pong
 	public static final int		PADDLE_HEIGHT		= 100;
 	public static final int		BALL_SIDE_LENGTH	= 15;
 	public static final double	PADDLE_SPEED		= 10;
-	public static final double	BALL_SPEED			= 5;
+	public static final double	BALL_SPEED			= 1;
 	public static final int		GAME_WINDOW_WIDTH	= 500;
 	public static final int		GAME_WINDOW_HEIGHT	= 500;
 

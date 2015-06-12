@@ -37,7 +37,7 @@ public class NeuronNode extends AbstractNode
 	@Override
 	public double getOutput()
 	{
-		if (network.getGlobalValidate() == this.localValidate)
+		if (network.getGlobalValidateForwardProp() == this.localValidate)
 		{
 			double sum = 0;
 			for (int i = 0; i < this.parents.size(); i++)
