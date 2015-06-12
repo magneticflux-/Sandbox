@@ -36,25 +36,12 @@ public class RunV2
 
 		final JFrame frame = new JFrame("Gravity");
 
-<<<<<<< HEAD
 		final Universe u = new Universe(0.1, 0.01, dataset);
-=======
-		final Universe u = new Universe(0.1, 0.01);
->>>>>>> refs/remotes/origin/master
 		Random r = new Random(0);
 
-<<<<<<< HEAD
 		for (int i = 0; i < 3; i++)
-=======
-		for (int i = 0; i < 5; i++)
->>>>>>> refs/remotes/origin/master
 		{
-<<<<<<< HEAD
-			u.addBody(new Body(r.nextInt(300), r.nextInt(300), (r.nextDouble() - 0.5) / 5, (r.nextDouble() - 0.5) / 5, dataset, chart.getXYPlot()
-=======
-			u.addBody(new Body(r.nextInt(200) + 100, r.nextInt(200) + 100, (r.nextDouble() - 0.5) / 2, (r.nextDouble() - 0.5) / 2, dataset, chart.getXYPlot()
->>>>>>> refs/remotes/origin/master
-					.getRenderer()));
+			u.addBody(new Body(r.nextInt(300), r.nextInt(300), (r.nextDouble() - 0.5) / 5, (r.nextDouble() - 0.5) / 5, dataset, chart.getXYPlot().getRenderer()));
 		}
 
 		// u.addBody(new Body(100, 100, 0.3, 0.1, dataset));
