@@ -10,21 +10,22 @@ import javax.swing.JPanel;
 
 public class Pong
 {
-	public static final int		PADDLE_WIDTH		= 20;
-	public static final int		PADDLE_HEIGHT		= 100;
-	public static final int		BALL_SIDE_LENGTH	= 15;
-	public static final double	PADDLE_SPEED		= 10;
-	public static final double	BALL_SPEED			= 5;
-	public static final int		GAME_WINDOW_WIDTH	= 500;
-	public static final int		GAME_WINDOW_HEIGHT	= 500;
+	public static final int		PADDLE_WIDTH			= 20;
+	public static final int		PADDLE_HEIGHT			= 100;
+	public static final int		BALL_SIDE_LENGTH		= 15;
+	public static final double	PADDLE_SPEED			= 10;
+	public static final double	BALL_SPEED				= 5;
+	public static final double	BALL_SPEED_MULTIPLIER	= 1.1;
+	public static final int		GAME_WINDOW_WIDTH		= 500;
+	public static final int		GAME_WINDOW_HEIGHT		= 500;
 
 	public static void main(String[] args)
 	{
 		final double[] values = new double[10];// Left pos and vel, right pos and vel, ball x, y, xV, yV, left score, right score
 		final Random r = new Random(0);
 
-		values[0] = GAME_WINDOW_HEIGHT / 2;
-		values[2] = GAME_WINDOW_HEIGHT / 2;
+		values[0] = GAME_WINDOW_HEIGHT;// GAME_WINDOW_HEIGHT / 2;
+		values[2] = GAME_WINDOW_HEIGHT;// GAME_WINDOW_HEIGHT / 2;
 
 		values[4] = GAME_WINDOW_WIDTH / 2;
 		values[5] = GAME_WINDOW_HEIGHT / 2;
@@ -41,11 +42,12 @@ public class Pong
 			public void paintComponent(Graphics g)
 			{
 				super.paintComponent(g);
-				if (values[0] + values[1] - PADDLE_HEIGHT > 0 && values[0] + values[1] < this.getHeight())
+
+				if (values[0] + values[1] - PADDLE_HEIGHT >= 0 && values[0] + values[1] <= this.getHeight())
 				{
 					values[0] += values[1];
 				}
-				if (values[2] + values[3] - PADDLE_HEIGHT > 0 && values[2] + values[3] < this.getHeight())
+				if (values[2] + values[3] - PADDLE_HEIGHT >= 0 && values[2] + values[3] <= this.getHeight())
 				{
 					values[2] += values[3];
 				}
@@ -79,7 +81,7 @@ public class Pong
 				}
 				else if (values[4] < PADDLE_WIDTH)
 				{
-					values[6] = -values[6];
+					values[6] = -values[6] * BALL_SPEED_MULTIPLIER;
 				}
 
 				if (values[4] > this.getWidth() - PADDLE_WIDTH && (values[5] > values[2] || values[5] < values[2] - PADDLE_HEIGHT))
@@ -102,12 +104,12 @@ public class Pong
 				}
 				else if (values[4] > this.getWidth() - PADDLE_WIDTH)
 				{
-					values[6] = -values[6];
+					values[6] = -values[6] * BALL_SPEED_MULTIPLIER;
 				}
 
 				if (values[5] > GAME_WINDOW_HEIGHT || values[5] < 0)
 				{
-					values[7] = -values[7];
+					values[7] = -values[7] * BALL_SPEED_MULTIPLIER;
 				}
 
 				try
