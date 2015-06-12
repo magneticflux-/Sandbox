@@ -2,6 +2,7 @@ package com.sandbox.gravity;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -35,12 +36,24 @@ public class RunV2
 
 		final JFrame frame = new JFrame("Gravity");
 
+<<<<<<< HEAD
 		final Universe u = new Universe(0.1, 0.01, dataset);
+=======
+		final Universe u = new Universe(0.1, 0.01);
+>>>>>>> refs/remotes/origin/master
 		Random r = new Random(0);
 
+<<<<<<< HEAD
 		for (int i = 0; i < 3; i++)
+=======
+		for (int i = 0; i < 5; i++)
+>>>>>>> refs/remotes/origin/master
 		{
+<<<<<<< HEAD
 			u.addBody(new Body(r.nextInt(300), r.nextInt(300), (r.nextDouble() - 0.5) / 5, (r.nextDouble() - 0.5) / 5, dataset, chart.getXYPlot()
+=======
+			u.addBody(new Body(r.nextInt(200) + 100, r.nextInt(200) + 100, (r.nextDouble() - 0.5) / 2, (r.nextDouble() - 0.5) / 2, dataset, chart.getXYPlot()
+>>>>>>> refs/remotes/origin/master
 					.getRenderer()));
 		}
 
@@ -56,21 +69,23 @@ public class RunV2
 			}
 
 			private static final long	serialVersionUID	= 1L;
+			private BufferedImage		frame				= null;
 
 			@Override
 			public void paintComponent(Graphics g)
 			{
 				long startTime = System.nanoTime();
+				super.paintComponent(g);
+				g.drawImage(frame, 0, 0, this);
 
 				u.stepTime();
-				if (u.getTick() % 100 == 0)
+				if (u.getTick() % 1000 == 0)
 				{
-					super.paintComponent(g);
-					g.drawImage(u.getFrame(this.getWidth(), this.getHeight()), 0, 0, this);
-
-					double framerate = 1000000000 / (System.nanoTime() - startTime);
-					g.drawString(framerate + " FPS", 50, 50);
+					frame = u.getFrame(this.getWidth(), this.getHeight());
 				}
+
+				double framerate = 1000000000 / (System.nanoTime() - startTime);
+				g.drawString(framerate + " FPS", 50, 50);
 
 				repaint();
 			}

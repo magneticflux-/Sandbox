@@ -2,15 +2,26 @@ package com.sandbox.neural;
 
 public abstract class NeuralNet
 {
-	private boolean	globalValidate	= true;
+	private boolean	globalValidateForwardProp	= true;
+	private boolean	globalValidateBackProp		= true;
 
-	public boolean getGlobalValidate()
+	public boolean getGlobalValidateForwardProp()
 	{
-		return this.globalValidate;
+		return this.globalValidateForwardProp;
 	}
 
-	public void invertGlobalValidate()
+	public void invalidateForwardProp()
 	{
-		this.globalValidate = !this.globalValidate;
+		this.globalValidateForwardProp = !this.globalValidateForwardProp;
+	}
+
+	public boolean getGlobalValidateBackProp()
+	{
+		return this.globalValidateBackProp;
+	}
+
+	public void invalidateBackProp()
+	{
+		this.globalValidateBackProp = !this.globalValidateBackProp;
 	}
 }

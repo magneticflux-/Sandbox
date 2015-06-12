@@ -51,7 +51,7 @@ public class FeedforwardNetwork extends NeuralNet
 		}
 	}
 
-	public static final InputNode	BIAS_NODE	= new InputNode(0.01, 0);
+	public static final InputNode	BIAS_NODE	= new InputNode(1, 0);
 
 	public static void main(final String[] args) throws IOException
 	{
@@ -129,7 +129,7 @@ public class FeedforwardNetwork extends NeuralNet
 
 		for (int i = 0; i < inputs.length; i++)
 			((InputNode) this.inputs.getNode(i)).setOutput(inputs[i]);
-		this.invertGlobalValidate();
+		this.invalidateForwardProp();
 
 		final double[] outputs = new double[this.layers.get(this.layers.size() - 1).getNodes().size()];
 		for (int i = 0; i < outputs.length; i++)
@@ -188,7 +188,8 @@ public class FeedforwardNetwork extends NeuralNet
 
 		if (Double.parseDouble(System.getProperty("java.specification.version")) < 1.8)
 		{
-			System.out.println("_" + Double.parseDouble(System.getProperty("java.specification.version")));
+			System.out.println("Java version is not supported. Functionality is in reduced mode. Your version: "
+					+ Double.parseDouble(System.getProperty("java.specification.version")));
 			BufferedImage image = new BufferedImage(320, 50, BufferedImage.TYPE_INT_RGB);
 			image.getGraphics().drawString("Something went wrong rendering the network!", 10, 10);
 			return image;
