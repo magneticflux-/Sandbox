@@ -2,18 +2,17 @@ package com.sandbox.neural;
 
 import org.apache.commons.math3.util.FastMath;
 
-public class HyperbolicTangentActivation implements DifferentiableFunction
+public class SoftplusActivation implements DifferentiableFunction
 {
-
 	@Override
 	public double compute(double x)
 	{
-		return FastMath.tanh(x);
+		return FastMath.log(1 + FastMath.exp(x));
 	}
 
 	@Override
 	public double computeDerivative(double x)
 	{
-		return 1 / FastMath.pow(FastMath.cosh(x), 2);
+		return 1 / (1 + FastMath.exp(-x));
 	}
 }

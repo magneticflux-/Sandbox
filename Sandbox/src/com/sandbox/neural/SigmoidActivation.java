@@ -15,6 +15,6 @@ public class SigmoidActivation implements DifferentiableFunction
 	@Override
 	public double computeDerivative(double x)
 	{
-		return 0;
+		return FastMath.exp(x) / FastMath.pow(FastMath.exp(x) + 1, 2);
 	}
 }

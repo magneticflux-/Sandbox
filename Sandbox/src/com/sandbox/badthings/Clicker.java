@@ -36,14 +36,14 @@ public class Clicker
 							e.printStackTrace();
 						}
 						// System.out.println("test");
-						robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-						robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+						robot.mousePress(InputEvent.BUTTON1_MASK);
+						robot.mouseRelease(InputEvent.BUTTON1_MASK);
 					}
 					else
 					{
 						try
 						{
-							Thread.sleep(100);
+							Thread.sleep(25);
 						}
 						catch (InterruptedException e)
 						{
