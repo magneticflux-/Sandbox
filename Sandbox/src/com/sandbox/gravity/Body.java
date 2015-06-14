@@ -53,6 +53,11 @@ public class Body
 		return this.mass;
 	}
 
+	public double getVelocity()
+	{
+		return FastMath.sqrt(FastMath.pow(this.xV, 2) + FastMath.pow(this.yV, 2));
+	}
+
 	public void setUniverse(Universe u)
 	{
 		this.universe = u;

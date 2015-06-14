@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.math3.util.FastMath;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 public class Universe
 {
@@ -22,8 +24,9 @@ public class Universe
 	private double			deltaTime;
 	private Path2D.Double	barycenter;
 	private int				tick	= 0;
+	private XYSeries		totalEnergy;
 
-	public Universe(double gravConst, double deltaTime)
+	public Universe(double gravConst, double deltaTime, XYSeriesCollection logs)
 	{
 		this.gravConst = gravConst;
 		this.bodies = new ArrayList<Body>();
@@ -31,6 +34,8 @@ public class Universe
 		this.deltaTime = deltaTime;
 		this.barycenter = new Path2D.Double();
 		this.barycenter.moveTo(0, 0);
+		this.totalEnergy = new XYSeries("Total System Energy");
+		logs.addSeries(this.totalEnergy);
 	}
 
 	public int getTick()
@@ -98,6 +103,15 @@ public class Universe
 			xCenter /= totalMass;
 			yCenter /= totalMass;
 			this.barycenter.lineTo(xCenter, 500 - yCenter);
+		}
+		if (this.getTick() % 100 == 0)
+		{
+			double momentumSum = 0;
+			for (Body b : this.bodies)
+			{
+				momentumSum += b.getMass() * b.getVelocity();
+			}
+			this.totalEnergy.add(this.getTick(), momentumSum / 25);
 		}
 
 		LinkedList<Future<?>> completion = new LinkedList<Future<?>>();
