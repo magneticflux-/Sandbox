@@ -121,6 +121,16 @@ public class FeedforwardNetwork extends NeuralNet
 		s.close();
 	}
 
+	public double[] evaluate(final int[] inputs)
+	{
+		final double[] doubleInputs = new double[inputs.length];
+		for (int i = 0; i < inputs.length; i++)
+		{
+			doubleInputs[i] = inputs[i];
+		}
+		return evaluate(doubleInputs);
+	}
+
 	public double[] evaluate(final double[] inputs)
 	{
 		if (inputs.length != this.inputs.getNodes().size())

@@ -40,7 +40,7 @@ public class FeedforwardNetworkEvolveFunction
 {
 	public static void main(String[] args)
 	{
-		final String layout = "2 4 1";
+		final String layout = "2 5 5 1";
 		CandidateFactory<FeedforwardNetwork> candidateFactory = new NetworkCandidateFactory(layout, 4);
 		List<EvolutionaryOperator<FeedforwardNetwork>> operators = new LinkedList<EvolutionaryOperator<FeedforwardNetwork>>();
 		operators.add(new FeedforwardNetworkCrossover(1));
@@ -219,7 +219,7 @@ public class FeedforwardNetworkEvolveFunction
 		}
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
-		final FeedforwardNetwork result = engine.evolve(250000, 2500, abort);
+		final FeedforwardNetwork result = engine.evolve(2500, 250, abort);
 		System.out.println("Fittest individual: " + result);
 	}
 
