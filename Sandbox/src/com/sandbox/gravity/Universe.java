@@ -109,7 +109,7 @@ public class Universe
 			double momentumSum = 0;
 			for (Body b : this.bodies)
 			{
-				momentumSum += b.getMass() * b.getVelocity();
+				momentumSum += b.getTotalPotentialEnergy(); // b.getMass() * FastMath.pow(b.getVelocity(), 2) / 2 + b.getTotalPotentialEnergy();
 			}
 			this.totalEnergy.add(this.getTick(), momentumSum / 25);
 		}

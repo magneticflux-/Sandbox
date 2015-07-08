@@ -2,6 +2,7 @@ package com.sandbox.gravity;
 
 import java.awt.Paint;
 import java.awt.geom.Point2D;
+import java.util.HashMap;
 
 import org.apache.commons.math3.util.FastMath;
 import org.jfree.chart.renderer.AbstractRenderer;
@@ -13,13 +14,14 @@ import com.electronauts.mathutil.MathUtil;
 
 public class Body
 {
-	private double		mass;
-	private double		x, y;
-	private double		xV, yV;
-	private Universe	universe;
-	private XYSeries	speedLog;
-	private XYSeries	positionLog;
-	private Paint		paint;
+	private double					mass;
+	private double					x, y;
+	private double					xV, yV;
+	private Universe				universe;
+	private XYSeries				speedLog;
+	private XYSeries				positionLog;
+	private Paint					paint;
+	private HashMap<Body, Double>	potentialEnergy	= new HashMap<Body, Double>();
 
 	public Body(double x, double y, double xV, double yV, XYSeriesCollection logs, XYItemRenderer renderer)
 	{
@@ -43,9 +45,23 @@ public class Body
 	public synchronized void reactTo(Body b)
 	{
 		double angle = MathUtil.angleTo(this.getPoint(), b.getPoint());
-		double force = this.universe.getGravConst() * this.getMass() * b.getMass() / MathUtil.distanceSquared(this.getPoint(), b.getPoint());
-		this.xV += FastMath.cos(angle) * force * this.universe.getDeltaTime() / this.mass;
-		this.yV += FastMath.sin(angle) * force * this.universe.getDeltaTime() / this.mass;
+		double acceleration = this.universe.getGravConst() * this.mass * b.getMass() / MathUtil.distanceSquared(this.getPoint(), b.getPoint());
+		double xA = FastMath.cos(angle) * acceleration * this.universe.getDeltaTime() / this.mass;
+		double yA = FastMath.sin(angle) * acceleration * this.universe.getDeltaTime() / this.mass;
+		this.potentialEnergy.put(b, acceleration * MathUtil.distance(this.getPoint(), b.getPoint()));
+		this.xV += xA;
+		this.yV += yA;
+	}
+
+	public double getTotalPotentialEnergy()
+	{
+		double totalEnergy = 0;
+		for (double value : this.potentialEnergy.values())
+		{
+			totalEnergy += value;
+		}
+		System.out.println(totalEnergy);
+		return totalEnergy;
 	}
 
 	public double getMass()
