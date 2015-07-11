@@ -30,7 +30,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 {
 	public static void main(String[] args)
 	{
-		Kryo kryo= new Kryo();
+		Kryo kryo = new Kryo();
 		Input in = null;
 		try
 		{
@@ -68,6 +68,10 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		input.keyPressed(START);
 		nes.frameAdvance();
 		input.keyReleased(START);
+
+		for (int i = 0; i < 162; i++)
+			// Exact frame number until Mario gains control
+			nes.frameAdvance();
 
 		int fitness = 0;
 		int maxDistance = 0;
@@ -163,8 +167,8 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			if (reactions[3] > 0) input.keyPressed(R);
 			if (reactions[4] > 0) input.keyPressed(A);
 			if (reactions[5] > 0) input.keyPressed(B);
-			//if (reactions[6] > 0) input.keyPressed(SELECT);
-			//if (reactions[7] > 0) input.keyPressed(START);
+			// if (reactions[6] > 0) input.keyPressed(SELECT);
+			// if (reactions[7] > 0) input.keyPressed(START);
 
 			System.out.println("Points: " + points + "Timeout: " + timeout);
 			nes.frameAdvance();
