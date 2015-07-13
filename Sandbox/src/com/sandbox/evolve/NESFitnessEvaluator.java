@@ -1,7 +1,6 @@
 package com.sandbox.evolve;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -28,7 +27,7 @@ import com.sandbox.neural.FeedforwardNetwork;
 
 public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 {
-	public static void main(String[] args)
+	public static void main1(String[] args)
 	{
 		Kryo kryo = new Kryo();
 		Input in = null;
@@ -48,7 +47,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		nes.reset();
 		// NESFitnessEvaluator.loadSavestate(nes);
 
-		final GUIImpl gui = ((GUIImpl) nes.gui);
+		final GUIImpl gui = ((GUIImpl) nes.getGUI());
 		final KeyListener input = gui.getKeyListeners()[0];
 
 		final KeyEvent U = new KeyEvent(gui, 0, 0, 0, KeyEvent.VK_UP, '^');
@@ -90,16 +89,16 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 
 			int score = 0;
 			int time = 0;
-			byte world = (byte) nes.cpuram.read(0x075F);
-			byte level = (byte) nes.cpuram.read(0x0760);
-			byte lives = (byte) (nes.cpuram.read(0x075A) + 1);
-			int marioX = nes.cpuram.read(0x6D) * 0x100 + nes.cpuram.read(0x86);
-			int marioY = nes.cpuram.read(0x03B8) + 16;
-			int marioState = nes.cpuram.read(0x000E);
+			byte world = (byte) nes.getCPURAM().read(0x075F);
+			byte level = (byte) nes.getCPURAM().read(0x0760);
+			byte lives = (byte) (nes.getCPURAM().read(0x075A) + 1);
+			int marioX = nes.getCPURAM().read(0x6D) * 0x100 + nes.getCPURAM().read(0x86);
+			int marioY = nes.getCPURAM().read(0x03B8) + 16;
+			int marioState = nes.getCPURAM().read(0x000E);
 			for (int i = 0x07DD; i <= 0x07E2; i++)
-				score += nes.cpuram._read(i) * FastMath.pow(10, (0x07E2 - i + 1));
+				score += nes.getCPURAM()._read(i) * FastMath.pow(10, (0x07E2 - i + 1));
 			for (int i = 0x07F8; i <= 0x07FA; i++)
-				time += nes.cpuram._read(i) * FastMath.pow(10, (0x07FA - i));
+				time += nes.getCPURAM()._read(i) * FastMath.pow(10, (0x07FA - i));
 
 			int points = (score / 5) + (time * 10) + (marioX / 4) + (lives * 500) + (level * 250) + (world * 2000);
 
@@ -135,17 +134,17 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 					else
 					{
 						// System.out.println("Block data at " + dx + ", " + dy + ": " + nes.cpuram.read(addr));
-						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.cpuram.read(addr);
+						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.getCPURAM().read(addr);
 					}
 				}
 
 			for (int i = 0; i <= 4; i++)
 			{
-				int enemy = nes.cpuram.read(0xF + i);
+				int enemy = nes.getCPURAM().read(0xF + i);
 				if (enemy != 0)
 				{
-					int ex = nes.cpuram.read(0x6E + i) * 0x100 + nes.cpuram.read(0x87 + i);
-					int ey = nes.cpuram.read(0xCF + i) + 24;
+					int ex = nes.getCPURAM().read(0x6E + i) * 0x100 + nes.getCPURAM().read(0x87 + i);
+					int ey = nes.getCPURAM().read(0xCF + i) + 24;
 					int enemyMarioDeltaX = (ex - marioX) / 16;
 					int enemyMarioDeltaY = (ey - marioY) / 16;
 					try
@@ -183,7 +182,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		}
 	}
 
-	public static void main1(String[] args)
+	public static void main(String[] args)
 	{
 		long startTime = System.nanoTime();
 		final NES nes = new NES(false);
@@ -192,7 +191,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		nes.loadROM("C:\\Users\\Mitchell\\Desktop\\fceux-2.2.2-win32\\ROMs\\Super Mario Bros..nes");
 		boolean logging = true;
 
-		final GUIImpl gui = ((GUIImpl) nes.gui);
+		final GUIImpl gui = ((GUIImpl) nes.getGUI());
 		System.out.println("Getting listeners");
 		final ControllerImpl input = (ControllerImpl) gui.getKeyListeners()[0];
 		System.out.println("Got listener " + input);
@@ -214,8 +213,12 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		nes.frameAdvance();
 		input.keyReleased(START);
 
+		for (int i = 0; i < 162; i++)
+			// Exact frame number until Mario gains control
+			nes.frameAdvance();
+
 		nes.runEmulation = true;
-		nes.run();
+		// nes.run();
 
 		Thread nesUpdateThread = new Thread(new Runnable()
 		{
@@ -224,6 +227,14 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			{
 				while (true)
 				{
+					try
+					{
+						Thread.sleep(5);
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
 					long startTime = System.nanoTime();
 					nes.frameAdvance();
 					long endTime = System.nanoTime();
@@ -245,100 +256,9 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			@Override
 			public void run()
 			{
-				final int[][] vision = new int[16][16];
+				final int[][] vision = new int[13][13];
 				final int viewSizeMultiplier = 2;
 				JFrame frame = new JFrame("Vision");
-				frame.addKeyListener(new KeyListener()
-				{
-					@Override
-					public void keyTyped(KeyEvent e)
-					{
-						switch (e.getKeyChar())
-						{
-						case 's':
-						{
-							nes.pause();
-							System.out.println("Started write.");
-							Kryo kryo = new Kryo();
-							Output output = null;
-							try
-							{
-								output = new Output(new FileOutputStream("savestate.clm"));
-							}
-							catch (final FileNotFoundException e1)
-							{
-								e1.printStackTrace();
-							}
-							kryo.writeClassAndObject(output, new ImmutablePair<int[], int[]>(nes.cpuram.wram, nes.ppu.bitmap));
-							output.close();
-							System.out.println("Finished write.");
-							nes.resume();
-							break;
-						}
-						case 'l':
-						{
-							nes.pause();
-							System.out.println("Started read.");
-							Kryo kryo = new Kryo();
-							Input input = null;
-							try
-							{
-								input = new Input(new FileInputStream("savestate.clm"));
-							}
-							catch (final FileNotFoundException e1)
-							{
-								e1.printStackTrace();
-							}
-							@SuppressWarnings("unchecked")
-							ImmutablePair<int[], int[]> savestate = (ImmutablePair<int[], int[]>) kryo.readClassAndObject(input);
-							System.arraycopy(savestate.left, 0, nes.cpuram.wram, 0, nes.cpuram.wram.length);
-							System.arraycopy(savestate.right, 0, nes.ppu.bitmap, 0, nes.ppu.bitmap.length);
-							input.close();
-							System.out.println("Finished read.");
-							nes.resume();
-							break;
-						}
-						case 'f':
-						{
-							for (int i = 0; i < 100; i++)
-							{
-								if (nes.runEmulation)
-								{
-									// ((GUIImpl) nes.gui).getKeyListeners()[0].keyPressed(new KeyEvent(((GUIImpl) nes.gui), 0, 0, 0, KeyEvent.VK_RIGHT, '>'));
-									nes.frameStartTime = System.nanoTime();
-									nes.getActionReplay().applyPatches();
-									nes.runframe();
-									if (nes.isFrameLimiterOn() && !nes.dontSleep)
-									{
-										nes.limiter.sleep();
-									}
-									nes.frameDoneTime = System.nanoTime() - nes.frameStartTime;
-									// ((GUIImpl) nes.gui).getKeyListeners()[0].keyReleased(new KeyEvent(((GUIImpl) nes.gui), 0, 0, 0, KeyEvent.VK_RIGHT, '>'));
-								}
-								else
-								{
-									nes.limiter.sleepFixed();
-									if (nes.ppu != null && nes.framecount > 1)
-									{
-										EventQueue.invokeLater(nes.render);
-									}
-								}
-							}
-							break;
-						}
-						}
-					}
-
-					@Override
-					public void keyReleased(KeyEvent e)
-					{
-					}
-
-					@Override
-					public void keyPressed(KeyEvent e)
-					{
-					}
-				});
 				frame.add(new JPanel()
 				{
 					private static final long	serialVersionUID	= 1L;
@@ -396,22 +316,22 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 					}
 					int score = 0;
 					int time = 0;
-					int world = nes.cpuram.read(0x075F);
-					int level = nes.cpuram.read(0x0760);
-					int lives = nes.cpuram.read(0x075A);
-					int marioX = nes.cpuram.read(0x6D) * 0x100 + nes.cpuram.read(0x86);
-					int marioY = nes.cpuram.read(0x03B8) + 16;
+					int world = nes.getCPURAM().read(0x075F);
+					int level = nes.getCPURAM().read(0x0760);
+					int lives = nes.getCPURAM().read(0x075A);
+					int marioX = nes.getCPURAM().read(0x6D) * 0x100 + nes.getCPURAM().read(0x86);
+					int marioY = nes.getCPURAM().read(0x03B8) + 16;
 					for (int i = 0x07DD; i <= 0x07E2; i++)
-						score += nes.cpuram._read(i) * FastMath.pow(10, (0x07E2 - i + 1));
+						score += nes.getCPURAM()._read(i) * FastMath.pow(10, (0x07E2 - i + 1));
 					for (int i = 0x07F8; i <= 0x07FA; i++)
-						time += nes.cpuram._read(i) * FastMath.pow(10, (0x07FA - i));
+						time += nes.getCPURAM()._read(i) * FastMath.pow(10, (0x07FA - i));
 
-					int points = (score / 5) + (time * 10) + (marioX / 4) + (lives * 500) + (level * 250) + (world * 2000);
+					int points = ((time - 400) * 10) + (marioX) + (level * 250) + (world * 2000);
 
 					if (logging)
-						System.out.println(String.format("Points: %d, Time: %d, Score: %d, World: %d, Level: %d, Lives: %d, MarioX: %d, MarioY: %d"
-								+ (nes.cpuram.read(0x000E) == 0x0B ? ", DYING" : ", STATE: " + nes.cpuram.read(0x000E)), points, time, score, world, level,
-								lives, marioX, marioY));
+						System.out.println("Timeout: " + (30 + (marioX / 250)) + "Points: " + points + ", Time: " + time + " Score: " + score + ", World: "
+								+ world + "d, Level: " + level + ", Lives: " + lives + ", MarioX: " + marioX + ", MarioY: " + marioY
+								+ (nes.getCPURAM().read(0x000E) == 0x0B ? ", DYING" : ", STATE: " + nes.getCPURAM().read(0x000E)));
 
 					synchronized (vision)
 					{
@@ -432,17 +352,17 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 								else
 								{
 									// System.out.println("Block data at " + dx + ", " + dy + ": " + nes.cpuram.read(addr));
-									vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.cpuram.read(addr);
+									vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.getCPURAM().read(addr);
 								}
 							}
 					}
 					for (int i = 0; i <= 4; i++)
 					{
-						int enemy = nes.cpuram.read(0xF + i);
+						int enemy = nes.getCPURAM().read(0xF + i);
 						if (enemy != 0)
 						{
-							int ex = nes.cpuram.read(0x6E + i) * 0x100 + nes.cpuram.read(0x87 + i);
-							int ey = nes.cpuram.read(0xCF + i) + 24;
+							int ex = nes.getCPURAM().read(0x6E + i) * 0x100 + nes.getCPURAM().read(0x87 + i);
+							int ey = nes.getCPURAM().read(0xCF + i) + 24;
 							int enemyMarioDeltaX = (ex - marioX) / 16;
 							int enemyMarioDeltaY = (ey - marioY) / 16;
 							try
@@ -486,8 +406,8 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		}
 		@SuppressWarnings("unchecked")
 		ImmutablePair<int[], int[]> savestate = (ImmutablePair<int[], int[]>) kryo.readClassAndObject(input);
-		System.arraycopy(savestate.left, 0, nes.cpuram.wram, 0, nes.cpuram.wram.length);
-		System.arraycopy(savestate.right, 0, nes.ppu.bitmap, 0, nes.ppu.bitmap.length);
+		// System.arraycopy(savestate.left, 0, nes.cpuram.wram, 0, nes.cpuram.wram.length);
+		// System.arraycopy(savestate.right, 0, nes.ppu.bitmap, 0, nes.ppu.bitmap.length);
 		input.close();
 		// System.out.println("Finished read.");
 		nes.resume();
@@ -522,7 +442,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		nes.reset();
 		// NESFitnessEvaluator.loadSavestate(nes);
 
-		final GUIImpl gui = ((GUIImpl) nes.gui);
+		final GUIImpl gui = ((GUIImpl) nes.getGUI());
 		final KeyListener input = gui.getKeyListeners()[0];
 
 		final KeyEvent U = new KeyEvent(gui, 0, 0, 0, KeyEvent.VK_UP, '^');
@@ -560,16 +480,16 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 
 			int score = 0;
 			int time = 0;
-			byte world = (byte) nes.cpuram.read(0x075F);
-			byte level = (byte) nes.cpuram.read(0x0760);
-			byte lives = (byte) (nes.cpuram.read(0x075A) + 1);
-			int marioX = nes.cpuram.read(0x6D) * 0x100 + nes.cpuram.read(0x86);
-			int marioY = nes.cpuram.read(0x03B8) + 16;
-			int marioState = nes.cpuram.read(0x000E);
+			byte world = (byte) nes.getCPURAM().read(0x075F);
+			byte level = (byte) nes.getCPURAM().read(0x0760);
+			byte lives = (byte) (nes.getCPURAM().read(0x075A) + 1);
+			int marioX = nes.getCPURAM().read(0x6D) * 0x100 + nes.getCPURAM().read(0x86);
+			int marioY = nes.getCPURAM().read(0x03B8) + 16;
+			int marioState = nes.getCPURAM().read(0x000E);
 			for (int i = 0x07DD; i <= 0x07E2; i++)
-				score += nes.cpuram._read(i) * FastMath.pow(10, (0x07E2 - i + 1));
+				score += nes.getCPURAM()._read(i) * FastMath.pow(10, (0x07E2 - i + 1));
 			for (int i = 0x07F8; i <= 0x07FA; i++)
-				time += nes.cpuram._read(i) * FastMath.pow(10, (0x07FA - i));
+				time += nes.getCPURAM()._read(i) * FastMath.pow(10, (0x07FA - i));
 
 			int points = (score / 5) + (time * 10) + (marioX / 4) + (lives * 500) + (level * 250) + (world * 2000);
 
@@ -605,17 +525,17 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 					else
 					{
 						// System.out.println("Block data at " + dx + ", " + dy + ": " + nes.cpuram.read(addr));
-						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.cpuram.read(addr);
+						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.getCPURAM().read(addr);
 					}
 				}
 
 			for (int i = 0; i <= 4; i++)
 			{
-				int enemy = nes.cpuram.read(0xF + i);
+				int enemy = nes.getCPURAM().read(0xF + i);
 				if (enemy != 0)
 				{
-					int ex = nes.cpuram.read(0x6E + i) * 0x100 + nes.cpuram.read(0x87 + i);
-					int ey = nes.cpuram.read(0xCF + i) + 24;
+					int ex = nes.getCPURAM().read(0x6E + i) * 0x100 + nes.getCPURAM().read(0x87 + i);
+					int ey = nes.getCPURAM().read(0xCF + i) + 24;
 					int enemyMarioDeltaX = (ex - marioX) / 16;
 					int enemyMarioDeltaY = (ey - marioY) / 16;
 					try
