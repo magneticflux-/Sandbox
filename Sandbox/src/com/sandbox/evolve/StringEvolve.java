@@ -1,14 +1,5 @@
 package com.sandbox.evolve;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-
-import javax.swing.JComponent;
-
 import org.apache.commons.math3.util.FastMath;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 import org.uncommons.maths.random.Probability;
@@ -29,39 +20,43 @@ import org.uncommons.watchmaker.framework.selection.RouletteWheelSelection;
 import org.uncommons.watchmaker.framework.termination.TargetFitness;
 import org.uncommons.watchmaker.swing.evolutionmonitor.EvolutionMonitor;
 
-class StringEvaluator implements FitnessEvaluator<String>
-{
-	private final String	targetString;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+
+import javax.swing.JComponent;
+
+class StringEvaluator implements FitnessEvaluator<String> {
+	private final String targetString;
 
 	/**
 	 * Assigns one "fitness point" for every character in the candidate String that matches the corresponding position in the target string.
 	 */
-	public StringEvaluator(final String target)
-	{
+	public StringEvaluator(final String target) {
 		super();
 		this.targetString = target;
 	}
 
 	@Override
-	public double getFitness(final String candidate, final List<? extends String> population)
-	{
+	public double getFitness(final String candidate, final List<? extends String> population) {
 		int matches = 0;
 		for (int i = 0; i < candidate.length(); i++)
-			if (candidate.charAt(i) == this.targetString.charAt(i)) matches++;
+			if (candidate.charAt(i) == this.targetString.charAt(i))
+				matches++;
 		return matches;
 	}
 
 	@Override
-	public boolean isNatural()
-	{
+	public boolean isNatural() {
 		return true;
 	}
 }
 
-public class StringEvolve
-{
-	public static void main(final String[] args)
-	{
+public class StringEvolve {
+	public static void main(final String[] args) {
 		System.out.print("Input Target String: ");
 		final Scanner s = new Scanner(System.in);
 		final String target = s.nextLine();
@@ -91,14 +86,12 @@ public class StringEvolve
 
 		final EvolutionEngine<String> engine = new GenerationalEvolutionEngine<String>(factory, pipeline, fitnessEvaluator, selection, rng);
 
-		engine.addEvolutionObserver(new EvolutionObserver<String>()
-				{
+		engine.addEvolutionObserver(new EvolutionObserver<String>() {
 			@Override
-			public void populationUpdate(final PopulationData<? extends String> data)
-			{
+			public void populationUpdate(final PopulationData<? extends String> data) {
 				System.out.printf("Generation %d: %s\n", data.getGenerationNumber(), data.getBestCandidate());
 			}
-				});
+		});
 		final EvolutionMonitor<String> monitor = new EvolutionMonitor<String>(new StringRenderer(), false);
 		monitor.showInFrame("Evolution", true);
 		engine.addEvolutionObserver(monitor);
@@ -107,26 +100,20 @@ public class StringEvolve
 	}
 }
 
-class StringRenderer implements Renderer<String, JComponent>
-{
+class StringRenderer implements Renderer<String, JComponent> {
 	@Override
-	public JComponent render(final String entity)
-	{
+	public JComponent render(final String entity) {
 		final String input = entity;
-		final JComponent jc = new JComponent()
-		{
-			private static final long	serialVersionUID	= 1L;
-			private final String		toRender			= input;
-			private double				inc					= 0;
+		final JComponent jc = new JComponent() {
+			private static final long serialVersionUID = 1L;
+			private final String toRender = input;
+			private double inc = 0;
 
 			@Override
-			public void paintComponent(final Graphics g)
-			{
-				g.setColor(new Color((int) (128 + 127 * FastMath.sin(this.inc + 2 * FastMath.PI / 3)), (int) (128 + 127 * FastMath.sin(this.inc + 4 * FastMath.PI / 3)),
-						(int) (128 + 127 * FastMath.sin(this.inc + 0 * FastMath.PI / 3))));
+			public void paintComponent(final Graphics g) {
+				g.setColor(new Color((int) (128 + 127 * FastMath.sin(this.inc + 2 * FastMath.PI / 3)), (int) (128 + 127 * FastMath.sin(this.inc + 4 * FastMath.PI / 3)), (int) (128 + 127 * FastMath.sin(this.inc + 0 * FastMath.PI / 3))));
 				g.fillRect(0, 0, this.getWidth(), this.getHeight());
-				g.setColor(new Color((int) (128 + 127 * FastMath.sin(this.inc + 0)), (int) (128 + 127 * FastMath.sin(this.inc + 2 * FastMath.PI / 3)),
-						(int) (128 + 127 * FastMath.sin(this.inc + 4 * FastMath.PI / 3))));
+				g.setColor(new Color((int) (128 + 127 * FastMath.sin(this.inc + 0)), (int) (128 + 127 * FastMath.sin(this.inc + 2 * FastMath.PI / 3)), (int) (128 + 127 * FastMath.sin(this.inc + 4 * FastMath.PI / 3))));
 				g.drawString(this.toRender, 50, 50);
 				this.inc += 0.001;
 				this.repaint();

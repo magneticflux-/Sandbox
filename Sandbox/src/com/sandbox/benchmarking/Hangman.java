@@ -2,15 +2,13 @@ package com.sandbox.benchmarking;
 
 import java.util.Scanner;
 
-public class Hangman
-{
-	private static String[]	words	= { "inheritance", "abstraction", "encapsulation", "polymorphism" };
+public class Hangman {
+	private static String[] words = {"inheritance", "abstraction", "encapsulation", "polymorphism"};
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		Scanner wordInput = new Scanner(System.in);
 		System.out.print("Enter word to guess: ");
-		words = new String[] { wordInput.nextLine() };
+		words = new String[]{wordInput.nextLine()};
 		System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
 		Scanner input = new Scanner(System.in);
@@ -20,8 +18,7 @@ public class Hangman
 		int failedGuesses = 0;
 
 		boolean done = false;
-		while (!done)
-		{
+		while (!done) {
 			System.out.println("Tried: " + game.getTried());
 			System.out.println("Failed guesses: " + failedGuesses);
 			System.out.println(game.getGuessed());
@@ -29,38 +26,34 @@ public class Hangman
 
 			System.out.print("Enter next letter (or Quit): ");
 			String s = input.next();
-			if ("quit".equalsIgnoreCase(s)) break;
-			if (s.length() != 1)
-			{
+			if ("quit".equalsIgnoreCase(s))
+				break;
+			if (s.length() != 1) {
 				System.out.println("Invalid input");
-			}
-			else
-			{
+			} else {
 				int result = game.tryLetter(s.charAt(0));
-				switch (result)
-				{
-				case 0:
+				switch (result) {
+					case 0:
 
-					System.out.println("Already tried");
-					break;
+						System.out.println("Already tried");
+						break;
 
-				case -1:
+					case -1:
 
-					System.out.println("Sorry, not there");
-					failedGuesses++;
-					break;
+						System.out.println("Sorry, not there");
+						failedGuesses++;
+						break;
 
-				case 1:
+					case 1:
 
-					System.out.println("Yes!");
-					break;
+						System.out.println("Yes!");
+						break;
 				}
 			}
 
 			count++;
 
-			if (game.getGuessed().indexOf('-') == -1)
-			{
+			if (game.getGuessed().indexOf('-') == -1) {
 				System.out.println("You guessed " + word + " in " + count + " tries.");
 				done = true;
 			}

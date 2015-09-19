@@ -1,8 +1,7 @@
 package com.sandbox.neural;
 
-public interface DifferentiableFunction
-{
-	public abstract double compute(double x);
+public interface DifferentiableFunction {
+	double compute(double x);
 
-	public abstract double computeDerivative(double x);
+	double computeDerivative(double x);
 }

@@ -5,17 +5,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
-public class ExecTest
-{
-	public static void main(String[] args) throws Exception
-	{
+public class ExecTest {
+	public static void main(String[] args) throws Exception {
 		Runtime rt = Runtime.getRuntime();
 		rt.exec("open /Users/ladmin/Applications/Utilities/Terminal.app");
 		System.out.print("Command: ");
-		while (true)
-		{
-			@SuppressWarnings("resource")
-			Process proc = rt.exec(new Scanner(System.in).nextLine());
+		while (true) {
+			@SuppressWarnings("resource") Process proc = rt.exec(new Scanner(System.in).nextLine());
 			InputStream stderr = proc.getErrorStream();
 			InputStream stdin = proc.getInputStream();
 

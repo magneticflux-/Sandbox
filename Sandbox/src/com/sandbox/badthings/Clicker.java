@@ -11,42 +11,28 @@ import java.awt.event.KeyListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-public class Clicker
-{
-	public static void main(String[] args) throws AWTException
-	{
+public class Clicker {
+	public static void main(String[] args) throws AWTException {
 		JFrame frame = new JFrame();
 		final boolean[] click = new boolean[1];
 		final Robot robot = new Robot();
-		Runnable r = new Runnable()
-		{
+		Runnable r = new Runnable() {
 			@Override
-			public void run()
-			{
-				while (true)
-				{
-					if (click[0])
-					{
-						try
-						{
+			public void run() {
+				while (true) {
+					if (click[0]) {
+						try {
 							Thread.sleep(5);
-						}
-						catch (InterruptedException e)
-						{
+						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 						// System.out.println("test");
 						robot.mousePress(InputEvent.BUTTON1_MASK);
 						robot.mouseRelease(InputEvent.BUTTON1_MASK);
-					}
-					else
-					{
-						try
-						{
+					} else {
+						try {
 							Thread.sleep(25);
-						}
-						catch (InterruptedException e)
-						{
+						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
@@ -55,39 +41,32 @@ public class Clicker
 		};
 		Thread t = new Thread(r);
 		t.start();
-		frame.add(new JButton("Shutdown")
-		{
-			private static final long	serialVersionUID	= 1L;
+		frame.add(new JButton("Shutdown") {
+			private static final long serialVersionUID = 1L;
+
 			{
-				this.addActionListener(new ActionListener()
-				{
+				this.addActionListener(new ActionListener() {
 					@Override
-					public void actionPerformed(ActionEvent e)
-					{
+					public void actionPerformed(ActionEvent e) {
 						System.out.println("Shutdown");
 						click[0] = false;
 					}
 				});
-				this.addKeyListener(new KeyListener()
-				{
+				this.addKeyListener(new KeyListener() {
 					@Override
-					public void keyTyped(KeyEvent e)
-					{
-						if (e.getKeyChar() == 'a')
-						{
+					public void keyTyped(KeyEvent e) {
+						if (e.getKeyChar() == 'a') {
 							click[0] = !click[0];
 							System.out.println("clicked to " + click[0]);
 						}
 					}
 
 					@Override
-					public void keyReleased(KeyEvent e)
-					{
+					public void keyReleased(KeyEvent e) {
 					}
 
 					@Override
-					public void keyPressed(KeyEvent e)
-					{
+					public void keyPressed(KeyEvent e) {
 					}
 				});
 			}

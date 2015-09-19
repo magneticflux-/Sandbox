@@ -1,5 +1,13 @@
 package com.sandbox.evolve;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.sandbox.neural.FeedforwardNetwork;
+
+import org.apache.commons.math3.util.FastMath;
+import org.electronauts.mathutil.MathUtil;
+import org.uncommons.watchmaker.framework.PopulationData;
+
 import java.awt.Graphics;
 import java.awt.MouseInfo;
 import java.awt.Point;
@@ -23,142 +31,125 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.apache.commons.math3.util.FastMath;
-import org.uncommons.watchmaker.framework.PopulationData;
+public class FeedforwardNetworkGame {
+	public static final String SAVE_FILE = "SAVE_FILE";
 
-import com.electronauts.mathutil.MathUtil;
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.sandbox.neural.FeedforwardNetwork;
-
-public class FeedforwardNetworkGame
-{
-	public static final String	SAVE_FILE	= "SAVE_FILE";
-
-	public static void main(final String[] args)
-	{
+	public static void main(final String[] args) {
 		final Kryo kryo = new Kryo();
 		final Arena arena = new Arena(new Rectangle(0, 0, 600, 600), -1);
 		final Arena.Fighter player = arena.new Fighter(null, 200, 200, 0, false, false, arena);
 		arena.addFighter(player);
 
 		final JFrame frame = new JFrame("Game");
-		final MouseListener mouse = new MouseListener()
-		{
+		final MouseListener mouse = new MouseListener() {
 			@Override
-			public void mouseClicked(final MouseEvent e)
-			{
+			public void mouseClicked(final MouseEvent e) {
 			}
 
 			@Override
-			public void mouseEntered(final MouseEvent e)
-			{
-			}
-
-			@Override
-			public void mouseExited(final MouseEvent e)
-			{
-			}
-
-			@Override
-			public void mousePressed(final MouseEvent e)
-			{
+			public void mousePressed(final MouseEvent e) {
 				player.isShooting = true;
 			}
 
 			@Override
-			public void mouseReleased(final MouseEvent e)
-			{
+			public void mouseReleased(final MouseEvent e) {
 				player.isShooting = false;
+			}
+
+			@Override
+			public void mouseEntered(final MouseEvent e) {
+			}
+
+			@Override
+			public void mouseExited(final MouseEvent e) {
 			}
 		};
 		frame.addMouseListener(mouse);
-		final KeyListener key = new KeyListener()
-		{
-			public static final double	SPEED	= 4;
+		final KeyListener key = new KeyListener() {
+			public static final double SPEED = 4;
 
 			@Override
-			public void keyPressed(final KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_W && player.yV <= 0) player.yV += SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_S && player.yV >= 0) player.yV -= SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_A && player.xV >= 0) player.xV -= SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_D && player.xV <= 0) player.xV += SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_SPACE) player.isShooting = true;
-				if (e.getKeyCode() == KeyEvent.VK_Z) player.fov += FastMath.PI / 32;
-				if (e.getKeyCode() == KeyEvent.VK_X) player.fov -= FastMath.PI / 32;
-				if (e.getKeyCode() == KeyEvent.VK_C) player.range += 10;
-				if (e.getKeyCode() == KeyEvent.VK_V) player.range -= 10;
+			public void keyTyped(final KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_W && player.yV <= 0)
+					player.yV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_S && player.yV >= 0)
+					player.yV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_A && player.xV >= 0)
+					player.xV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_D && player.xV <= 0)
+					player.xV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_SPACE)
+					player.isShooting = true;
+				if (e.getKeyCode() == KeyEvent.VK_Z)
+					player.fov += FastMath.PI / 32;
+				if (e.getKeyCode() == KeyEvent.VK_X)
+					player.fov -= FastMath.PI / 32;
+				if (e.getKeyCode() == KeyEvent.VK_C)
+					player.range += 10;
+				if (e.getKeyCode() == KeyEvent.VK_V)
+					player.range -= 10;
 
 			}
 
 			@Override
-			public void keyReleased(final KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_W) player.yV -= SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_S) player.yV += SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_A) player.xV += SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_D) player.xV -= SPEED;
-				if (e.getKeyCode() == KeyEvent.VK_SPACE) player.isShooting = false;
-			}
-
-			@Override
-			public void keyTyped(final KeyEvent e)
-			{
+			public void keyReleased(final KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_W)
+					player.yV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_S)
+					player.yV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_A)
+					player.xV += SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_D)
+					player.xV -= SPEED;
+				if (e.getKeyCode() == KeyEvent.VK_SPACE)
+					player.isShooting = false;
 			}
 		};
 		frame.addKeyListener(key);
-		final ActionListener action = new ActionListener()
-		{
+		final ActionListener action = new ActionListener() {
 			@SuppressWarnings("unchecked")
 			@Override
-			public void actionPerformed(final ActionEvent e)
-			{
-				if (e.getActionCommand() == FeedforwardNetworkGame.SAVE_FILE)
-				{
+			public void actionPerformed(final ActionEvent e) {
+				if (e.getActionCommand() == FeedforwardNetworkGame.SAVE_FILE) {
 					if (e.getSource() instanceof PopulationData<?>)
-						arena.addFighter(arena.new Fighter(((PopulationData<FeedforwardNetwork>) e.getSource()).getBestCandidate(), 100, 100, 0, true, false,
-								arena));
-				}
-				else
+						arena.addFighter(arena.new Fighter(((PopulationData<FeedforwardNetwork>) e.getSource()).getBestCandidate(), 100, 100, 0, true, false, arena));
+				} else
 					throw new IllegalArgumentException("Illegal parameter specified!");
 			}
 		};
-		frame.setJMenuBar(new JMenuBar()
-		{
-			private static final long	serialVersionUID	= 1L;
+		frame.setJMenuBar(new JMenuBar() {
+			private static final long serialVersionUID = 1L;
+
 			{
-				this.add(new JMenu("File")
-				{
-					private static final long	serialVersionUID	= 1L;
+				this.add(new JMenu("File") {
+					private static final long serialVersionUID = 1L;
+
 					{
-						this.add(new JMenuItem("Open...")
-						{
-							private static final long	serialVersionUID	= 1L;
+						this.add(new JMenuItem("Open...") {
+							private static final long serialVersionUID = 1L;
+
 							{
-								this.addActionListener(new ActionListener()
-								{
-									File	directory	= new File(System.getProperty("user.home"));
+								this.addActionListener(new ActionListener() {
+									File directory = new File(System.getProperty("user.home"));
 
 									@Override
-									public void actionPerformed(final ActionEvent e)
-									{
+									public void actionPerformed(final ActionEvent e) {
 										final JFileChooser open = new JFileChooser(this.directory);
 
 										final int returnVal = open.showOpenDialog(null);
-										if (returnVal == JFileChooser.APPROVE_OPTION)
-										{
+										if (returnVal == JFileChooser.APPROVE_OPTION) {
 											this.directory = open.getSelectedFile();
-											try
-											{
+											try {
 												Input i = null;
 												i = new Input(new FileInputStream(this.directory));
 												action.actionPerformed(new ActionEvent(kryo.readClassAndObject(i), 0, FeedforwardNetworkGame.SAVE_FILE));
 												i.close();
 
-											}
-											catch (final FileNotFoundException e1)
-											{
+											} catch (final FileNotFoundException e1) {
 												e1.printStackTrace();
 											}
 										}
@@ -170,14 +161,12 @@ public class FeedforwardNetworkGame
 				});
 			}
 		});
-		final JPanel panel = new JPanel()
-		{
-			private static final long	serialVersionUID	= 1L;
-			public static final double	updateSpeed			= 50 / 3d;
+		final JPanel panel = new JPanel() {
+			public static final double updateSpeed = 50 / 3d;
+			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void paintComponent(final Graphics g)
-			{
+			public void paintComponent(final Graphics g) {
 				final long startTime = System.nanoTime();
 				super.paintComponent(g);
 				arena.paint(g);
@@ -186,24 +175,17 @@ public class FeedforwardNetworkGame
 				final Point p = MouseInfo.getPointerInfo().getLocation();
 				SwingUtilities.convertPointFromScreen(p, this);
 
-				player.angleV = FastMath.atan2(
-						FastMath.sin(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle),
-						FastMath.cos(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle)) / 2;
+				player.angleV = FastMath.atan2(FastMath.sin(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle), FastMath.cos(-MathUtil.angleTo(new Point2D.Double(player.getX(), this.getHeight() - player.getY()), p) - player.angle)) / 2;
 
-				try
-				{
+				try {
 					if (updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
 						Thread.sleep((long) (updateSpeed - (System.nanoTime() - startTime) / 1000000d));
-					else
-					{
+					else {
 					}
-				}
-				catch (final InterruptedException e)
-				{
+				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
-				while (updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0)
-				{
+				while (updateSpeed - (System.nanoTime() - startTime) / 1000000 > 0) {
 				}
 				this.repaint();
 			}

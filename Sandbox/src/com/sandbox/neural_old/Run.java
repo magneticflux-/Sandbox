@@ -1,5 +1,7 @@
 package com.sandbox.neural_old;
 
+import org.apache.commons.math3.util.FastMath;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Arrays;
@@ -8,26 +10,20 @@ import java.util.Random;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import org.apache.commons.math3.util.FastMath;
-
-public class Run
-{
-	public static void main(final String[] args)
-	{
+public class Run {
+	public static void main(final String[] args) {
 		final String networkType = "2 1";
 		final Random r = new Random();
 		final InputValue var1 = new InputValue(3d);
 		final InputValue var2 = new InputValue(4d);
-		final Population maxPop = new Population(1, networkType, new InputValue[] { var1, var2 }, new double[] { var1.getOutput() + var2.getOutput() }, r);
+		final Population maxPop = new Population(1, networkType, new InputValue[]{var1, var2}, new double[]{var1.getOutput() + var2.getOutput()}, r);
 
 		final JFrame frame = new JFrame("Network");
-		final JComponent panel = new JComponent()
-		{
-			private static final long	serialVersionUID	= 1L;
+		final JComponent panel = new JComponent() {
+			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void paintComponent(final Graphics g)
-			{
+			public void paintComponent(final Graphics g) {
 				final Network n = maxPop.selectBest(1)[0];
 				final int width = this.getWidth();
 				final int height = this.getHeight();
@@ -35,25 +31,21 @@ public class Run
 
 				double max = 0;
 				for (int y = 0; y < height; y++)
-					for (int x = 0; x < width; x++)
-					{
-						final double[] input = new double[] { x - width / 2, y - height / 2 };
+					for (int x = 0; x < width; x++) {
+						final double[] input = new double[]{x - width / 2, y - height / 2};
 
 						n.setEnvironment(input);
 						pixels[y][x] = n.getOutputs()[0];
-						if (FastMath.abs(pixels[y][x]) > max) max = FastMath.abs(pixels[y][x]);
+						if (FastMath.abs(pixels[y][x]) > max)
+							max = FastMath.abs(pixels[y][x]);
 					}
 
 				for (int y = 0; y < height; y++)
-					for (int x = 0; x < width; x++)
-					{
+					for (int x = 0; x < width; x++) {
 						final int shade = 128 + (int) (127 * (pixels[y][x] / max));
-						try
-						{
+						try {
 							g.setColor(new Color(shade, shade, shade));
-						}
-						catch (final IllegalArgumentException e)
-						{
+						} catch (final IllegalArgumentException e) {
 							System.out.println("Shade was: " + shade + "; pixel was " + pixels[y][x] + "; max was " + max);
 						}
 
@@ -63,7 +55,7 @@ public class Run
 				g.setColor(Color.RED);
 				final double x = width / 4;
 				final double y = height / 4;
-				final double[] input = new double[] { x - width / 2, y - height / 2 };
+				final double[] input = new double[]{x - width / 2, y - height / 2};
 				n.setEnvironment(input);
 				final double value = n.getOutputs()[0];
 				g.fillRect((int) x, (int) y, 1, 1);
@@ -76,37 +68,31 @@ public class Run
 		frame.setVisible(true);
 
 		final JFrame frame2 = new JFrame("Correct");
-		final JComponent panel2 = new JComponent()
-		{
-			private static final long	serialVersionUID	= 1L;
+		final JComponent panel2 = new JComponent() {
+			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void paintComponent(final Graphics g)
-			{
+			public void paintComponent(final Graphics g) {
 				final int width = this.getWidth();
 				final int height = this.getHeight();
 				final double[][] pixels = new double[height][width];
 
 				double max = 0;
 				for (int y = 0; y < height; y++)
-					for (int x = 0; x < width; x++)
-					{
-						final double[] input = new double[] { x - width / 2, y - height / 2 };
+					for (int x = 0; x < width; x++) {
+						final double[] input = new double[]{x - width / 2, y - height / 2};
 
 						pixels[y][x] = Config.operation(input[0], input[1]);
-						if (FastMath.abs(pixels[y][x]) > max) max = FastMath.abs(pixels[y][x]);
+						if (FastMath.abs(pixels[y][x]) > max)
+							max = FastMath.abs(pixels[y][x]);
 					}
 
 				for (int y = 0; y < height; y++)
-					for (int x = 0; x < width; x++)
-					{
+					for (int x = 0; x < width; x++) {
 						final int shade = 128 + (int) (127 * (pixels[y][x] / max));
-						try
-						{
+						try {
 							g.setColor(new Color(shade, shade, shade));
-						}
-						catch (final IllegalArgumentException e)
-						{
+						} catch (final IllegalArgumentException e) {
 							System.out.println("Shade was: " + shade + "; pixel was " + pixels[y][x] + "; max was " + max);
 						}
 
@@ -128,13 +114,11 @@ public class Run
 		frame2.setVisible(true);
 
 		final JFrame frame3 = new JFrame("Difference");
-		final JComponent panel3 = new JComponent()
-		{
-			private static final long	serialVersionUID	= 1L;
+		final JComponent panel3 = new JComponent() {
+			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void paintComponent(final Graphics g)
-			{
+			public void paintComponent(final Graphics g) {
 				final Network n = maxPop.selectBest(1)[0];
 				final int width = this.getWidth();
 				final int height = this.getHeight();
@@ -142,26 +126,22 @@ public class Run
 
 				double max = 0;
 				for (int y = 0; y < height; y++)
-					for (int x = 0; x < width; x++)
-					{
-						final double[] input = new double[] { x - width / 2, y - height / 2 };
+					for (int x = 0; x < width; x++) {
+						final double[] input = new double[]{x - width / 2, y - height / 2};
 
 						n.setEnvironment(input);
 						pixels[y][x] = FastMath.abs(Config.operation(input[0], input[1]) - n.getOutputs()[0]);
 
-						if (FastMath.abs(pixels[y][x]) > max) max = FastMath.abs(pixels[y][x]);
+						if (FastMath.abs(pixels[y][x]) > max)
+							max = FastMath.abs(pixels[y][x]);
 					}
 
 				for (int y = 0; y < height; y++)
-					for (int x = 0; x < width; x++)
-					{
+					for (int x = 0; x < width; x++) {
 						final int shade = (int) (255 * (pixels[y][x] / max));
-						try
-						{
+						try {
 							g.setColor(new Color(shade, shade, shade));
-						}
-						catch (final IllegalArgumentException e)
-						{
+						} catch (final IllegalArgumentException e) {
 							System.out.println("Shade was: " + shade + "; pixel was " + pixels[y][x] + "; max was " + max);
 							g.setColor(Color.CYAN);
 						}
@@ -178,14 +158,13 @@ public class Run
 		frame3.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame3.setVisible(true);
 
-		if (Config.DEBUG)
-		{
+		if (Config.DEBUG) {
 			System.out.println("---DEBUG---");
 
-			final Network n1 = new Network("2 2 1", new InputValue[] { var1, var2 }, r);
+			final Network n1 = new Network("2 2 1", new InputValue[]{var1, var2}, r);
 			n1.randomizeWeights(-1, 1);
 			n1.randomizeBiases(-2, 2);
-			final Network n2 = new Network("2 2 1", new InputValue[] { var1, var2 }, r);
+			final Network n2 = new Network("2 2 1", new InputValue[]{var1, var2}, r);
 			n2.randomizeWeights(-1, 1);
 			n2.randomizeBiases(-2, 2);
 
@@ -203,9 +182,8 @@ public class Run
 			offspring[1].inspectNet();
 		}
 		maxPop.updateFitness();
-		while (true)
-		{
-			final Population p = new Population(10000, networkType, new InputValue[] { var1, var2 }, new double[] { var1.getOutput() * var2.getOutput() }, r);
+		while (true) {
+			final Population p = new Population(10000, networkType, new InputValue[]{var1, var2}, new double[]{var1.getOutput() * var2.getOutput()}, r);
 			// p.viewStatus();
 			p.updateFitness();
 			final Network[] victors = p.selectBest(1);
@@ -215,21 +193,15 @@ public class Run
 			maxPop.updateFitness();
 
 			frame.repaint();
-			try
-			{
+			try {
 				Thread.sleep(500);
-			}
-			catch (final InterruptedException e)
-			{
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			frame2.repaint();
-			try
-			{
+			try {
 				Thread.sleep(500);
-			}
-			catch (final InterruptedException e)
-			{
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 			frame3.repaint();

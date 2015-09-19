@@ -1,5 +1,12 @@
 package com.sandbox.gravity;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -8,25 +15,13 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-
-public class RunV2
-{
-	public static void main(String[] args)
-	{
+public class RunV2 {
+	public static void main(String[] args) {
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		XYSeries testSeries = new XYSeries("Test");
 		dataset.addSeries(testSeries);
-		JFreeChart chart = ChartFactory.createXYLineChart("Test Chart", "Simulation Ticks", "Particle Speed", dataset, PlotOrientation.VERTICAL, false, true,
-				false);
-		ChartPanel chartPanel = new ChartPanel(chart, ChartPanel.DEFAULT_WIDTH, ChartPanel.DEFAULT_HEIGHT, ChartPanel.DEFAULT_MINIMUM_DRAW_WIDTH,
-				ChartPanel.DEFAULT_MINIMUM_DRAW_HEIGHT, ChartPanel.DEFAULT_MAXIMUM_DRAW_WIDTH, ChartPanel.DEFAULT_MAXIMUM_DRAW_HEIGHT, false, false, true,
-				true, false, false);
+		JFreeChart chart = ChartFactory.createXYLineChart("Test Chart", "Simulation Ticks", "Particle Speed", dataset, PlotOrientation.VERTICAL, false, true, false);
+		ChartPanel chartPanel = new ChartPanel(chart, ChartPanel.DEFAULT_WIDTH, ChartPanel.DEFAULT_HEIGHT, ChartPanel.DEFAULT_MINIMUM_DRAW_WIDTH, ChartPanel.DEFAULT_MINIMUM_DRAW_HEIGHT, ChartPanel.DEFAULT_MAXIMUM_DRAW_WIDTH, ChartPanel.DEFAULT_MAXIMUM_DRAW_HEIGHT, false, false, true, true, false, false);
 		JFrame frame2 = new JFrame("Chart");
 		frame2.add(chartPanel);
 		frame2.setSize(700, 800);
@@ -39,8 +34,7 @@ public class RunV2
 		final Universe u = new Universe(0.1, 0.01, dataset);
 		Random r = new Random(0);
 
-		for (int i = 0; i < 3; i++)
-		{
+		for (int i = 0; i < 3; i++) {
 			u.addBody(new Body(r.nextInt(300), r.nextInt(300), (r.nextDouble() - 0.5) / 5, (r.nextDouble() - 0.5) / 5, dataset, chart.getXYPlot().getRenderer()));
 		}
 
@@ -49,25 +43,22 @@ public class RunV2
 		// u.addBody(new Body(150, 300, 0.1, -0.1, dataset));
 		// u.addBody(new Body(100, 150, -0.1, -0.1, dataset));
 
-		frame.add(new JPanel()
-		{
+		frame.add(new JPanel() {
+			private static final long serialVersionUID = 1L;
+			private BufferedImage frame = null;
+
 			{
 				this.setBackground(Color.WHITE);
 			}
 
-			private static final long	serialVersionUID	= 1L;
-			private BufferedImage		frame				= null;
-
 			@Override
-			public void paintComponent(Graphics g)
-			{
+			public void paintComponent(Graphics g) {
 				long startTime = System.nanoTime();
 				super.paintComponent(g);
 				g.drawImage(frame, 0, 0, this);
 
 				u.stepTime();
-				if (u.getTick() % 1000 == 0)
-				{
+				if (u.getTick() % 1000 == 0) {
 					frame = u.getFrame(this.getWidth(), this.getHeight());
 				}
 

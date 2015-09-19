@@ -1,39 +1,34 @@
 package com.sandbox.evolve;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.sandbox.neural.AbstractNode;
+import com.sandbox.neural.FeedforwardNetwork;
+import com.sandbox.neural.NeuronNode;
+import com.sandbox.neural.NodeLayer;
 
 import org.uncommons.maths.number.ConstantGenerator;
 import org.uncommons.maths.number.NumberGenerator;
 import org.uncommons.maths.random.Probability;
 import org.uncommons.watchmaker.framework.EvolutionaryOperator;
 
-import com.sandbox.neural.AbstractNode;
-import com.sandbox.neural.FeedforwardNetwork;
-import com.sandbox.neural.NeuronNode;
-import com.sandbox.neural.NodeLayer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-public class FeedforwardNetworkMutation implements EvolutionaryOperator<FeedforwardNetwork>
-{
-	private final NumberGenerator<Probability>	mutationProbability;
+public class FeedforwardNetworkMutation implements EvolutionaryOperator<FeedforwardNetwork> {
+	private final NumberGenerator<Probability> mutationProbability;
 
-	public FeedforwardNetworkMutation(final NumberGenerator<Probability> mutationProbability)
-	{
-		this.mutationProbability = mutationProbability;
-	}
-
-	public FeedforwardNetworkMutation(final Probability mutationProbability)
-	{
+	public FeedforwardNetworkMutation(final Probability mutationProbability) {
 		this(new ConstantGenerator<Probability>(mutationProbability));
 	}
 
+	public FeedforwardNetworkMutation(final NumberGenerator<Probability> mutationProbability) {
+		this.mutationProbability = mutationProbability;
+	}
+
 	@Override
-	public List<FeedforwardNetwork> apply(final List<FeedforwardNetwork> selectedCandidates, final Random rng)
-	{
+	public List<FeedforwardNetwork> apply(final List<FeedforwardNetwork> selectedCandidates, final Random rng) {
 		final List<FeedforwardNetwork> mutatedPopulation = new ArrayList<FeedforwardNetwork>(selectedCandidates.size());
-		for (final FeedforwardNetwork selectedNetwork : selectedCandidates)
-		{
+		for (final FeedforwardNetwork selectedNetwork : selectedCandidates) {
 			final FeedforwardNetwork n = selectedNetwork.getDeepCopy();
 			for (final NodeLayer l : n.getLayers())
 				for (final AbstractNode abn : l.getNodes())
@@ -46,8 +41,7 @@ public class FeedforwardNetworkMutation implements EvolutionaryOperator<Feedforw
 		return mutatedPopulation;
 	}
 
-	private double mutate(final double value, final Random rng)
-	{
+	private double mutate(final double value, final Random rng) {
 		return value + (rng.nextDouble() - 0.5) * 2 * FeedforwardNetworkEvolve.MUTATION_RANGE;
 	}
 }

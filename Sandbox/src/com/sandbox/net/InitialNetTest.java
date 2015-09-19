@@ -20,19 +20,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class InitialNetTest
-{
-	public static final int	DEFAULT_PORT	= 2245;
-
-	public static void logMessage(JTextArea log, String message, String sender)
-	{
-		log.setText(log.getText() + '\n' + sender + " says: " + message);
-		log.setCaretPosition(log.getText().length());
-	}
+public class InitialNetTest {
+	public static final int DEFAULT_PORT = 2245;
 
 	@SuppressWarnings("resource")
-	public static void main(String[] args) throws IOException
-	{
+	public static void main(String[] args) throws IOException {
 		final ServerSocket server = new ServerSocket(DEFAULT_PORT);
 		final Socket[] client = new Socket[1];
 		final PrintWriter[] toSend = new PrintWriter[1];
@@ -49,34 +41,24 @@ public class InitialNetTest
 
 		log.setEditable(false);
 
-		connectButton.addActionListener(new ActionListener()
-		{
+		connectButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				try
-				{
+			public void actionPerformed(ActionEvent e) {
+				try {
 					Socket s = new Socket(Inet4Address.getByName(ip.getText()), DEFAULT_PORT);
 					toSend[0] = new PrintWriter(s.getOutputStream(), true);
-				}
-				catch (UnknownHostException e1)
-				{
+				} catch (UnknownHostException e1) {
 					e1.printStackTrace();
-				}
-				catch (IOException e1)
-				{
+				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		});
 
-		sendButton.addActionListener(new ActionListener()
-		{
+		sendButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				if (toSend[0] != null)
-				{
+			public void actionPerformed(ActionEvent e) {
+				if (toSend[0] != null) {
 					toSend[0].println(data.getText());
 					logMessage(log, data.getText(), "User");
 				}
@@ -98,57 +80,47 @@ public class InitialNetTest
 		final PrintWriter[] out = new PrintWriter[1];
 		final BufferedReader[] in = new BufferedReader[1];
 
-		Thread t2 = new Thread(new Runnable()
-		{
+		Thread t2 = new Thread(new Runnable() {
 			@Override
-			public void run()
-			{
-				try
-				{
+			public void run() {
+				try {
 					logMessage(log, "Began accepting sockets...", "System");
 					client[0] = server.accept();
 					logMessage(log, "Socket accepted from " + client[0].getInetAddress().getCanonicalHostName(), "System");
 					out[0] = new PrintWriter(client[0].getOutputStream(), true);
 					in[0] = new BufferedReader(new InputStreamReader(client[0].getInputStream()));
-				}
-				catch (IOException e)
-				{
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		});
 		t2.start();
 
-		Thread t3 = new Thread(new Runnable()
-		{
+		Thread t3 = new Thread(new Runnable() {
 
 			@Override
-			public void run()
-			{
-				while (true)
-				{
-					try
-					{
-						while (in[0] == null || !in[0].ready())
-						{
-							try
-							{
+			public void run() {
+				while (true) {
+					try {
+						while (in[0] == null || !in[0].ready()) {
+							try {
 								Thread.sleep(10);
-							}
-							catch (InterruptedException e1)
-							{
+							} catch (InterruptedException e1) {
 								e1.printStackTrace();
 							}
 						}
 						logMessage(log, in[0].readLine(), client[0].getInetAddress().getCanonicalHostName());
-					}
-					catch (IOException e)
-					{
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
 			}
 		});
 		t3.start();
+	}
+
+	public static void logMessage(JTextArea log, String message, String sender) {
+		log.setText(log.getText() + '\n' + sender + " says: " + message);
+		log.setCaretPosition(log.getText().length());
 	}
 }

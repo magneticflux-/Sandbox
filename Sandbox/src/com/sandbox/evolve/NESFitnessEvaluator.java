@@ -1,46 +1,41 @@
 package com.sandbox.evolve;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.grapeshot.halfnes.NES;
+import com.grapeshot.halfnes.ui.ControllerImpl;
+import com.grapeshot.halfnes.ui.GUIImpl;
+import com.sandbox.neural.FeedforwardNetwork;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.math3.util.FastMath;
 import org.uncommons.watchmaker.framework.FitnessEvaluator;
 import org.uncommons.watchmaker.framework.PopulationData;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import com.grapeshot.halfnes.NES;
-import com.grapeshot.halfnes.ui.ControllerImpl;
-import com.grapeshot.halfnes.ui.GUIImpl;
-import com.sandbox.neural.FeedforwardNetwork;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.List;
 
-public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
-{
-	public static void main1(String[] args)
-	{
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork> {
+	private static ThreadLocal<Kryo> kryo = new ThreadLocal<Kryo>();
+	private ThreadLocal<NES> nes = new ThreadLocal<NES>();
+
+	public static void main1(String[] args) {
 		Kryo kryo = new Kryo();
 		Input in = null;
-		try
-		{
+		try {
 			in = new Input(new FileInputStream("codex/Mario/generation_1776.pop"));
-		}
-		catch (final FileNotFoundException e1)
-		{
+		} catch (final FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		@SuppressWarnings("unchecked")
-		FeedforwardNetwork candidate = ((PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(in)).getBestCandidate();
+		@SuppressWarnings("unchecked") FeedforwardNetwork candidate = ((PopulationData<FeedforwardNetwork>) kryo.readClassAndObject(in)).getBestCandidate();
 		in.close();
 		NES nes = new NES(false);
 		nes.loadROM("C:\\Users\\Mitchell\\Desktop\\fceux-2.2.2-win32\\ROMs\\Super Mario Bros..nes");
@@ -76,8 +71,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		int maxDistance = 0;
 		int timeout = 0;
 
-		while (true)
-		{
+		while (true) {
 			input.keyReleased(U);
 			input.keyReleased(D);
 			input.keyReleased(L);
@@ -103,14 +97,12 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			int points = (score / 5) + (time * 10) + (marioX / 4) + (lives * 500) + (level * 250) + (world * 2000);
 
 			timeout++;
-			if (marioX > maxDistance)
-			{
+			if (marioX > maxDistance) {
 				maxDistance = marioX;
 				timeout = 0;
 			}
 			// System.out.println("Lives: " + lives + " Timeout: " + timeout + " Distance: " + marioX);
-			if (lives <= 2 || timeout > 240 || marioState == 0x0B)
-			{
+			if (lives <= 2 || timeout > 240 || marioState == 0x0B) {
 				fitness = points;
 				break;
 			}
@@ -118,41 +110,32 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			final int[][] vision = new int[10][10];
 
 			for (int dx = -vision[0].length / 2; dx < vision[0].length / 2; dx += 1)
-				for (int dy = -vision.length / 2; dy < vision.length / 2; dy += 1)
-				{
+				for (int dy = -vision.length / 2; dy < vision.length / 2; dy += 1) {
 					int x = marioX + (dx * 16) + 8;
 					int y = marioY + (dy * 16) - 16;
 					int page = (int) FastMath.floor(x / 256) % 2;
 					int subx = (int) FastMath.floor((x % 256) / 16);
 					int suby = (int) FastMath.floor((y - 32) / 16);
 					int addr = 0x500 + page * 13 * 16 + suby * 16 + subx;
-					if (suby >= 13 || suby < 0)
-					{
+					if (suby >= 13 || suby < 0) {
 						// System.out.println("Outside level.");
 						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = 0;
-					}
-					else
-					{
+					} else {
 						// System.out.println("Block data at " + dx + ", " + dy + ": " + nes.cpuram.read(addr));
 						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.getCPURAM().read(addr);
 					}
 				}
 
-			for (int i = 0; i <= 4; i++)
-			{
+			for (int i = 0; i <= 4; i++) {
 				int enemy = nes.getCPURAM().read(0xF + i);
-				if (enemy != 0)
-				{
+				if (enemy != 0) {
 					int ex = nes.getCPURAM().read(0x6E + i) * 0x100 + nes.getCPURAM().read(0x87 + i);
 					int ey = nes.getCPURAM().read(0xCF + i) + 24;
 					int enemyMarioDeltaX = (ex - marioX) / 16;
 					int enemyMarioDeltaY = (ey - marioY) / 16;
-					try
-					{
+					try {
 						vision[enemyMarioDeltaY + (vision.length / 2)][enemyMarioDeltaX + (vision[0].length / 2)] = -enemy;
-					}
-					catch (ArrayIndexOutOfBoundsException e)
-					{
+					} catch (ArrayIndexOutOfBoundsException e) {
 					}
 				}
 			}
@@ -160,30 +143,44 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			int[] visionunwound = NESFitnessEvaluator.unwind2DArray(vision);
 			double[] reactions = candidate.evaluate(visionunwound);
 
-			if (reactions[0] > 0) input.keyPressed(U);
-			if (reactions[1] > 0) input.keyPressed(D);
-			if (reactions[2] > 0) input.keyPressed(L);
-			if (reactions[3] > 0) input.keyPressed(R);
-			if (reactions[4] > 0) input.keyPressed(A);
-			if (reactions[5] > 0) input.keyPressed(B);
+			if (reactions[0] > 0)
+				input.keyPressed(U);
+			if (reactions[1] > 0)
+				input.keyPressed(D);
+			if (reactions[2] > 0)
+				input.keyPressed(L);
+			if (reactions[3] > 0)
+				input.keyPressed(R);
+			if (reactions[4] > 0)
+				input.keyPressed(A);
+			if (reactions[5] > 0)
+				input.keyPressed(B);
 			// if (reactions[6] > 0) input.keyPressed(SELECT);
 			// if (reactions[7] > 0) input.keyPressed(START);
 
 			System.out.println("Points: " + points + "Timeout: " + timeout);
 			nes.frameAdvance();
-			try
-			{
+			try {
 				Thread.sleep(8);
-			}
-			catch (InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	public static void main(String[] args)
-	{
+	public static int[] unwind2DArray(int[][] arr) {
+		int[] out = new int[arr.length * arr[0].length];
+		int i = 0;
+		for (int x = 0; x < arr[0].length; x++) {
+			for (int y = 0; y < arr.length; y++) {
+				out[i] = arr[y][x];
+				i++;
+			}
+		}
+		return out;
+	}
+
+	public static void main(String[] args) {
 		long startTime = System.nanoTime();
 		final NES nes = new NES(false);
 		long endTime = System.nanoTime();
@@ -220,19 +217,13 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		nes.runEmulation = true;
 		// nes.run();
 
-		Thread nesUpdateThread = new Thread(new Runnable()
-		{
+		Thread nesUpdateThread = new Thread(new Runnable() {
 			@Override
-			public void run()
-			{
-				while (true)
-				{
-					try
-					{
+			public void run() {
+				while (true) {
+					try {
 						Thread.sleep(5);
-					}
-					catch (InterruptedException e)
-					{
+					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 					long startTime = System.nanoTime();
@@ -251,51 +242,37 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			}
 		});
 
-		Thread interfaceThread = new Thread(new Runnable()
-		{
+		Thread interfaceThread = new Thread(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				final int[][] vision = new int[13][13];
 				final int viewSizeMultiplier = 2;
 				JFrame frame = new JFrame("Vision");
-				frame.add(new JPanel()
-				{
-					private static final long	serialVersionUID	= 1L;
+				frame.add(new JPanel() {
+					private static final long serialVersionUID = 1L;
 
 					@Override
-					public void paintComponent(Graphics g)
-					{
+					public void paintComponent(Graphics g) {
 						super.paintComponent(g);
 						g.setFont(g.getFont().deriveFont(16.0f));
-						for (int y = 0; y < vision.length; y++)
-						{
-							for (int x = 0; x < vision[y].length; x++)
-							{
-								synchronized (vision)
-								{
+						for (int y = 0; y < vision.length; y++) {
+							for (int x = 0; x < vision[y].length; x++) {
+								synchronized (vision) {
 									int value = (vision[y][x] + 256) % 256;
 									g.setColor(new Color(255 - value, 255 - value, 255 - value));
-									g.fillRect((x * 16) * viewSizeMultiplier, (y * 16) * viewSizeMultiplier, (16) * viewSizeMultiplier,
-											(16) * viewSizeMultiplier);
+									g.fillRect((x * 16) * viewSizeMultiplier, (y * 16) * viewSizeMultiplier, (16) * viewSizeMultiplier, (16) * viewSizeMultiplier);
 									g.setColor(Color.BLACK);
-									g.drawRect((x * 16) * viewSizeMultiplier, (y * 16) * viewSizeMultiplier, (16) * viewSizeMultiplier,
-											(16) * viewSizeMultiplier);
+									g.drawRect((x * 16) * viewSizeMultiplier, (y * 16) * viewSizeMultiplier, (16) * viewSizeMultiplier, (16) * viewSizeMultiplier);
 									g.setColor(Color.RED);
-									g.drawString("" + vision[y][x], (x * 16) * viewSizeMultiplier, (y * 16) * viewSizeMultiplier
-											+ g.getFontMetrics().getHeight());
+									g.drawString("" + vision[y][x], (x * 16) * viewSizeMultiplier, (y * 16) * viewSizeMultiplier + g.getFontMetrics().getHeight());
 								}
 							}
 						}
 						g.setColor(Color.RED);
-						g.fillRect(((vision[0].length / 2) * 16 + 8 - 4) * viewSizeMultiplier, ((vision.length / 2) * 16 + 8 - 4) * viewSizeMultiplier,
-								(8) * viewSizeMultiplier, (16 + 8) * viewSizeMultiplier);
-						try
-						{
+						g.fillRect(((vision[0].length / 2) * 16 + 8 - 4) * viewSizeMultiplier, ((vision.length / 2) * 16 + 8 - 4) * viewSizeMultiplier, (8) * viewSizeMultiplier, (16 + 8) * viewSizeMultiplier);
+						try {
 							Thread.sleep(16);
-						}
-						catch (InterruptedException e)
-						{
+						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 						repaint();
@@ -304,14 +281,10 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setSize(600, 600);
 				frame.setVisible(true);
-				while (true)
-				{
-					try
-					{
+				while (true) {
+					try {
 						Thread.sleep(16);
-					}
-					catch (InterruptedException e)
-					{
+					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 					int score = 0;
@@ -329,48 +302,36 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 					int points = ((time - 400) * 10) + (marioX) + (level * 250) + (world * 2000);
 
 					if (logging)
-						System.out.println("Timeout: " + (30 + (marioX / 250)) + "Points: " + points + ", Time: " + time + " Score: " + score + ", World: "
-								+ world + "d, Level: " + level + ", Lives: " + lives + ", MarioX: " + marioX + ", MarioY: " + marioY
-								+ (nes.getCPURAM().read(0x000E) == 0x0B ? ", DYING" : ", STATE: " + nes.getCPURAM().read(0x000E)));
+						System.out.println("Timeout: " + (30 + (marioX / 250)) + "Points: " + points + ", Time: " + time + " Score: " + score + ", World: " + world + "d, Level: " + level + ", Lives: " + lives + ", MarioX: " + marioX + ", MarioY: " + marioY + (nes.getCPURAM().read(0x000E) == 0x0B ? ", DYING" : ", STATE: " + nes.getCPURAM().read(0x000E)));
 
-					synchronized (vision)
-					{
+					synchronized (vision) {
 						for (int dx = -vision[0].length / 2; dx < vision[0].length / 2; dx += 1)
-							for (int dy = -vision.length / 2; dy < vision.length / 2; dy += 1)
-							{
+							for (int dy = -vision.length / 2; dy < vision.length / 2; dy += 1) {
 								int x = marioX + (dx * 16) + 8;
 								int y = marioY + (dy * 16) - 16;
 								int page = (int) FastMath.floor(x / 256) % 2;
 								int subx = (int) FastMath.floor((x % 256) / 16);
 								int suby = (int) FastMath.floor((y - 32) / 16);
 								int addr = 0x500 + page * 13 * 16 + suby * 16 + subx;
-								if (suby >= 13 || suby < 0)
-								{
+								if (suby >= 13 || suby < 0) {
 									// System.out.println("Outside level.");
 									vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = 0;
-								}
-								else
-								{
+								} else {
 									// System.out.println("Block data at " + dx + ", " + dy + ": " + nes.cpuram.read(addr));
 									vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.getCPURAM().read(addr);
 								}
 							}
 					}
-					for (int i = 0; i <= 4; i++)
-					{
+					for (int i = 0; i <= 4; i++) {
 						int enemy = nes.getCPURAM().read(0xF + i);
-						if (enemy != 0)
-						{
+						if (enemy != 0) {
 							int ex = nes.getCPURAM().read(0x6E + i) * 0x100 + nes.getCPURAM().read(0x87 + i);
 							int ey = nes.getCPURAM().read(0xCF + i) + 24;
 							int enemyMarioDeltaX = (ex - marioX) / 16;
 							int enemyMarioDeltaY = (ey - marioY) / 16;
-							try
-							{
+							try {
 								vision[enemyMarioDeltaY + (vision.length / 2)][enemyMarioDeltaX + (vision[0].length / 2)] = -enemy;
-							}
-							catch (ArrayIndexOutOfBoundsException e)
-							{
+							} catch (ArrayIndexOutOfBoundsException e) {
 							}
 							if (logging)
 								System.out.println("Enemy of type " + enemy + " in slot " + i + " @ (" + enemyMarioDeltaX + ", " + enemyMarioDeltaY + ")");
@@ -383,12 +344,8 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		interfaceThread.start();
 	}
 
-	private static ThreadLocal<Kryo>	kryo	= new ThreadLocal<Kryo>();
-
-	public static void loadSavestate(NES nes)
-	{
-		if (kryo.get() == null)
-		{
+	public static void loadSavestate(NES nes) {
+		if (kryo.get() == null) {
 			kryo.set(new Kryo());
 		}
 		Kryo kryo = NESFitnessEvaluator.kryo.get();
@@ -396,16 +353,12 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		nes.pause();
 		// System.out.println("Started read.");
 		Input input = null;
-		try
-		{
+		try {
 			input = new Input(new FileInputStream("savestate.clm"));
-		}
-		catch (final FileNotFoundException e1)
-		{
+		} catch (final FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		@SuppressWarnings("unchecked")
-		ImmutablePair<int[], int[]> savestate = (ImmutablePair<int[], int[]>) kryo.readClassAndObject(input);
+		@SuppressWarnings("unchecked") ImmutablePair<int[], int[]> savestate = (ImmutablePair<int[], int[]>) kryo.readClassAndObject(input);
 		// System.arraycopy(savestate.left, 0, nes.cpuram.wram, 0, nes.cpuram.wram.length);
 		// System.arraycopy(savestate.right, 0, nes.ppu.bitmap, 0, nes.ppu.bitmap.length);
 		input.close();
@@ -413,28 +366,9 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		nes.resume();
 	}
 
-	public static int[] unwind2DArray(int[][] arr)
-	{
-		int[] out = new int[arr.length * arr[0].length];
-		int i = 0;
-		for (int x = 0; x < arr[0].length; x++)
-		{
-			for (int y = 0; y < arr.length; y++)
-			{
-				out[i] = arr[y][x];
-				i++;
-			}
-		}
-		return out;
-	}
-
-	private ThreadLocal<NES>	nes	= new ThreadLocal<NES>();
-
 	@Override
-	public double getFitness(FeedforwardNetwork candidate, List<? extends FeedforwardNetwork> population)
-	{
-		if (nes.get() == null)
-		{
+	public double getFitness(FeedforwardNetwork candidate, List<? extends FeedforwardNetwork> population) {
+		if (nes.get() == null) {
 			nes.set(new NES(true));
 			nes.get().loadROM("C:\\Users\\Mitchell\\Desktop\\fceux-2.2.2-win32\\ROMs\\Super Mario Bros..nes");
 		}
@@ -467,8 +401,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 		int maxDistance = 0;
 		int timeout = 0;
 
-		while (true)
-		{
+		while (true) {
 			input.keyReleased(U);
 			input.keyReleased(D);
 			input.keyReleased(L);
@@ -494,14 +427,12 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			int points = (score / 5) + (time * 10) + (marioX / 4) + (lives * 500) + (level * 250) + (world * 2000);
 
 			timeout++;
-			if (marioX > maxDistance)
-			{
+			if (marioX > maxDistance) {
 				maxDistance = marioX;
 				timeout = 0;
 			}
 			// System.out.println("Lives: " + lives + " Timeout: " + timeout + " Distance: " + marioX);
-			if (lives <= 2 || timeout > 240 || marioState == 0x0B)
-			{
+			if (lives <= 2 || timeout > 240 || marioState == 0x0B) {
 				fitness = points;
 				break;
 			}
@@ -509,41 +440,32 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			final int[][] vision = new int[10][10];
 
 			for (int dx = -vision[0].length / 2; dx < vision[0].length / 2; dx += 1)
-				for (int dy = -vision.length / 2; dy < vision.length / 2; dy += 1)
-				{
+				for (int dy = -vision.length / 2; dy < vision.length / 2; dy += 1) {
 					int x = marioX + (dx * 16) + 8;
 					int y = marioY + (dy * 16) - 16;
 					int page = (int) FastMath.floor(x / 256) % 2;
 					int subx = (int) FastMath.floor((x % 256) / 16);
 					int suby = (int) FastMath.floor((y - 32) / 16);
 					int addr = 0x500 + page * 13 * 16 + suby * 16 + subx;
-					if (suby >= 13 || suby < 0)
-					{
+					if (suby >= 13 || suby < 0) {
 						// System.out.println("Outside level.");
 						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = 0;
-					}
-					else
-					{
+					} else {
 						// System.out.println("Block data at " + dx + ", " + dy + ": " + nes.cpuram.read(addr));
 						vision[dy + (vision.length / 2)][dx + (vision[0].length / 2)] = nes.getCPURAM().read(addr);
 					}
 				}
 
-			for (int i = 0; i <= 4; i++)
-			{
+			for (int i = 0; i <= 4; i++) {
 				int enemy = nes.getCPURAM().read(0xF + i);
-				if (enemy != 0)
-				{
+				if (enemy != 0) {
 					int ex = nes.getCPURAM().read(0x6E + i) * 0x100 + nes.getCPURAM().read(0x87 + i);
 					int ey = nes.getCPURAM().read(0xCF + i) + 24;
 					int enemyMarioDeltaX = (ex - marioX) / 16;
 					int enemyMarioDeltaY = (ey - marioY) / 16;
-					try
-					{
+					try {
 						vision[enemyMarioDeltaY + (vision.length / 2)][enemyMarioDeltaX + (vision[0].length / 2)] = -enemy;
-					}
-					catch (ArrayIndexOutOfBoundsException e)
-					{
+					} catch (ArrayIndexOutOfBoundsException e) {
 					}
 				}
 			}
@@ -551,14 +473,22 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 			int[] visionunwound = NESFitnessEvaluator.unwind2DArray(vision);
 			double[] reactions = candidate.evaluate(visionunwound);
 
-			if (reactions[0] > 0) input.keyPressed(U);
-			if (reactions[1] > 0) input.keyPressed(D);
-			if (reactions[2] > 0) input.keyPressed(L);
-			if (reactions[3] > 0) input.keyPressed(R);
-			if (reactions[4] > 0) input.keyPressed(A);
-			if (reactions[5] > 0) input.keyPressed(B);
-			if (reactions[6] > 0) input.keyPressed(SELECT);
-			if (reactions[7] > 0) input.keyPressed(START);
+			if (reactions[0] > 0)
+				input.keyPressed(U);
+			if (reactions[1] > 0)
+				input.keyPressed(D);
+			if (reactions[2] > 0)
+				input.keyPressed(L);
+			if (reactions[3] > 0)
+				input.keyPressed(R);
+			if (reactions[4] > 0)
+				input.keyPressed(A);
+			if (reactions[5] > 0)
+				input.keyPressed(B);
+			if (reactions[6] > 0)
+				input.keyPressed(SELECT);
+			if (reactions[7] > 0)
+				input.keyPressed(START);
 
 			nes.frameAdvance();
 		}
@@ -567,8 +497,7 @@ public class NESFitnessEvaluator implements FitnessEvaluator<FeedforwardNetwork>
 	}
 
 	@Override
-	public boolean isNatural()
-	{
+	public boolean isNatural() {
 		return true;
 	}
 }

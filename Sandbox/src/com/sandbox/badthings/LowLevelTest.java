@@ -6,11 +6,8 @@ import java.util.Random;
 
 import sun.misc.Unsafe;
 
-public class LowLevelTest
-{
-	public static void main(final String[] args) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-			IllegalAccessException, InvocationTargetException
-	{
+public class LowLevelTest {
+	public static void main(final String[] args) throws SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		final Constructor<Unsafe> unsafeConstructor = Unsafe.class.getDeclaredConstructor();
 		unsafeConstructor.setAccessible(true);
 		final Unsafe unsafe = unsafeConstructor.newInstance();
